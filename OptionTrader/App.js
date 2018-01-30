@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, BackHandler } from 'react-native';
+import { StyleSheet, Text, View, BackHandler, ToastAndroid } from 'react-native';
 import { TabNavigator } from 'react-navigation'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Show from './containers/Show'

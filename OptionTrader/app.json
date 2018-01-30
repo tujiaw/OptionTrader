@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Option Trader",
-    "slug": "option-trader",
+    "slug": "optiontrader",
     "sdkVersion": "25.0.0",
      "android": {
         "package": "com.example.OptionTrader"
