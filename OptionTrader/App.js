@@ -5,6 +5,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Show from './containers/Show'
 import Edit from './containers/Edit'
 import Me from './containers/Me'
+import { Provider } from 'react-redux'
+import store from './utils/store'
 
 const MainTab = TabNavigator(
   {
@@ -93,7 +95,9 @@ class App extends React.Component {
 
   render() {
     return (
-      <MainTab />
+      <Provider store={store}>
+        <MainTab />
+      </Provider>
     )
   }
 }

@@ -5,7 +5,7 @@ export default class Edit extends React.Component {
   render() {
     return (
       <View style={styles.root}>
-        <Text>Edit</Text>
+        <Text>Edit ok</Text>
       </View>
     )        
   }

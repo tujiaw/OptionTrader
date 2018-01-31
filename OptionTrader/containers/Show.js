@@ -1,10 +1,11 @@
 import React from 'react'
 import { StyleSheet, View, Text, SectionList } from 'react-native'
+import { connect } from 'react-redux'
 import MainHeader from '../components/MainHeader'
 import MarketItem from '../components/MarketItem'
 import OrderItem from '../components/OrderItem'
 
-export default class Show extends React.Component {
+class Show extends React.Component {
   state = {
     mainHeaderData: {},
     dataList: [
@@ -57,6 +58,14 @@ export default class Show extends React.Component {
   }
 }
 
+function mapStateToProps(state) {
+  return {capitalStateData: state.capitalStateData}
+}
+
+function mapDispatchToProps(dispatch) {
+  return {}
+}
+
 const styles = StyleSheet.create({
   root: {
     flex: 1,
@@ -66,3 +75,5 @@ const styles = StyleSheet.create({
   list: {
   }
 })
+
+export default connect(mapStateToProps, mapDispatchToProps)(Show)
