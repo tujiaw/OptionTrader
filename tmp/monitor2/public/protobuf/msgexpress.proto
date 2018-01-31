@@ -1,0 +1,200 @@
+package MsgExpress;
+
+option java_package = "com.sumscope";
+option java_outer_classname = "MsgExpress";
+
+message ErrMessage {
+  required int32 errcode = 1;
+  required string errmsg = 2;
+}
+
+message StartupApplication { //
+  required string exefullname = 1;
+  repeated string args = 2;
+}
+
+message StopBroker { //
+  optional string dummy = 1;
+}
+
+message CommonResponse { //
+  required int32 retcode = 1;
+  optional string msg = 2;
+}
+
+message LoginInfo {
+  optional int32  type = 1;
+  optional string name = 2;
+  optional int32  group = 3;
+  optional string  uuid = 4;
+  optional string auth = 5;
+  optional int64 starttime = 6;
+  repeated int32 serviceid = 7;
+  optional string ip = 8;
+}
+
+message LoginResponse {//
+  optional int32 addr = 1;
+}
+
+message Logout {
+  optional int32 reserve = 1;
+}
+
+message GetAppList {
+  repeated int32 serviceid = 1;
+}
+
+message GetAppInfo {
+  required int32 addr = 1;
+}
+
+enum AppStatus {
+  None = 0 ;
+  Connected = 1 ;
+  Authing = 2;
+  Authed =3;
+}
+
+message AppInfo {
+  required LoginInfo loginInfo = 1;
+  required int32 addr = 2;
+  optional int64 logintime = 3;
+  optional AppStatus status = 4;
+  optional string token = 5;
+}
+
+message UpdateAppStatus {
+  required int32 addr = 1;
+  required AppStatus status = 2;
+  required string token = 3;
+}
+
+message AppList {
+  repeated AppInfo appinfo = 1;
+}
+
+message KickOffApp {
+  required int32 addr = 1;
+}
+
+message HeartBeat {
+  optional int32  cpu = 1;
+  optional int32  topmemory = 2;
+  optional int32  memory = 3;
+  optional int32  sendqueue = 4;
+  optional int32  receivequeue = 5;
+}
+message HeartBeatResponse {
+  required int32 retcode = 1;
+}
+
+enum DataType {
+  STRING = 1;
+  INT32 = 2;
+  UINT32 = 3;
+  INT64 = 4;
+  UINT64 = 5;
+  FLOAT = 6;
+  DOUBLE = 7;
+  DATETIME = 8;
+  BINARY = 9;
+  BOOL = 10;
+}
+
+
+
+message Complex {
+  required int64 a = 1;
+  required bytes b = 2;
+}
+
+message DataItem {
+  required int32 key = 1;
+  required DataType type = 2;
+  repeated bytes value = 3;//将要废弃
+  repeated string strVal = 4;
+  repeated int32 iVal = 5;
+  repeated uint32 uiVal = 6;
+  repeated int64 lVal = 7;
+  repeated uint64 ulVal = 8;
+  repeated float fVal = 9;
+  repeated double dVal = 10;
+  repeated bool bVal = 11;
+  repeated bytes rawVal = 12;
+  repeated uint64 tVal = 13;
+  repeated Complex compVal = 14;
+  optional bool isPK = 20;//是否作为Primary Key,存储和查询的时候用
+}
+
+enum Operator {
+  Equal = 1;
+  NotEqual = 2;
+  Less = 3;
+  LessOrEqual = 4;
+  Bigger = 5;
+  BiggerOrEqual = 6;
+}
+
+message ConditionValue {
+  required Operator operator = 1;
+  required bytes value = 2;
+}
+
+message ConditionItem {
+  required int32 key = 1;
+  required DataType type = 2;
+  repeated ConditionValue value = 3;
+}
+
+message SimpleSubscription {
+  repeated int32 topic = 1;
+}
+
+message SubscribeData {
+  required int32 subid = 1;
+  required int32 topic = 2;
+  repeated DataItem condition = 3;
+  repeated ConditionItem excondition = 4;
+  repeated int32 index = 5;
+  optional int32 useraddr = 6[default=0];
+}
+
+message UnSubscribeData {
+  required int32 subid = 1;
+  optional int32 useraddr = 2[default=0];
+}
+
+message ComplexSubscribeData {
+  repeated UnSubscribeData unsub = 1;
+  repeated SubscribeData sub = 2;
+}
+
+message PublishData {
+  required int32 topic = 1;
+  repeated DataItem item = 2;
+  repeated int32 subid = 3;
+  optional string uuid = 4;
+  optional uint64 id = 5;
+}
+
+message TokenInfo
+{
+  required bytes token = 1;
+  required int64 userid=2;
+}
+
+message Header
+{
+  required int32 packageType = 1;//Request=1,Response,Publish
+  optional int32 iszip=2;
+  optional int32 compratio=3;
+  required int32 serialnum=4;
+  required int32 command=5;
+}
+message Pack
+{
+  required Header header=1;
+  required bytes body=2;
+}
+

@@ -1,0 +1,518 @@
+package AccountServer;
+
+// 获取公司性质列表
+message ReqGetNatureList
+{	
+}
+
+message ResGetNatureList
+{
+	required int32 result = 1;			// errcode
+	optional string error_desc = 2;		// 错误描述
+	repeated string id = 3;				// 公司性质ID
+	repeated string name = 4;			// 公司性质名称
+}
+
+// 手机账户登录接口
+message ReqLogin
+{
+	required string loginName = 1;		// 登录名
+	required string password = 2;		// 密码
+	required string productCode = 3;		// 产品代码
+	optional string clientIp = 4;		// 客户端IP
+	optional string clientMac = 5;		// 客户端MAC
+	optional string clientType = 6;		// 客户端类型
+	required string clientEquip = 7;		// 客户端设备
+	repeated MsgClientInfo clientInfo = 8;	// 升级所需key/value信息
+	optional string deviceId = 9;			// register device id
+	optional uint32 mobileStatus = 10;		// 1:allow push message 0:disallow push message
+}
+
+message MsgClientInfo
+{
+	enum CLIENT_KEY
+	{
+		CHANNEL		= 1;
+		PLATFORM	= 2;
+		PRODUCT		= 3;
+		VERSION		= 4;
+		TERMINAL	= 5;
+		OSVERSION	= 6;		
+	}
+	enum CHANNEL_TYPE
+	{
+		ASSIST_91			= 1;
+		APPSTORE			= 2;
+		MOBILE_ASSIST_360	= 3;
+		ANDROID_MARKET		= 4;
+		SUMSCOPE_INTERNAL	= 255;
+		SUMSCOPE_OFFICIAL	= 0;
+	}
+	enum PLATFORM_TYPE
+	{
+		ANDROID				= 1;
+		IOS					= 2;
+		WINDOWS_PHONE		= 3;
+	}
+	enum PRODUCT_TYPE
+	{
+		QUOTEBORAD		= 1;
+		QM				= 2;
+	}
+	enum TERMINAL_TYPE
+	{
+		PC				= 1;
+		MOBILE			= 2;
+	}
+	required CLIENT_KEY key = 1;
+	required string value = 2;
+}
+
+message ResLogin
+{
+	required int32 result = 1;			// errcode
+	optional string error_desc = 2;
+	optional string token = 3;			// 登录令牌,会话ID
+	optional string id = 4;				// 账户ID 
+	optional uint64 userid = 5;			// QM userid
+}
+
+// PC登录接口
+message ReqNewLogin
+{
+	required string loginName = 1;		// 登录名
+	required string password = 2;		// 密码
+	optional bool bMonitor = 3;			// 是否监控账户登录
+}
+
+message ResNewLogin
+{
+	required int32 result = 1;			// errcode
+	optional string error_desc = 2;
+	optional string token = 3;			// 登录令牌,会话ID
+	optional string id = 4;				// 账户UUID
+	optional int64 userid = 5;			// 账户64位整型ID
+}
+
+// 账户登出
+message ReqLogout
+{
+	optional string token = 1;			// 登录令牌,会话ID
+	optional string deviceId = 2;		// 禁用的手机设备ID
+}
+
+message ResLogout
+{
+	required int32 result = 1;			// errcode
+	optional string error_desc = 2;
+}
+
+// 验证会话是否有效
+message ReqSessionValid
+{
+	required string token = 1;		// 登录令牌,会话ID
+}
+
+message ResSessionValid
+{
+	required int32 result = 1;	//errcode
+	optional string error_desc = 2;
+	optional int64 userid = 3;
+}
+
+// 查询城市名
+message ReqCity
+{
+	required string name = 1;	// 城市名,代码或拼音
+}
+
+message ResCity
+{
+	required int32 result = 1;		//errcode
+	optional string error_desc = 2;
+	repeated string cityName = 3;	// 城市名列表
+}
+
+// 查询正式金融公司名称
+message ReqFinancialCompany
+{
+	required string name = 1;	// 公司全称,简称或拼音
+}
+
+message ResFinancialCompany
+{
+	required int32 result = 1;		//errcode
+	optional string error_desc = 2;
+	repeated string companyName = 3;	// 公司名
+}
+
+// 获取账户64位整型ID
+message ReqGetUserIdBySession
+{
+	required string token = 1;				// 登录令牌,会话ID
+}
+
+message ResGetUserIdBySession
+{
+	required int32 result = 1;			//errcode
+	optional string error_desc = 2;
+	optional uint64 userId = 3;		// 账户64位整型ID
+}
+
+// 通过会话ID获取账户ID
+message ReqGetAccountIdBySession
+{
+	required string token = 1;
+}
+
+message ResGetAccountIdBySession
+{
+	required int32 result = 1;			//errcode
+	optional string error_desc = 2;
+	optional string accountId = 3;
+}
+
+// 获取账户CDC权限
+message ReqGetCDC
+{
+	required string token = 1;
+}
+
+message ResGetCDC
+{
+	required int32 result = 1;			//errcode
+	optional string error_desc = 2;
+	optional string cdc = 3;			// cdc 1:授权 2：未授权
+}
+
+// 获取账户CDC权限和中介公司白名单列表
+message ReqGetCDCAndCompany
+{
+	required string token = 1;
+}
+
+message ResGetCDCAndCompany
+{
+	required int32 result = 1;			//errcode
+	optional string error_desc = 2;
+	optional string cdc = 3;			// cdc 1:授权 2：未授权
+	repeated MsgBrokerCompanyDetail companyIdList = 4;	// 中介公司ID列表
+}
+
+// 获取账户CDC权限和中介公司列表
+message ReqCDCAndCompanyList
+{
+	required string accountId = 1;
+}
+
+message ResCDCAndCompanyList
+{
+	required int32 result = 1;			//errcode
+	optional string error_desc = 2;
+	optional string cdc = 3;			// cdc 1:授权 2：未授权
+	repeated MsgBrokerCompanyDetail companyIdList = 4;	// 中介公司ID列表
+}
+
+// 获取账户中介公司白名单列表
+message ReqBrokerCompanyList
+{
+	required string token = 1;
+}
+
+message ResBrokerCompanyList
+{
+	required int32 result = 1;			//errcode
+	optional string error_desc = 2;
+	repeated MsgBrokerCompanyDetail companyIdList = 3;	// 中介公司ID列表
+}
+
+message MsgBrokerCompanyDetail
+{
+	required string id = 1;
+	optional string name = 2;
+	optional string code = 3;
+	optional string nameEn = 4;
+	repeated MsgBrokerCompanyContact contact = 5;
+}
+
+message MsgBrokerCompanyContact
+{
+	optional string name = 1;
+	optional string tel = 2;
+	optional string dept = 3;
+	optional string qq = 4;
+	optional string rm = 5;
+}
+
+//获取账户信息
+message ReqGetAccountInfo
+{
+	required string accountId = 1;
+}
+
+message ResGetAccountInfo
+{
+	required int32 result = 1;			//errcode
+	optional string error_desc = 2;
+	optional MsgAccountInfo accountInfo = 3;
+}
+
+message MsgAccountInfo
+{
+	optional string username = 1;
+	optional string displayName = 2;
+	optional string mobile = 3;
+	optional string msn = 4;
+	optional string qq = 5;
+	optional string address = 6;
+	optional string rm = 7;
+	optional string telephone = 8;
+	optional string companyName = 9;
+}
+
+// 激活账户
+message ReqActiveAccount
+{	
+	required string loginName = 1;		// 登录名
+	required string device = 2;			// 设备ID
+}
+
+message ResActiveAccount
+{
+	required int32 result = 1;			//errcode
+	optional string error_desc = 2;
+}
+
+// 验证账户登录名和密码是否正确
+message ReqAccountValid
+{
+	required string loginName = 1;
+	required string password = 2;
+}
+
+message ResAccountValid
+{
+	required int32 result = 1;			//errcode
+	optional string error_desc = 2;
+}
+
+// 请求排序中介公司
+message ReqSortBrokerCompany
+{
+	required string accountId = 1;
+	repeated MsgBrokerCompany brokerCompanyInfo = 2;
+}
+
+message MsgBrokerCompany
+{
+	required string id = 1;
+	required int32 index = 2;
+}
+
+message ResSortBrokerCompany
+{
+	required int32 result = 1;			//errcode
+	optional string error_desc = 2;
+}
+
+// 请求获取客户经理信息
+message ReqClientManagerInfo
+{
+	required string loginName = 1;
+}
+
+message ResClientManagerInfo
+{
+	required int32 result = 1;			//errcode
+	optional string error_desc = 2;
+	optional MsgClientManager clientManagerInfo = 3;
+}
+
+message MsgClientManager
+{
+	optional string id = 1;
+	optional string name = 2;
+	optional string mobile = 3;
+	optional string telephone = 4;
+	optional string email = 5;
+	optional string hotline = 6;
+}
+
+// 获取账户手机号
+message ReqGetMobile
+{
+	required string loginName = 1;
+}
+
+message ResGetMobile
+{
+	required int32 result = 1;			//errcode
+	optional string error_desc = 2;
+	optional string mobile = 3;
+}
+
+//  移除手机账户白名单
+message ReqRemoveAccountUnlimited
+{
+	required string loginName = 1;
+}
+
+message ResRemoveAccountUnlimited
+{
+	required int32 result = 1;			//errcode
+	optional string error_desc = 2;
+}
+
+message ReqTestConnection
+{
+	
+}
+
+message ResTestConnection
+{
+	required int32 result = 1;			//errcode
+	optional string error_desc = 2;
+}
+
+// 更新手机推送状态
+message ReqUpdateMobileStatus
+{
+	required uint64 userId = 1;
+	optional uint32 mobileStatus = 2;		// 1:allow push message 0:disallow push message
+}
+
+message ResUpdateMobileStatus
+{
+	required int32 result = 1;			//errcode
+	optional string error_desc = 2;
+}
+
+// 移除手机推送设备信息
+message ReqRemoveMobileDevice
+{
+	repeated string deviceId = 1;
+}
+
+message ResRemoveMobileDevice
+{
+	required int32 result = 1;			//errcode
+	optional string error_desc = 2;
+}
+
+// 创建监控账户
+message ReqCreateMonitor
+{
+	required string username = 1;
+	required string password = 2;		// md5
+	required string companyId = 3;
+	optional string right = 4;			// 监控账户权限
+	optional string rightdesc = 5;		// 监控账户权限描述
+}
+
+message ResCreateMonitor
+{
+	required int32 result = 1;			//errcode
+	optional string error_desc = 2;
+	optional string accountId = 3;
+}
+
+// 更新监控账户信息
+message ReqUpdateMonitor
+{
+	required string accountId = 1;
+	optional string oldPassword = 2;		// md5
+	optional string newPassword = 3;		// md5
+	optional string companyId = 4;
+	optional string right = 5;			// 监控账户权限
+	optional string rightdesc = 6;		// 监控账户权限描述
+}
+
+message ResUpdateMonitor
+{
+	required int32 result = 1;			//errcode
+	optional string error_desc = 2;
+}
+
+// 获取监控账户信息
+message ReqGetMonitorInfo
+{
+	required string accountId = 1;
+}
+
+message ResGetMonitorInfo
+{
+	required int32 result = 1;			//errcode
+	optional string error_desc = 2;
+	optional string companyId = 3;
+	optional string right = 4;			// 监控账户权限
+	optional string rightdesc = 5;		// 监控账户权限描述
+}
+
+// 通过登录名获取用户ID
+message ReqGetUserIdByName
+{
+	repeated string usernameList = 1;
+}
+
+message ResGetUserIdByName
+{
+	required int32 result = 1;			//errcode
+	optional string error_desc = 2;
+	repeated uint64 userIdList = 3;
+}
+
+// 通过用户ID获取登录名
+message ReqGetUserNameByUserId
+{
+	repeated uint64 userIdList = 1;
+}
+
+message ResGetUserNameByUserId
+{
+	required int32 result = 1;			//errcode
+	optional string error_desc = 2;
+	repeated string usernameList = 3;
+}
+
+// 获取监控账户列表信息
+message ReqGetMonitorList
+{
+}
+
+message ResGetMonitorList
+{
+	required int32 result = 1;			//errcode
+	optional string error_desc = 2;
+	repeated MsgMonitor monitorList = 3;	
+}
+
+message MsgMonitor
+{
+	required string accountId = 1;
+	optional string username = 2;
+	optional string companyId = 3;
+	optional string companyName = 4;
+	optional string right = 5;			// 监控账户权限
+	optional string rightdesc = 6;		// 监控账户权限描述
+}
+
+// 请求手机账户权限
+message ReqAccountPermission
+{
+	required string accountid = 1;
+	optional int32 platform = 2;		 // 0:mobile 1:pc
+}
+
+message ResAccountPermission
+{
+	required int32 result = 1;			//errcode
+	optional string error_desc = 2;
+	repeated MsgPermission permission = 3;
+}
+
+message MsgPermission
+{
+	optional string id = 1;
+	optional string code = 2;
+	optional string permissionvalue = 3;
+}

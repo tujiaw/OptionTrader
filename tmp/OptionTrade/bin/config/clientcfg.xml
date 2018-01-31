@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- 配置AppServer 和 AppClient	的配置文件 -->
+<configuration>
+	<!-- appName 的基本信息 -->
+  <client>
+    <appName>C#_Test</appName>
+    <appType>1</appType>
+    <appGroup>1</appGroup>
+    <uuid>C#_Test</uuid>
+    <auth>test</auth>
+    <serviceList>
+    </serviceList>  
+	<subscribeList>
+	  <topic>267386881</topic>
+	  <topic>931135498</topic>
+	  <topic>931135499</topic>
+	  <topic>931135500</topic>
+	  <topic>931135501</topic>
+	  <topic>931135502</topic>
+	  <topic>931135503</topic>
+    </subscribeList>
+  </client>
+  <serverGroup>
+	<!-- 消息总线的地址和端口 （broker） -->
+	<server  IP="47.100.7.224" port="55555"></server> 
+	<!--<server  IP="127.0.0.1" port="8888"></server>-->
+  </serverGroup>
+  <heartbeat>
+      <maxHeartBeatTick>5</maxHeartBeatTick>
+      <hearbeatinterval>5000</hearbeatinterval>
+      <brokeninterval>3000</brokeninterval>
+      <switch>1</switch>
+  </heartbeat>
+  <zlib>
+	  <switch>1</switch>
+	  <threshold>1024</threshold>
+  </zlib>
+  <connection>
+      <timeout>6000</timeout>
+  </connection>
+  <performance>
+      <threadNum>4</threadNum>
+      <buffersize>100000</buffersize>
+      <recvqueuesize>10000</recvqueuesize>
+      <sendqueuesize>10000</sendqueuesize>
+  </performance>
+ <log>
+    <level>2</level>
+    <filename>log</filename>
+    <report>0</report>
+    <reportlevel>3</reportlevel>
+  </log>
+</configuration>

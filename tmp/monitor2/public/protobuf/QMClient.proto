@@ -1,0 +1,349 @@
+package QMClient;
+
+option java_package = "com.sumscope.QM.Client";
+option java_outer_classname = "QMClient";
+
+// 债券类型
+enum EBondType
+{
+	Bond_Type_Begin           = -1;                     
+	Bond_Type_National        = 0;     // 国债
+	Bond_Type_Center          = 1;     // 央票
+	Bond_Type_Financial       = 2;     // 金融债
+	Bond_Type_Municipals      = 3;     // 地方债
+	Bond_Type_ShortFinancial  = 4;     // 短融
+	Bond_Type_Ticket          = 5;     // 中票
+	Bond_Type_Enterprise      = 6;     // 企业债
+	Bond_Type_Others          = 7;     // 其他
+	Bond_Type_NFRate          = 8;     // 浮息债
+	Bond_Type_Municp          = 9;     // 城投债
+	Bond_Type_All             = 10;    // 
+	Bond_Type_End             = 11;     
+}
+
+// 好友请求处理状态
+enum EAddRequestStatus
+{
+	AddRequestStatus_Not_Handle = 0;
+	AddRequestStatus_Accept     = 1;        
+	AddRequestStatus_Refused    = 2;
+}
+
+// 隐私策略
+enum EPrivatePolicy
+{
+	PrivatePolicy_Public          = 0;                 
+	PrivatePolicy_PublicToFriends = 1;
+	PrivatePolicy_Secret          = 2;
+}
+
+// 联系人分组类型
+enum EUserShowType
+{
+	EUserShow_Group     = 0;  // 自定义
+	EUserShow_Company   = 1;  // 公司
+	EUserShow_OrgType   = 2;  // 机构类型
+	EUserShow_Province  = 3;  // 省份
+}
+
+// 提醒结构体
+message AlertInfo {
+	required string name = 1;            // 提醒名称
+	repeated string keyWord = 2;         // 提醒关键字
+	required bool isAll = 3;             // 是否全局提醒
+	repeated uint64 userId = 4;          // 联系人列表
+	repeated string company = 5;        // 公司列表
+	repeated uint64 roomId = 6;          // 群列表
+	required bool isHighLight = 7;       // 是否高亮显示
+	required int32 colorIndex = 8;       // 颜色方案
+	required bool isAudio = 9;           // 是否声音提醒
+	required bool isShowAlertWnd = 10;   // 是否悬浮框提醒
+	required bool isEnable = 11;         // 是否启用
+}
+message AlertInfoList {
+	repeated AlertInfo info = 1;         // 提醒列表
+}
+
+// 常用联系人
+message FavoriteRosters {
+	repeated uint64 rosterId = 1;        // 联系人ID，用户或者群
+}
+
+// 设置
+message SettingInfo {
+	required bool bShowLastMsg = 1;                  // 当前消息中显示最新一条消息
+	required bool bShowHeader = 2;                   // 是否显示头像
+	required bool bStopStrangerMsg = 3;              // 屏蔽陌生人消息
+	required uint32 rosterShowType = 4;              // 联系人显示类型
+	required uint32 autoChangeType = 5;              // 鼠标键盘无动态，自动切换离开状态的类型
+	required bool bAutoReplyWhenLeave = 6;           // 离开或忙碌自动回复
+	required string autoReplyMsg = 7;                // 自动回复消息列表
+	required uint32 autoReplyIndex = 8;              // 当前选择的自动应答索引
+	required string shortCutMainWnd = 9;             // 弹出主窗口快捷键
+	required string shortCutCloseAllPopWnd = 10;     // 关闭所有弹出窗口快捷键
+	required string shortCutShowUnReadMsg = 11;      // 查看未读消息快捷键
+	required string shortCutShot = 12;               // 截图快捷键
+	required uint32 phonePolicy = 13;                // 电话隐私策略
+	required uint32 emailPolicy = 14;                // 邮件隐私策略	
+	repeated uint32 bondColor = 15;                  // 债券类型颜色
+	required uint32 fontSize = 16;                   // 字体大小
+	required uint32 fontColor = 17;                  // 字体颜色
+	optional uint32 showPercent = 18;                // 显示比例
+	optional uint32	groupType  = 19;                 // 分组类型
+}
+
+// 消息内容的类型
+enum EMessageBodyType {
+    MSG_Body_Type_TEXT                = 0; // 文本 --> 以前版本版本用
+    MSG_Body_Type_Emoticon            = 1; // 系统表情 --> 如“:/face/17.png” ，在common\skin\sysface\face.xml 内name字段的值 --> 以前版本版本用
+    MSG_Body_Type_PIC                 = 2; // 图片 --> PicSendInfo
+    MSG_Body_Type_File                = 3; // 文件 --> FileSendInfo
+    MSG_Body_Type_Shake               = 4; // 抖动 --> nothing  --> 以前版本版本用
+    MSG_Body_Type_RoomCard            = 5; // 群名片 --> RoomCardInfo
+	MSG_Body_Type_QB_QuoteMoney       = 6; // 资金报价 --> QuotationMoneyInfo
+	MSG_Body_Type_QB_QuoteConditions  = 7; // 条件报价 --> 
+	MSG_Body_Type_QB_QuoteBond        = 8; // 债券报价 --> QuotationBondInfo
+	MSG_Body_Type_QB_Contacts         = 9; // 群发人员(后续开发者废弃不用，因之前有版本使用，暂兼容处理)
+	MSG_Body_Type_EnhancedTEXT        = 10; // 加强版文本 --> TxtContent
+    MSG_Body_Type_EnhancedEmoticon    = 11; // 加强版系统表情 --> SysEmotionInfo
+	MSG_Body_Type_EnhancedShake       = 12; // 加强版抖动 --> ShakeInfo
+	MSG_Body_Type_FinancialNews       = 13; // 新闻资讯-财经头条 --> FinancialNewsInfo
+	MSG_Body_Type_OrganizationNotice  = 14; // 机构通知 --> OrganizationNoticeInfo  当服务器更新使用此消息时，消息内容为双份，先新后旧。注：当先解析此消息类型时 MSG_Body_Type_EnhancedTEXT 内的 TxtType_Organization 消息不解析，否则此消息不解析
+	MSG_Body_Type_NEWBONDPUSH         = 15; // 新券推送 --> BondPushInfo
+	MSG_Body_Type_BONDTXT             = 16; // 机构信息 --> BondTxtMsg
+}
+
+// 消息内容结构
+message MessageBody {
+	required uint32 type     = 1;     // 消息内容的类型 -- 此处不直接设置为EMessageBodyType
+	required bytes msg       = 2;     // 消息内容
+	optional string basiccontent = 3; // 基本消息内容
+}
+
+enum MessageBodyListType {
+	MSG_Basic = 0; // 基本消息类型
+	MSG_MassGroup = 1; // 群发助手消息类型  --> ContactInfoSnap
+	MSG_Robot = 2; // 机器小传消息类型 --> RobotMessageInfo
+}
+
+message MessageBodyList {
+	repeated MessageBody bodyList = 1;               // 消息列表
+	optional uint32 bodyListType  = 2;   // 消息列表消息类型 - MessageBodyListType
+	optional bytes ExtendContent  = 3; // 扩展字段 --> 根据bodyListType确定结构 如MessageBodyListType内标注
+	optional bool ServerSent      = 4;// 服务器代发
+}
+
+enum TxtContentType {
+	TxtType_Basic = 0; // 普通文本消息 --> string
+	TxtType_Organization = 1; // 机构回复 --> TxtOrganization  注：当先解析此消息类型时 MSG_Body_Type_OrganizationNotice 消息不解析，否则此消息不解析
+}
+
+// 文本消息
+message TxtContent {
+	required bytes content    = 1;                  // 文本消息内容
+	optional uint32 type       = 2;                  // 文本类型 --> TxtContentType
+}
+
+enum TxtOrganizationType {
+	OrgType_Basic     = 0; // 普通文本  --> string
+	OrgType_Subscribe = 1; // 订阅文本 --> QuotationBondBrief
+	OrgType_Price     = 2; // 报价文本 --> QuotationBondBrief
+	OrgType_NoPrice   = 3; // 暂无报价文本 --> QuotationBondBriefList
+	OrgType_PriceRange= 4; // 一级分销券区间变动等信息 --> BondReminderInfo
+}
+
+message QuotationBondBrief {
+	required string combBondKey   = 1;  // 债券code 交互用 如查找债券信息
+	required uint32 bondType      = 2;  // EBondType 债券类型  
+	required string companyId     = 3;  // 公司id
+	required string bondShowname  = 4;  // 债券名称
+	optional string bid           = 5;  // 买 价格
+    optional string volBid        = 6;  // 买 数量
+    optional string ofr           = 7;	// 卖 价格
+    optional string volOfr		  = 8;  // 卖 数量
+}
+
+message QuotationBondBriefList {
+	repeated QuotationBondBrief bondbriefs = 1; // 文本债券集合
+}
+
+message BondReminderInfo {
+	required QuotationBondBrief bondbrief = 1; // 债券信息
+	optional string distributors          = 2; // 分销商
+	optional string remindertxt           = 3; // 提醒信息文本
+}
+
+// 机构回复 文本
+message TxtOrganization {
+	required bytes content    = 1;                  // 文本消息内容
+	optional uint32 type       = 2;                  // 回复类型 --> TxtOrganizationType
+}
+
+enum EmotionType {
+	Emotion_Self = 0; // 自定义表情 -- 暂时走的图片流程
+	Emotion_Sysbasic = 1; // 系统表情开始
+}
+
+// 系统表情
+message SysEmotionInfo {
+	required string emotion    = 1;                  // 系统表情 如“:/face/17.png” ，在common\skin\sysface\face.xml 内name字段的值
+	required uint32 type       = 2;                  // 系统表情类型 -- EmotionType
+}
+
+// 图片传输参数
+message PicSendInfo {
+	optional bytes content     = 1;                  // 缩略图二进制内容
+	optional string uuid       = 2;                  // uuid
+	optional string filePath   = 3;                  // 图片文件全路径
+	optional uint32 totalSize  = 4;                  // 文件总大小
+	optional string extName    = 5;                  // 后缀名
+	optional uint32 keyServer  = 6;                  // 加密服务器
+	optional uint64 keyId      = 7;                  // 加密Key
+}
+
+// 文件传输参数
+message FileSendInfo {
+	required string uuid       = 1;                  // uuid
+	required string fileName   = 2;                  // 文件名称
+	required string filePath   = 3;                  // 本地存储全路径
+	required uint32 totalSize  = 4;                  // 文件总大小
+	required uint32 doneSize   = 5;                  // 已完成大小
+	optional uint64 fileMsgId  = 6;                  // 文件消息ID
+	optional uint32 statusSend = 7;                  // 发送方状态
+	optional uint32 statusRecv = 8;                  // 接收方状态
+	optional uint32 keyServer  = 9;                  // 加密服务器
+	optional uint64 keyId      = 10;                 // 加密Key
+}
+
+// 抖动类型
+enum ShakeType {
+	Shake_Normal = 0; // 普通
+	//Shake_Force  = 1; // 强制抖动
+}
+// 抖动
+message ShakeInfo {
+	optional uint32 type       = 1;                  // 抖动类型 - ShakeType
+}
+
+// 群名片
+message RoomCardInfo {
+	required uint64 roomId     = 1;                  // 群ID
+	optional string roomName   = 2;                  // 群名称
+	optional string alias      = 3;                  // 群号
+	optional string ownerName  = 4;                  // 群主名称
+	optional uint32 totalNum   = 5;                  // 总人数
+}
+
+// 报价类型
+enum EQuotationOpType
+{
+	Quotation_Op_Pub    = 0;  // 发布报价
+	Quotation_Op_Cancel	= 1;  // 撤销报价
+	Quotation_Op_Rsp    = 2;  // 回复报价
+};
+
+message QBMultiStr {
+	required string display  = 1;
+	optional string val      = 2;
+}
+
+message QBTerm {
+	required string display    = 1;
+	optional int32 termType    = 2;
+	repeated string valList    = 3;
+}
+
+// Money报价信息
+message QuotationMoneyInfo {
+	required string quotationID     = 1;           // 报价ID
+	optional QBMultiStr direct      = 2;           // 方向
+	optional QBMultiStr assetsType  = 3;           // 资产
+	repeated QBTerm term            = 4;           // 期限
+	optional QBMultiStr count       = 5;           // 数量
+	optional QBMultiStr price       = 6;           // 价格
+	repeated QBMultiStr tags        = 7;           // 标签
+	optional string memo            = 8;           // 备注
+	optional uint32 type            = 9;           // 报价操作类型 --> EQuotationOpType
+	optional string postScript      = 10;          // 附言
+	optional uint64 timeExpiration  = 11;          // 撤销时间
+}
+
+// 群发助手扩展信息
+message ContactInfoSnap {
+	repeated uint64 id       = 1;        // 联系人ID，用户或者群
+	repeated string name     = 2;
+	repeated string company  = 3;
+}
+
+// 机器小转
+message RobotMessageInfo {
+	required uint64 id                         = 1;         // 联系人ID
+	required string name                       = 2;         // 用户名称
+	required string orgname                    = 3;         // 用户机构简称
+	optional string sayextend                  = 4;         // 扩展字段（说道：）
+	optional string autoextend                 = 5;         // 扩展字段（自动回复：）
+	repeated MessageBody bodyList              = 6;         // 自动回复
+}
+
+message BondInfo {
+	required string combBondKey   = 1;  // 债券code 交互用 如查找债券信息
+	optional string market        = 2;  // 市场方向              
+	optional string bondId        = 3;  // 债券ID 展示用       
+	optional string shortName     = 4;  // 债券简称          
+	optional string shortPinYin   = 5;  // 债券简拼           
+	optional string allPinYin     = 6;  // 债券全拼            
+	optional string term          = 7;  // 期限               
+	optional string issuerRating  = 8;  // 评级     
+	optional uint32 bondType      = 9;  // EBondType 债券类型  
+	optional string bondShowname  = 10; // 债券界面展示名称，按照规则 
+	optional string biddingrange  = 11; // 投标区间
+	optional string tenderCloseTime  = 12; // 截标时间
+}
+
+// Bond报价信息
+message QuotationBondInfo {
+	required string quotationID          = 1;      // 报价ID
+    optional string bid                  = 2;      // 买 价格
+    optional string volBid               = 3;      // 买 数量
+    optional string ofr                  = 4;	   // 卖 价格
+    optional string volOfr				 = 5;      // 卖 数量
+    optional string memo				 = 6;      // 备注
+    optional uint64 timeQuote    	     = 7;      // 报价时间
+    optional uint64 timeExpiration	     = 8;      // 撤销时间
+	optional int32 typeCancel            = 9;      // 撤销计时类型
+    repeated QBMultiStr tags	         = 10;     // 标签
+    optional BondInfo bondInfo           = 11;     // 债券信息
+    optional string companyId			 = 12;     // 公司机构id
+	optional string postScript           = 13;     // 附言
+	optional uint32 typeOp               = 14;     // 报价操作类型 --> EQuotationOpType
+}
+
+// 新闻资讯-财经头条
+message FinancialNewsInfo {
+	required int32 type         = 1;   // 资讯消息类型 --> FinancialNewsType
+	optional bytes content      = 2;   // 资讯内容
+}
+enum FinancialNewsType {
+	News_Txt    = 0; // 纯展示文本 --> 无
+}
+
+
+// 机构通知
+message OrganizationNoticeInfo {
+	required int32 type        = 1;   // 机构通知类型 --> TxtOrganizationType
+	optional bytes content     = 2;   // 通知内容
+}
+
+// 新券推送 --> BondPushInfo
+message BondPushInfo {
+	repeated BondInfo bondInfos   = 1;     // 债券信息
+	optional string title = 2; // 标题
+	optional string content = 3; // 附加资讯
+}
+
+// 机构信息 --> BondTxtMsg
+message BondTxtMsg {
+	optional string title = 1; // 标题
+	optional string content = 2; // 内容
+}
+

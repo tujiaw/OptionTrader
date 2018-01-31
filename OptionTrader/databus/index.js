@@ -1,5 +1,5 @@
 
-import { wsip, wsport, path } from '../config'
+import Config from '../config'
 import * as Cons from './command'
 import { timestampformat } from '../utils/tools'
 var databus = require('./databus')
@@ -80,7 +80,7 @@ function subscribeList(subList, topicList) {
  */
 export function startWebSocket() {
   return new Promise((resolve, reject) => {
-      databus.connect(wsip, wsport, path, {
+      databus.connect(Config.wsip, Config.wsport, Config.path, {
 				onConnectSuccess: function() {
 					databus.setPushDataFactory(function(topic, jsonContent) {
 						parsePublishData(topic, jsonContent);
