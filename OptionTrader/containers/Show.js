@@ -7,7 +7,6 @@ import OrderItem from '../components/OrderItem'
 
 class Show extends React.Component {
   state = {
-    mainHeaderData: {},
     dataList: [
       {
         title: '市场',
@@ -46,7 +45,7 @@ class Show extends React.Component {
   render() {
     return (
       <View style={styles.root}>
-        <MainHeader data={this.state.mainHeaderData} />
+        <MainHeader data={this.props.capitalStateData} />
         <SectionList
           style={styles.list}
           renderItem={this._renderItem}
