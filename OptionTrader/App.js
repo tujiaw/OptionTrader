@@ -9,7 +9,7 @@ import { Provider } from 'react-redux'
 import store from './utils/store'
 
 // test
-import capitalStateAction from './actions/capitalStateAction'
+import * as capitalStateAction from './actions/capitalStateAction'
 
 const MainTab = TabNavigator(
   {
@@ -66,14 +66,16 @@ const MainTab = TabNavigator(
   }
 )
 
+/// test data ///////////
 setInterval(() => {
   const initData = {
-    dynamicEquity: Math.random() * 100,
-    frozenCapital: Math.random() * 10,
-    avaiableCapital: Math.random() * 1000,
+    dynamicEquity: Math.round(Math.random() * 10000),
+    frozenCapital: Math.round(Math.random() * 1000),
+    avaiableCapital: Math.round(Math.random() * 100),
   }
   store.dispatch(capitalStateAction.update(initData))
-}, 10000)
+}, 3000)
+//////////////////////////
 
 class App extends React.Component {
   constructor(props) {

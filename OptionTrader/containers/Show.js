@@ -30,7 +30,6 @@ class Show extends React.Component {
   }
 
   _renderItem = ({item}) => {
-    console.log(item)
     if (item.dBidPrice1) {
       return (
         <MarketItem key={item.key} data={item} />
