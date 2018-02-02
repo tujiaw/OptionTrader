@@ -14,3 +14,4 @@ export default function capitalStateData(state = initData, action) {
       return state
   }
 }
+

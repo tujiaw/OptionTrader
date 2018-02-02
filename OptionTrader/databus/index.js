@@ -2,6 +2,7 @@
 import Config from '../config'
 import * as Cons from './command'
 import { timestampformat } from '../utils/tools'
+
 var databus = require('./databus')
 
 export const heartBeat = (function() {

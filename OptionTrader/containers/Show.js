@@ -2,41 +2,28 @@ import React from 'react'
 import { StyleSheet, View, Text, SectionList } from 'react-native'
 import { connect } from 'react-redux'
 import MainHeader from '../components/MainHeader'
+import MarketHeader from '../components/MarketHeader'
+import OrderHeader from '../components/OrderHeader'
 import MarketItem from '../components/MarketItem'
 import OrderItem from '../components/OrderItem'
 
 class Show extends React.Component {
-  state = {
-    dataList: [
-      {
-        title: '市场',
-        data: [{
-          key: 1,
-          code: 'IC1892',
-          dBidPrice1: '3434.5',
-          nBidVolume1: '3000',
-        }]
-      },
-      {
-        title: '成交',
-        data: [{
-          key: 1,
-          ordertime: '20180130',
-          nOrderID: 'aaa',
-          nOrderSysID: 'bbb'
-        }]
-      }
-    ]
+  _renderHeader = ({section}) => {
+    if (section.title.name === '市场') {
+      return MarketHeader(section)
+    } else {
+      return OrderHeader(section)
+    }
   }
 
   _renderItem = ({item}) => {
-    if (item.dBidPrice1) {
+    if (item.dataType === '市场') {
       return (
-        <MarketItem key={item.key} data={item} />
+        <MarketItem data={item} />
       )
     } else {
       return (
-        <OrderItem />
+        <OrderItem/>
       )
     }
   }
@@ -48,8 +35,9 @@ class Show extends React.Component {
         <SectionList
           style={styles.list}
           renderItem={this._renderItem}
-          renderSectionHeader={({section}) => <Text>{section.title}</Text>}
-          sections={this.state.dataList}
+          renderSectionHeader={this._renderHeader}
+          sections={this.props.dataList}
+          keyExtractor={(item, index) => ('i-' + index + item)}
         />
       </View>
     )        
@@ -57,7 +45,10 @@ class Show extends React.Component {
 }
 
 function mapStateToProps(state) {
-  return {capitalStateData: state.capitalStateData}
+  return {
+    capitalStateData: state.capitalStateData,
+    dataList: [state.marketData, state.orderData]
+  }
 }
 
 function mapDispatchToProps(dispatch) {

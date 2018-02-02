@@ -4,10 +4,11 @@ import { View, Text } from 'react-native'
 export default class MarketItem extends React.Component {
   render() {
     const {data} = this.props
+    console.log(data)
     return (
       <View>
-        <Text>{data.dBidPrice1}</Text>
-        <Text>{data.nBidVolume1}</Text>
+        <Text>{data.code}</Text>
+        <Text>{data.price}</Text>
       </View>
     )
   }

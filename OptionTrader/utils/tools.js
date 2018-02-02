@@ -52,3 +52,7 @@ export function debounce(fn, delay) {
     var curTime = new Date();
     return DateFormat(curTime, 'yyyy-MM-dd h:m:s');
   }
+
+  export function isArray(obj) {
+    return Object.prototype.toString.call(obj)=='[object Array]'
+  }
