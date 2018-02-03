@@ -2,6 +2,7 @@ import store from '../utils/store'
 import * as capitalStateAction from '../actions/capitalStateAction'
 import * as marketAction from '../actions/marketAction'
 import * as orderAction from '../actions/orderAction'
+import { MARKET_TITLE, ORDER_TITLE } from '../constants'
 
 export default function testStart() {
     setInterval(() => {
@@ -15,7 +16,7 @@ export default function testStart() {
 
     setInterval(() => {
         const item = {
-            dataType: '市场',
+            dataType: MARKET_TITLE,
             instId: '',
             code: 'IC180',
             price: '1279.2',
@@ -38,7 +39,7 @@ export default function testStart() {
     let s_orderId = 1
     setInterval(() => {
         const item = {
-            dataType: '成交',
+            dataType: ORDER_TITLE,
             orderId: 0,
             orderTime: '14:37:31',
             code: 'IC',
@@ -51,11 +52,16 @@ export default function testStart() {
         }
         const initList = []
         for (let i = 0; i < 1; i++) {
+            if (s_orderId === 50) {
+                break;
+            }
             const obj = {...item}
             obj.orderId = s_orderId++
             obj.code += s_orderId
             initList.push(obj)
         }
-        store.dispatch(orderAction.update(initList))
+        if (initList.length > 0) {
+            store.dispatch(orderAction.update(initList))
+        }
     }, 5000)
 }

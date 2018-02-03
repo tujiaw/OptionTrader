@@ -7,25 +7,30 @@ import OrderHeader from '../components/OrderHeader'
 import MarketItem from '../components/MarketItem'
 import OrderItem from '../components/OrderItem'
 import * as orderAction from '../actions/orderAction'
+import { MARKET_TITLE, ORDER_TITLE } from '../constants'
 
 class Show extends React.Component {
   _renderHeader = ({section}) => {
-    if (section.title.name === '市场') {
+    if (section.title.name === MARKET_TITLE) {
       return MarketHeader(section)
-    } else {
+    } else if (section.title.name === ORDER_TITLE) {
       return OrderHeader(section)
+    } else {
+      return null
     }
   }
 
   _renderItem = ({item}) => {
-    if (item.dataType === '市场') {
+    if (item.dataType === MARKET_TITLE) {
       return (
         <MarketItem data={item} />
       )
-    } else {
+    } else if (item.dataType === ORDER_TITLE) {
       return (
         <OrderItem data={item} onRemove={() => { this._onRemoveOrder(item.orderId) }} />
       )
+    } else {
+      return null
     }
   }
 

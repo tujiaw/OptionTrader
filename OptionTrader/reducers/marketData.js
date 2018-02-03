@@ -1,9 +1,10 @@
 import { UPDATE_MARKET_DATA } from '../constants/actionTypes'
+import { MARKET_TITLE } from '../constants'
 import { isArray } from '../utils/tools'
 
 const initData = {
     title: {
-        name: '市场',
+        name: MARKET_TITLE,
         columnList: ['code', 'price', 'dir', 'total', 'yesday', 'today', 'avgPrice', 'profit'],
     },
     data: []

@@ -1,9 +1,10 @@
 import { UPDATE_ORDER_DATA, REMOVE_ORDER_FROM_ID } from '../constants/actionTypes'
+import { ORDER_TITLE } from '../constants'
 import { isArray } from '../utils/tools'
 
 const initData = {
     title: {
-        name: '成交',
+        name: ORDER_TITLE,
         columnList: ['orderTime', 'code', 'price', 'dir', 'operate', 'status', 'tradeTime', 'cancel']
     },
     data: []

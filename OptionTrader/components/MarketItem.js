@@ -22,7 +22,6 @@ export default class MarketItem extends React.Component {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginHorizontal: 5,
