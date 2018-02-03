@@ -16,6 +16,7 @@ export default function testStart() {
     setInterval(() => {
         const item = {
             dataType: '市场',
+            instId: '',
             code: 'IC180',
             price: '1279.2',
             dir: '空',
@@ -34,11 +35,13 @@ export default function testStart() {
         store.dispatch(marketAction.update(initList))
     }, 3000)
 
+    let s_orderId = 1
     setInterval(() => {
         const item = {
             dataType: '成交',
+            orderId: 0,
             orderTime: '14:37:31',
-            code: 'IC180',
+            code: 'IC',
             price: '6307.2',
             dir: '买',
             operate: 'close',
@@ -49,7 +52,8 @@ export default function testStart() {
         const initList = []
         for (let i = 0; i < 1; i++) {
             const obj = {...item}
-            obj.code += i
+            obj.orderId = s_orderId++
+            obj.code += s_orderId
             initList.push(obj)
         }
         store.dispatch(orderAction.update(initList))

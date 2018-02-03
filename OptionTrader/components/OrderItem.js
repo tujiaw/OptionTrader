@@ -1,8 +1,15 @@
 import React from 'react'
-import { StyleSheet, View, Text } from 'react-native'
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { StyleSheet, View, Text, Alert } from 'react-native'
+import RemoveButton from './RemoveButton'
 
 export default class OrderItem extends React.Component {
+  _onCancel = () => {
+    Alert.alert('提示', '确定要撤销这个单子吗？', [
+      {text: 'Cancel', onPress: console.log('cancel') },
+      {text: 'Ok', onPress: this.props.onRemove }
+    ])
+  }
+
   render() {
     const {data} = this.props
     return (
@@ -15,10 +22,7 @@ export default class OrderItem extends React.Component {
         <Text style={styles.column}>{data.status}</Text>
         <Text style={styles.column}>{data.tradeTime}</Text>
         {data.cancel==='wait' && 
-          <Ionicons
-            name={'ios-remove-circle'}
-            size={18}
-          />
+          <RemoveButton onPress={this._onCancel} />
         }
       </View>
     )

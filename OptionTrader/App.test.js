@@ -1,9 +1,12 @@
-import React from 'react';
-import App from './App';
 
-import renderer from 'react-test-renderer';
 
-it('renders without crashing', () => {
-  const rendered = renderer.create(<App />).toJSON();
-  expect(rendered).toBeTruthy();
-});
+const src = {
+  title: '2222',
+  data: [1, 2, 3]
+}
+
+let data = [...src.data]
+data.splice(1, 1)
+
+const dst = {...src, data}
+console.log(dst)

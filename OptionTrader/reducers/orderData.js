@@ -1,4 +1,4 @@
-import { UPDATE_ORDER_DATA } from '../constants/actionTypes'
+import { UPDATE_ORDER_DATA, REMOVE_ORDER_FROM_ID } from '../constants/actionTypes'
 import { isArray } from '../utils/tools'
 
 const initData = {
@@ -25,6 +25,19 @@ export default function orderData(state = initData, action) {
             oldState.data.push(newList[i])
         }
         return oldState
+    }
+    case REMOVE_ORDER_FROM_ID:
+    {
+        if (action.orderId) {
+            const data = [...state.data]
+            for (let i = 0; i < data.length; i++) {
+                if (data[i].orderId === action.orderId) {
+                    data.splice(i, 1)
+                    return {...state, data}
+                }
+            }
+        }
+        return state
     }
     default:
       return state

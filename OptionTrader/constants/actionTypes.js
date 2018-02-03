@@ -6,3 +6,6 @@ export const UPDATE_MARKET_DATA = 'UPDATE_MARKET_DATA'
 
 // 更新当日订单
 export const UPDATE_ORDER_DATA = 'UPDATE_ORDER_DATA'
+
+// 移除订单
+export const REMOVE_ORDER_FROM_ID = 'REMOVE_ORDER_FROM_ID'

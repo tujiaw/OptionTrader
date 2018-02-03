@@ -6,6 +6,7 @@ import MarketHeader from '../components/MarketHeader'
 import OrderHeader from '../components/OrderHeader'
 import MarketItem from '../components/MarketItem'
 import OrderItem from '../components/OrderItem'
+import * as orderAction from '../actions/orderAction'
 
 class Show extends React.Component {
   _renderHeader = ({section}) => {
@@ -23,9 +24,13 @@ class Show extends React.Component {
       )
     } else {
       return (
-        <OrderItem data={item}/>
+        <OrderItem data={item} onRemove={() => { this._onRemoveOrder(item.orderId) }} />
       )
     }
+  }
+
+  _onRemoveOrder = (orderId) => {
+    this.props.removeOrder(orderId)
   }
 
   render() {
@@ -52,7 +57,9 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  return {}
+  return {
+    removeOrder: (orderId) => { dispatch(orderAction.remove(orderId)) }
+  }
 }
 
 const styles = StyleSheet.create({
