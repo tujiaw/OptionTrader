@@ -96,9 +96,7 @@ export default class TradeItem extends React.Component {
             textStyle={styles.buttonText}
           />
         </View>
-        <View style={styles.row3}>
-          <Text style={styles.tips}>{'Trade:{ IC1802  SellOpen  6207.2 }'}</Text>
-        </View>
+        <Text style={styles.tips}>{'Trade:{ IC1802  SellOpen  6207.2 }'}</Text>
       </View>
     )
   }
@@ -121,6 +119,7 @@ const styles = StyleSheet.create({
   },
   row2: {
     flex: 1,
+    justifyContent: 'flex-end',
   },
   leftTop: {
     flex: 1,
@@ -162,14 +161,13 @@ const styles = StyleSheet.create({
     maxHeight: 20,
   },
   operButtonGroup: {
-    flex: 1,
     maxHeight: 30,
   },
   buttonStyle: {
     width: 5,
   },
   tips: {
-    color: 'darkgrey'
+    color: 'darkgrey',
   },
   buttonText: {
     fontWeight: 'bold'
