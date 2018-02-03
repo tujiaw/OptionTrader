@@ -34,7 +34,7 @@ function RightTop(props) {
         <Text>Sell:1</Text>
         <Text>L</Text>
       </View>
-      <View style={styles.rightTopRow2}>
+      <View>
         <FormInput />
       </View>
       <View style={styles.rightTopRow3}>

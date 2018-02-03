@@ -28,16 +28,9 @@ export default class RemoveButton extends React.Component {
       >
         <Ionicons
           name={this.state.name}
-          size={18}
-          style={styles.icon}
+          size={20}
         />
       </TouchableWithoutFeedback>
     )
   }
 }
-
-const styles = StyleSheet.create({
-  icon: {
-    
-  }
-})

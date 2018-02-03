@@ -18,7 +18,7 @@ const MainTab = TabNavigator(
         tabBarLabel: '持仓',
         tabBarIcon: ({ tintColor, focused }) => (
           <Ionicons
-            name={focused ? 'ios-home' : 'ios-home-outline'}
+            name={focused ? 'ios-list-box' : 'ios-list-box-outline'}
             size={20}
             style={{ color: tintColor }}
           />
