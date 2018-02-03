@@ -81,16 +81,11 @@ class App extends React.Component {
 
   
   handleBack = () => {
-    // 两秒钟之内按两次Back键退出程序
-    this.backPressTime.push(new Date());
-    const count = this.backPressTime.length;
-    if (count >= 2) {
-      const ms = this.backPressTime[count - 1] - this.backPressTime[count - 2];
-      this.backPressTime = [];
-      if (ms <= 2000) {
-        return false;
-      }
+    if (this.lastBackPressed && this.lastBackPressed + 2000 >= Date.now()) {
+      // 两秒钟之内按两次Back键退出程序
+      return false
     }
+    this.lastBackPressed = Date.now()
     ToastAndroid.show('再按一次退出程序', ToastAndroid.SHORT);
     return true;
   }

@@ -20,6 +20,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'aliceblue',
     padding: 5,
+    marginTop: 2,
   },
   columnList: {
     flex: 1,

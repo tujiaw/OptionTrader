@@ -1,24 +1,31 @@
 import React from 'react'
-import { StyleSheet, View, Text } from 'react-native'
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
 import { FormInput, Button, ButtonGroup } from 'react-native-elements'
 
 function LeftTop(props) {
+  const { data, onValueChanged } = props
   return (
     <View style={styles.leftTop}>
       <View style={styles.leftTopCol1}>
-        <Text>I01082</Text>
-        <Text>6000</Text>
-        <Text>0000</Text>
+        <Text>{data.code || ''}</Text>
+        <TouchableOpacity onPress={() => { onValueChanged && onValueChanged(data.sellPrice) }} >
+          <Text>{data.sellPrice || '0000'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => { onValueChanged && onValueChanged(data.buyPrice) }} >
+          <Text>{data.buyPrice || '0000'}</Text>
+        </TouchableOpacity>
       </View>
       <View style={styles.leftTopCol2}>
-        <Text>C0000</Text>
-        <Text>0</Text>
-        <Text>0</Text>
+        <Text>{data.spotPrice || 'C0000'}</Text>
+        <Text>{data.sellVolume || '0'}</Text>
+        <Text>{data.buyVolume || '0'}</Text>
       </View>
       <View style={styles.leftTopCol3}>
-        <Text>00</Text>
+        <Text>{data.futuresMinusPostPrice || '00'}</Text>
         <Text></Text>
-        <Text>00000</Text>
+        <TouchableOpacity onPress={() => { onValueChanged && onValueChanged(data.dealPrice) }} >
+          <Text>{data.dealPrice || '00000'}</Text>
+        </TouchableOpacity>
         <Text></Text>
       </View>
     </View>
@@ -26,21 +33,25 @@ function LeftTop(props) {
 }
 
 function RightTop(props) {
+  const {data, editPrice, onValueAdd} = props
   const buttons = ['+', '-', '++', '--']
+  const values = [0.2, -0.2, 1, -1]
   return (
     <View style={styles.rightTop}>
       <View style={styles.rightTopRow1}>
-        <Text>Buy:2</Text>
-        <Text>Sell:1</Text>
-        <Text>L</Text>
+        <Text>{'Buy:' + data.morePosition || 0}</Text>
+        <Text>{'Sell:' + data.emptyPosition || 0}</Text>
+        <Text>{data.lock || ''}</Text>
       </View>
       <View>
-        <FormInput />
+        <FormInput value={editPrice || ''} />
       </View>
       <View style={styles.rightTopRow3}>
         <ButtonGroup 
           buttons={buttons}
           containerStyle={styles.plusButtonGroup}
+          textStyle={styles.buttonText}
+          onPress={(index) => { onValueAdd && onValueAdd(values[index]) }}
         />
       </View>
     </View>
@@ -48,19 +59,41 @@ function RightTop(props) {
 }
 
 export default class TradeItem extends React.Component {
+  state = {
+    editPrice: ''
+  }
+
+  _onPriceChanged = (value) => {
+    this.setState({ editPrice: '' + value })
+  }
+
+  _onPriceAdd = (value) => {
+    if (this.state.editPrice.length === 0) {
+      return
+    }
+    let fsrc = parseFloat(this.state.editPrice)
+    let fadd = parseFloat(value)
+    if (isNaN(fsrc) || isNaN(fadd)) {
+      return
+    }
+    fsrc += fadd
+    this.setState({ editPrice: '' + fsrc.toFixed(2) })
+  }
+
   render() {
     const { data } = this.props
     const buttons = ['B IH18C2', 'S IH18C2', 'X']
     return (
       <View style={styles.root}>
         <View style={styles.row1}>
-          <LeftTop />
-          <RightTop />
+          <LeftTop data={data} onValueChanged={this._onPriceChanged}/>
+          <RightTop data={data} editPrice={this.state.editPrice} onValueAdd={this._onPriceAdd}/>
         </View>
         <View style={styles.row2}>
           <ButtonGroup 
             buttons={buttons}
             containerStyle={styles.operButtonGroup}
+            textStyle={styles.buttonText}
           />
         </View>
         <View style={styles.row3}>
@@ -130,7 +163,7 @@ const styles = StyleSheet.create({
   },
   operButtonGroup: {
     flex: 1,
-    maxHeight: 50,
+    maxHeight: 30,
   },
   buttonStyle: {
     width: 5,
@@ -138,4 +171,7 @@ const styles = StyleSheet.create({
   tips: {
     color: 'darkgrey'
   },
+  buttonText: {
+    fontWeight: 'bold'
+  }
 })
