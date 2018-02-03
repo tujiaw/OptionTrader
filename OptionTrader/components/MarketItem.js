@@ -1,15 +1,35 @@
 import React from 'react'
-import { View, Text } from 'react-native'
+import { StyleSheet, View, Text } from 'react-native'
 
 export default class MarketItem extends React.Component {
   render() {
     const {data} = this.props
-    console.log(data)
     return (
-      <View>
-        <Text>{data.code}</Text>
-        <Text>{data.price}</Text>
+      <View style={styles.root}>
+        <Text style={[styles.baseText, styles.code]}>{data.code}</Text>
+        <Text style={[styles.baseText]}>{data.price}</Text>
+        <Text style={[styles.baseText]}>{data.dir}</Text>
+        <Text style={[styles.baseText]}>{data.total}</Text>
+        <Text style={[styles.baseText]}>{data.yesday}</Text>
+        <Text style={[styles.baseText]}>{data.today}</Text>
+        <Text style={[styles.baseText]}>{data.avgPrice}</Text>
+        <Text style={[styles.baseText]}>{data.profit}</Text>
       </View>
     )
   }
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginHorizontal: 5,
+  },
+  baseText: {
+  },
+  code: {
+    color: 'red'
+  }
+})

@@ -23,7 +23,7 @@ class Show extends React.Component {
       )
     } else {
       return (
-        <OrderItem/>
+        <OrderItem data={item}/>
       )
     }
   }

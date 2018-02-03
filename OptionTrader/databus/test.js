@@ -14,9 +14,9 @@ export default function testStart() {
     }, 3000)
 
     setInterval(() => {
-        const initList = [{
+        const item = {
             dataType: '市场',
-            code: 'IC1802',
+            code: 'IC180',
             price: '1279.2',
             dir: '空',
             total: 0,
@@ -24,22 +24,34 @@ export default function testStart() {
             today: 0,
             avgPrice: '6307.2',
             profit: '880',
-        }]
+        }
+        const initList = []
+        for (let i = 0; i < 4; i++) {
+            const obj = {...item}
+            obj.code += i
+            initList.push(obj)
+        }
         store.dispatch(marketAction.update(initList))
-    }, 5000)
+    }, 3000)
 
-    // setInterval(() => {
-    //     const initList = [{
-    //         dataType: '成交',
-    //         ordertime: '14:37:31',
-    //         code: 'IC1802',
-    //         price: '6307.2',
-    //         dir: '买',
-    //         operate: 'close',
-    //         status: 'traded',
-    //         tradeTime: '14:37:54',
-    //         cancel: ''
-    //     }]
-    //     store.dispatch(orderAction.update(initList))
-    // }, 7000)
+    setInterval(() => {
+        const item = {
+            dataType: '成交',
+            orderTime: '14:37:31',
+            code: 'IC180',
+            price: '6307.2',
+            dir: '买',
+            operate: 'close',
+            status: 'traded',
+            tradeTime: '14:37:54',
+            cancel: 'wait'
+        }
+        const initList = []
+        for (let i = 0; i < 1; i++) {
+            const obj = {...item}
+            obj.code += i
+            initList.push(obj)
+        }
+        store.dispatch(orderAction.update(initList))
+    }, 5000)
 }

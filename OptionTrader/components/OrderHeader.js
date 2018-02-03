@@ -8,7 +8,7 @@ const OrderHeader = (props) => {
       <Text>{title.name}</Text>
       <View style={styles.columnList}>
       {title.columnList && title.columnList.map((item, index) => {
-        return <Text key={index}>{item}</Text>
+        return <Text key={index} style={styles.column}>{item}</Text>
       })}
       </View>
     </View>
@@ -18,11 +18,18 @@ const OrderHeader = (props) => {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+    backgroundColor: 'aliceblue',
+    padding: 5,
+    marginTop: 2,
   },
   columnList: {
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-around'
+    justifyContent: 'space-between'
+  },
+  column: {
+    fontSize: 10,
+    color: 'grey'
   }
 })
 

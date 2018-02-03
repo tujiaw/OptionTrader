@@ -1,4 +1,5 @@
 import { UPDATE_ORDER_DATA } from '../constants/actionTypes'
+import { isArray } from '../utils/tools'
 
 const initData = {
     title: {
@@ -11,7 +12,20 @@ const initData = {
 export default function orderData(state = initData, action) {
   switch(action.type) {
     case UPDATE_ORDER_DATA:
-      return {...action.data}
+    {
+        const oldState = {...state}
+        const newList = []
+        if (isArray(action.data)) {
+            newList = action.data
+        } else {
+            newList.push(action.data)
+        }
+
+        for (let i = 0; i < newList.length; i++) {
+            oldState.data.push(newList[i])
+        }
+        return oldState
+    }
     default:
       return state
   }

@@ -4,7 +4,7 @@ import { isArray } from '../utils/tools'
 const initData = {
     title: {
         name: '市场',
-        columnList: ['code', 'price', 'dir', 'total', 'yeaday', 'today', 'avgPrice', 'profit'],
+        columnList: ['code', 'price', 'dir', 'total', 'yesday', 'today', 'avgPrice', 'profit'],
     },
     data: []
 }
