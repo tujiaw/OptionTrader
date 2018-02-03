@@ -2,6 +2,7 @@ import store from '../utils/store'
 import * as capitalStateAction from '../actions/capitalStateAction'
 import * as marketAction from '../actions/marketAction'
 import * as orderAction from '../actions/orderAction'
+import * as tradeAction from '../actions/tradeAction'
 import { MARKET_TITLE, ORDER_TITLE } from '../constants'
 
 export default function testStart() {
@@ -64,4 +65,14 @@ export default function testStart() {
             store.dispatch(orderAction.update(initList))
         }
     }, 5000)
+
+    let s_tradeCodeList = ['IC1802', 'IF1802', 'IH1802']
+    setInterval(() => {
+        for (let i = 0; i < s_tradeCodeList.length; i++) {
+            const newItem = {
+                code: s_tradeCodeList[i]
+            }
+            store.dispatch(tradeAction.update(newItem))
+        }
+    }, 1000)
 }

@@ -15,7 +15,7 @@ const MainTab = TabNavigator(
     Show: {
       screen: Show,
       navigationOptions: {
-        tabBarLabel: '展示',
+        tabBarLabel: '持仓',
         tabBarIcon: ({ tintColor, focused }) => (
           <Ionicons
             name={focused ? 'ios-home' : 'ios-home-outline'}

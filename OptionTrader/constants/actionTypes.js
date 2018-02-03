@@ -9,3 +9,7 @@ export const UPDATE_ORDER_DATA = 'UPDATE_ORDER_DATA'
 
 // 移除订单
 export const REMOVE_ORDER_FROM_ID = 'REMOVE_ORDER_FROM_ID'
+
+
+// 更新交易信息
+export const UPDATE_TRADE_DATA = 'UPDATE_TRADE_DATA'

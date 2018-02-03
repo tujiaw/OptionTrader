@@ -35,7 +35,7 @@ function RightTop(props) {
         <Text>L</Text>
       </View>
       <View style={styles.rightTopRow2}>
-        <FormInput containerStyle={styles.formInput}/>
+        <FormInput />
       </View>
       <View style={styles.rightTopRow3}>
         <ButtonGroup 
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
   },
   rightTopRow2: {
-
+    flex: 1,
   },
   rightTopRow3: {
     flex: 1,
@@ -137,5 +137,5 @@ const styles = StyleSheet.create({
   },
   tips: {
     color: 'darkgrey'
-  }
+  },
 })
