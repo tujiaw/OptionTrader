@@ -1,11 +1,34 @@
 import React from 'react'
-import { StyleSheet, View, Text } from 'react-native'
+import { StyleSheet, View, Text, FlatList } from 'react-native'
+import TradeItem from '../components/TradeItem'
 
 export default class Edit extends React.Component {
+  state = {
+    list: [{
+      code: '2324'
+    }, {
+      code: '3435'
+    }, {
+      code: '34355'
+    }, {
+      code: '23244'
+    }]
+  }
+
+  _renderItem = ({item}) => {
+    return (
+      <TradeItem data={item} />
+    )
+  }
+
   render() {
     return (
       <View style={styles.root}>
-        <Text>Edit ok</Text>
+        <FlatList
+          renderItem={this._renderItem}
+          keyExtractor={(item, index) => index}
+          data={this.state.list}
+        />
       </View>
     )        
   }
@@ -13,8 +36,7 @@ export default class Edit extends React.Component {
 
 const styles = StyleSheet.create({
   root: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
-  }
+    marginTop: 25,
+    marginHorizontal: 2
+  },
 })
