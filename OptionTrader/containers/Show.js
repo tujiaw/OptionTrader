@@ -8,8 +8,16 @@ import MarketItem from '../components/MarketItem'
 import OrderItem from '../components/OrderItem'
 import * as orderAction from '../actions/orderAction'
 import { MARKET_TITLE, ORDER_TITLE } from '../constants'
+import * as _ from 'lodash/core'
 
 class Show extends React.Component {
+  shouldComponentUpdate(nextProps, nextState) {
+    if (_.isEqual(this.props, nextProps)) {
+      return false
+    }
+    return true
+  }
+
   _renderHeader = ({section}) => {
     if (section.title.name === MARKET_TITLE) {
       return MarketHeader(section)

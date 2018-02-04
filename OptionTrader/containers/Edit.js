@@ -2,8 +2,16 @@ import React from 'react'
 import { StyleSheet, View, Text, FlatList } from 'react-native'
 import TradeItem from '../components/TradeItem'
 import { connect } from 'react-redux'
+import * as _ from 'lodash/core'
 
 class Edit extends React.Component {
+  shouldComponentUpdate(nextProps, nextState) {
+  if (_.isEqual(this.props, nextProps)) {
+      return false
+    }
+    return true
+  }
+
   _renderItem = ({item}) => {
     return (
       <TradeItem data={item} />

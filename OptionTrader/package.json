@@ -21,6 +21,7 @@
   "dependencies": {
     "bytebuffer": "^5.0.1",
     "expo": "^25.0.0",
+    "lodash": "^4.17.5",
     "pako": "^1.0.6",
     "protobufjs": "^6.8.4",
     "react": "16.2.0",

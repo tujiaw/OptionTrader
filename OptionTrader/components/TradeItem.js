@@ -33,7 +33,7 @@ function LeftTop(props) {
 }
 
 function RightTop(props) {
-  const {data, editPrice, onValueAdd} = props
+  const {data, editPrice, onValueAdd, onValueChanged} = props
   const buttons = ['+', '-', '++', '--']
   const values = [0.2, -0.2, 1, -1]
   return (
@@ -44,7 +44,7 @@ function RightTop(props) {
         <Text>{data.lock || ''}</Text>
       </View>
       <View>
-        <FormInput value={editPrice || ''} />
+        <FormInput value={editPrice || ''} onChangeText={onValueChanged} />
       </View>
       <View style={styles.rightTopRow3}>
         <ButtonGroup 
@@ -86,8 +86,12 @@ export default class TradeItem extends React.Component {
     return (
       <View style={styles.root}>
         <View style={styles.row1}>
-          <LeftTop data={data} onValueChanged={this._onPriceChanged}/>
-          <RightTop data={data} editPrice={this.state.editPrice} onValueAdd={this._onPriceAdd}/>
+          <LeftTop data={data} onValueChanged={this._onPriceChanged} />
+          <RightTop data={data} 
+            editPrice={this.state.editPrice} 
+            onValueAdd={this._onPriceAdd}
+            onValueChanged={this._onPriceChanged}
+          />
         </View>
         <View style={styles.row2}>
           <ButtonGroup 

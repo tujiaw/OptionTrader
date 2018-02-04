@@ -85,5 +85,5 @@ export default function testStart() {
             }
             store.dispatch(tradeAction.update(newItem))
         }
-    }, 1000)
+    }, 3000)
 }
