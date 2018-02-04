@@ -1,12 +1,8 @@
+var _ = require('lodash')
 
-
-const src = {
-  title: '2222',
-  data: [1, 2, 3]
-}
-
-let data = [...src.data]
-data.splice(1, 1)
-
-const dst = {...src, data}
-console.log(dst)
+_.forEach({ 'a': 1, 'b': 2 }, function(n, key) {
+  console.log(n, key);
+  if (n === 1) {
+    return false
+  }
+});
