@@ -1,0 +1,159 @@
+package Trade;
+
+
+
+message LoginReq { 
+  required string userid = 1; //用户id
+  required string passwd = 2; //密码
+  repeated string instruments = 3; //订阅的代码
+}
+
+message LoginResp { 
+  required int32 retCode = 1;
+  optional string msg = 2;
+  repeated string instruments = 3; //返回订阅的代码
+}
+
+message LogoutReq { 
+  
+}
+
+message LogoutResp { 
+  required int32 retCode = 1;
+  optional string msg = 2;
+}
+/*
+ public enum ORDER_TYPE
+    {
+        BUY = 1,		//多开
+        SELLSHORT,		//空开
+        SELL,		//平多
+        BUYTOCOVER,		//平空
+        //扩展
+        SMARTBUY,			//没有今仓且有昨空头仓，则平空，如果有今仓或无空头仓，则多开
+        SMARTSELL,			//没有今仓且有昨多头仓，则平多，如果有今仓或无多头仓，则空开
+    };
+*/
+message OrderReq { 
+  required string code = 1;
+  required double price = 2;
+  required int32 type = 3; //定义见ORDER_TYPE
+}
+
+message OrderResp { 
+  required int32 retCode = 1;
+  optional string msg = 2;
+}
+
+message CancelReq { 
+  required int32 orderid = 1; //报单ID
+}
+
+message CancelResp { 
+  required int32 retCode = 1;
+  optional string msg = 2;
+}
+
+message ModifyReq { 
+  required int32 orderid = 1; //报单ID
+  required double price = 2;
+}
+
+message ModifyResp { 
+  required int32 retCode = 1;
+  optional string msg = 2;
+}
+
+message MarketDataReq { 
+  required string code = 1;
+  required string date = 2;
+}
+
+message MarketDataResp { 
+  required string code = 1;
+  required string date = 2;
+  repeated MarketData data = 3;
+}
+
+message TradingAccount { 
+    optional double dPreBalance=1;                            // 上次结算准备金
+	optional double dPositionProfit=2;                        // 持仓盈亏
+	optional double dCloseProfit=3;                           // 平仓盈亏
+	optional double dCommission=4;                            // 手续费
+	optional double dCurrentMargin=5;                         // 当前保证金总额
+	optional double dFrozenCapital=6;                         // 冻结资金
+	optional double dAvaiableCapital=7;                       // 可用资金
+	optional double dDynamicEquity=8;                         // 动态权益
+}
+
+message MarketData { 
+    optional string	szINSTRUMENT=1;         // 合约ID
+	optional double dBidPrice1=2;                 // 申买价一
+	optional int32 nBidVolume1=3;                // 申买量一
+	optional double dAskPrice1=4;                 // 申卖价一
+	optional int32 nAskVolume1=5;                // 申卖量一    
+	optional double dLastPrice=6;                 // 最新价
+	optional double dAvgPrice=7;                  // 当日均价
+	optional int32 nVolume=8;                    // 成交量
+	optional double dOpenInt=9;                   // 持仓量
+	optional double dUpperLimitPrice=10;           // 涨停板价
+	optional double dLowerLimitPrice=11;           // 跌停板
+	optional string szUpdateTime=12;           // 最后修改时间(yyyyMMdd HH:mm:ss)
+	optional int32 nUpdateMillisec=13;            // 最后修改毫秒
+}
+
+message Position { 
+    optional string szINSTRUMENT=1;			// 合约ID
+	optional int32 nTradeDir=2;                              // 交易方向(买=0,卖=1)
+	optional double dAvgPrice=3;                              // 持仓均价
+	optional int32 nPosition=4;                              // 总持仓量
+	optional int32 nYesterdayPosition=5;                     // 昨仓
+	optional int32 nTodayPosition=6;                         // 今仓
+	optional double dMargin=7;                                // 占用保证金
+	optional double dPositionProfit=8;						// 持仓盈亏（换算单位后）
+}
+
+
+message Order { 
+    optional int32 nSessionID=1;								// SessionID
+	optional int32 nOrderID=2;                               // 本地报单ID
+	optional int32 nOrderSysID=3;							// SystemID/报单编号
+	optional string szINSTRUMENT=4;			// 合约ID
+	optional string szExchangeID=5;       // 交易所ID
+	optional int32 nTradeType=6;                             // 交易类型(投机,套利,套保)
+	optional int32 nTradeDir=7;                              // 交易方向(买,卖)
+	optional int32 nTradeOperate=8;                          // 交易开平操作(开,平,平今)
+	optional int32 nOrderStatus=9;                           // 报单状态
+	optional double dLimitPrice=10;                            // 报价
+	optional double dAvgPrice=11;                              // 成交均价
+	optional int32 nVolume=12;                                // 报单数量
+	optional int32 nTradeVolume=13;                           // 本次成交量
+	optional int32 nTradeVolumeLeft=14;                       // 本次未成交量
+	optional string szInsertDateTime=15;      // 委托时间(交易所)
+	optional string szTradeDateTime=16;       // 最后成交时间
+	optional string szOrderRefCustom=17;                    // 客户自定义自动(xSpeed仅支持数字)
+	optional int32 nRequestID=18;								//委托ID
+	optional int32 nTimestampCreate=19;
+	optional int32 nTimestampUpdate=20;
+}
+
+message Trade { 
+    optional string szTradeID=1;             // 成交编号
+	optional int32 nOrderID=2;                               // 对应委托报单ID
+	optional int32 nSystemID=3;								// SystemID/报单ID
+	optional string szINSTRUMENT=4;   // 合约ID
+	optional string szExchangeID=5;       // 交易所ID
+	optional int32 nTradeDir=6;                              // 交易方向(买,卖)
+	optional int32 nTradeOperate=7;                          // 交易开平操作(开,平,平今)
+	optional double dPrice=8;                                 // 价格
+	optional int32 nVolume=9;                                // 数量
+	optional string szTradeTime=10;           // 成交时间
+	optional string szTradingDay=11;          // 交易日
+	optional int32 nRequestID=12;								//委托ID
+}
+
+message ErrorInfo { 
+    optional int32 nRequestID=1;                              
+}
+
+

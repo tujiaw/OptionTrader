@@ -1,0 +1,191 @@
+import "qmppsm.proto";
+import "QMClient.proto";
+package PNServer;
+
+option java_package = "com.sumscope";
+option java_outer_classname = "PNServer";
+
+// 查询产品报价
+message PNReqQueryGoods
+{	
+	required SM.SMReqMessageSend msg = 1;
+}
+
+message PNResQueryGoods
+{
+	required int32 retcode = 1;			// errcode
+	optional string error_desc = 2;		// 错误描述	
+}
+
+// 报价订阅
+message PNReqGoodsSub
+{
+	required uint64 userId 			= 1;
+	required PNGoodsSubItem subItem = 2;	
+}
+
+message PNResGoodsSub
+{
+	required int32 retcode = 1;			// errcode
+	optional string error_desc = 2;		// 错误描述	
+}
+
+// 报价退订
+message PNReqGoodsUnSub
+{
+	required uint64 userId 				= 1;
+	required PNGoodsSubItem subItem 	= 2; 	// 债券订阅信息		
+}
+
+message PNResGoodsUnSub
+{
+	required int32 retcode = 1;			// errcode
+	optional string error_desc = 2;		// 错误描述	
+}
+
+// 查询公众号产品订阅
+message PNReqQueryPublicNumber
+{
+	required uint64 userId 		= 1;
+	required uint32 goodsType 	= 2;	// 产品类型
+}
+
+message PNResQueryPublicNumber
+{
+	required int32 retcode 		= 1;			// errcode
+	optional string error_desc 	= 2;		// 错误描述	
+	repeated PNGoodsSubItem subItemList	= 3;
+}
+
+message PNGoodsBond
+{
+	required string companyId = 1;
+	required string bondKey   = 2;
+}
+
+enum GOODS_TYPE
+{
+	GOODS_BOND = 1;
+}
+
+message PNGoodsSubItem
+{
+    required uint64 orgId    = 1; 
+	required uint32 type     = 2; // GOODS_TYPE
+	optional bytes  content  = 3;
+}
+
+// 账户首次登录
+message PNReqFirstLogin
+{
+	required uint64 userId = 1;
+}
+
+message PNResFirstLogin
+{
+	required int32 retcode 		= 1;			// errcode
+	optional string error_desc 	= 2;		// 错误描述		
+}
+
+// 查询债券信息
+message PNReqBondInfo
+{
+	repeated string bondKey   = 1;
+}
+
+message PNResBondInfo
+{
+	required int32 retcode 		= 1;			// errcode
+	optional string error_desc 	= 2;		// 错误描述
+	repeated QMClient.BondInfo bondList = 3;
+}
+
+// 接收财经新闻，财联社，华尔街资讯
+message PNReqFinancialNews
+{
+	required uint32 sourcetype = 5;		// 新闻来源 0：财经头条 1：财联社 2：华尔街
+	required string newsid = 1;				// 新闻ID
+	repeated MsgFinancialNews info = 3;
+}
+
+message PNResFinancialNews
+{
+	required int32 retcode 		= 1;		// errcode	0：成功 其它：错误码
+	optional string error_desc 	= 2;		// 错误描述		
+}
+
+message MsgFinancialNews
+{
+	required int32 key = 1;			// 1：新闻内容 2：新闻类型 3:新闻标题 4：发布时间
+	optional bytes value = 2;		// 要求utf8格式
+}
+
+// 公众号订阅
+message PNReqPubNoSubscribe
+{
+	required int32 command = 1;			// 1订阅公众号 2 取消订阅公众号 3 查询订阅公众号
+	required string loginname = 2;		// 登录名
+	required int64 publishid = 3;		// 公众号	
+}
+
+message PNResPubNoSubscribe
+{
+	required int32 retcode 		= 1;	// errcode	0：成功 其它：错误码
+	optional string error_desc 	= 2;	// 错误描述		
+	optional int32 queryretcode = 3;	// 查询订阅公众号返回1 表示已订阅，0表示未订阅
+}
+
+// 产品小技巧
+message PNReqProductSkill
+{
+	required QMClient.MessageBodyList bodylist = 1;
+}
+
+message PNResProductSkill
+{
+	required int32 retcode 		= 1;	// errcode	0：成功 其它：错误码
+	optional string error_desc 	= 2;	// 错误描述			
+}
+
+// 公众号订阅通知
+message PNReqPubnoNotification
+{
+	required int32 command = 1;		// 1订阅公众号 2 取消订阅公众号	
+	required int64 userId = 2;		// 用户ID
+	required int64 publishid = 3;	// 公众号ID
+}
+
+message PNResPubnoNotification
+{
+	required int32 retcode 		= 1;	// errcode	0：成功 其它：错误码
+	optional string error_desc 	= 2;	// 错误描述			
+}
+
+// 请求公众号列表
+message PNReqPubnoList
+{
+	
+}
+
+message PNResPubnoList
+{
+	required int32 retcode 		= 1;	// errcode	0：成功 其它：错误码
+	optional string error_desc 	= 2;	// 错误描述			
+	repeated int64 publishid    = 3; 	// 公众号ID
+	repeated string publishName	= 4;	// 公众号名称
+}
+
+// 固定公众号添加
+message PNReqAddPubno
+{
+	required int64 publishid = 1;		// 公众号ID
+	required string publishName = 2;	// 公众号名称
+	optional int32 typecode = 3;		// 公众号类型
+	optional string typedesc = 4;		// 公众号类型描述
+}
+
+message PNResAddPubno
+{
+	required int32 retcode 		= 1;	// errcode	0：成功 其它：错误码
+	optional string error_desc 	= 2;	// 错误描述			
+}

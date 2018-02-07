@@ -1,10 +1,11 @@
 (function(global, factory) {
-  /* CommonJS */ if (typeof require === 'function' && typeof module === "object" && module && module["exports"])
-      module['exports'] = (function() {
-          return factory();
-      })();
-  /* Global */ else
-      global["observer"] = factory();
+
+/* CommonJS */ if (typeof require === 'function' && typeof module === "object" && module && module["exports"])
+  module['exports'] = (function() {
+      return factory();
+  })();
+/* Global */ else
+  global["observer"] = factory();
 })(this, function() {
   var ob = function() {
     this.subscribers = [];			// 订阅者数组

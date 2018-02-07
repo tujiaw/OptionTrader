@@ -8,6 +8,15 @@ import Me from './containers/Me'
 import { Provider } from 'react-redux'
 import store from './utils/store'
 import testStart from './databus/test'
+import appClient from './databus'
+
+// appClient.open('47.100.7.224', '55555')
+// .then((json) => {
+//   console.log('start web socket ok')
+// })
+// .catch((err) => {
+//   console.log(JSON.stringify(err))
+// })
 
 testStart()
 const MainTab = TabNavigator(

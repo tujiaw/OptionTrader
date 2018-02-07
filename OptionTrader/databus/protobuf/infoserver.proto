@@ -1,0 +1,1702 @@
+import "qmppsm.proto";
+package InfoServer;
+
+option java_package = "com.sumscope";
+option java_outer_classname = "InfoServer";
+
+//IS=InfoServer
+
+// 获取用户信息	
+message ISReqUserInfo	
+{	
+	required uint64 ownerId = 1;
+	repeated uint64 userId = 2;
+	repeated uint64 version = 3;
+	required bool detail = 4;	
+}	
+	
+message ISResUserInfo	
+{	
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	repeated SM.SMUserDetailInfo userInfo = 3;
+}	
+
+// 获取用户分组名册	
+message ISReqUserGroup	
+{	
+	required uint64 userId        = 1;
+	required uint64 version       = 2;	// 组总版本号
+}	
+	
+message ISResUserGroup	
+{	
+	required int32 retcode        = 1;
+	optional bytes error_desc     = 2;
+	optional uint64 version       = 3;
+	repeated SM.SMGroup groupInfo = 4;
+	optional bool isComplete      = 5;  // 是否为全量
+}	
+
+// 获取名册变更记录	
+message ISReqRosterInfo
+{
+	required uint64 userId                  = 1;  // 用户ID
+	required uint64 version                 = 2;	// 名册版本 0:取全量数据 非0：取增量数据
+	optional bool removeAvatar				= 3;	// 移除头像数据
+}
+
+message ISResRosterInfo
+{
+	required int32 retcode                  = 1;
+	optional bytes error_desc               = 2;
+	optional uint64 versionRoster           = 3; 	// 当前Roster的版本号（根据成员变动改变）
+	repeated SM.SMRosterItemInfo userUpdate = 4;  // 是指定版本和最新版本之间增加的成员
+	repeated uint64 userRemoved             = 5; 	// 请求中指定版本号时,是指定版本和最新版本之间删除的成员,只填id;
+	optional bool isComplete                = 6;  // 是否为全量
+}
+
+// 获取用户好友信息
+message ISReqFriendInfo
+{
+	required uint64 userId                  = 1; // 用户ID
+	required uint64 friendId                = 2; // 好友ID
+}
+message ISResFriendInfo
+{
+	required int32 retcode                  = 1; // 错误码【如果不存在该好友，返回失败】
+	optional SM.SMRosterItemInfo rosterInfo = 2; // 好友信息
+}
+
+// 取名册ID
+message ISReqRosterId
+{
+	required uint64 userId = 1;
+}
+
+message ISResRosterId
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	repeated uint64 rosterId = 3;
+}
+
+// 取公司信息
+message ISReqCompanyInfo
+{
+	repeated string companyId = 1;
+}
+
+message ISResCompanyInfo
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	repeated SM.SMCompany companyInfo = 3;
+}
+
+// 更新用户信息
+message ISReqUpdateUserInfo
+{
+	required uint64 userId = 1;
+	required SM.SMUserDetailInfo userinfo = 2;
+}
+
+message ISResUpdateUserInfo
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional int32 avatarId = 3;	
+	optional uint64 version = 4;
+}
+
+// 更改头像 接口废弃
+message ISReqChangeAvatar
+{
+	required uint64 userId = 1;	
+	required int32 avatarId = 2;	// avatarId=0 自定义头像
+	optional bytes avatar = 3;		
+}
+
+message ISResChangeAvatar
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional int32 avatarId = 3;	// 头像ID 1万以下：系统头像 1万以上：自定义头像
+	optional uint64 version = 4;
+}
+
+// 更新个性签名 接口废弃
+message ISReqUpdateSignature
+{
+	required uint64 userId = 1;
+	required string signature = 2;
+}
+
+message ISResUpdateSignature
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional uint64 version = 3;
+}
+
+// 重命名分组
+message ISReqReNameGroup
+{
+	required uint64 userId = 1;
+	required uint32 groupId = 2;
+	required string groupName = 3;
+}
+
+message ISResReNameGroup
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional uint64 version = 3;		// 组版本
+}
+
+// 组顺序调整
+message ISReqUpdateGroupOrder
+{
+	required uint64 userId = 1;
+	required uint32 groupId = 2;
+	required uint32 groupOrder = 3;
+}
+
+message ISResUpdateGroupOrder
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;	
+	optional uint64 groupVersion = 3;
+}
+
+// 创建组
+message ISReqCreateGroup
+{
+	required uint64 userId = 1;
+	required string groupName = 2;
+}
+
+message ISResCreateGroup
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;	
+	optional uint32 groupId = 3;
+	optional uint64 groupVersion = 4;
+	optional uint32 groupOrder = 5;
+}
+
+// 删除组
+message ISReqDelGroup
+{
+	required uint64 userId = 1;
+	required uint32 groupId = 2;
+}
+
+message ISResDelGroup
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;		
+	optional uint64 groupVersion = 3;
+}
+
+// 需要明确组需求：组中无好友时， 是否要删除组
+// 好友分组转移
+message ISReqMoveFriend
+{
+	required uint64 userId = 1;
+	required uint64 friendId = 2;
+	required uint32 fromGroupId = 3;
+	required uint32 toGroupId = 4;		
+}
+
+message ISResMoveFriend
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional uint64 groupVersion = 3;				
+}
+
+// 删除好友
+message ISReqDelFriend
+{
+	required uint64 userId = 1;
+	required uint64 friendId = 2;
+	required uint32 groupId = 3;
+}
+
+message ISResDelFriend
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;	
+	optional uint64 groupVersion = 3;		// 组版本
+	optional uint64 rosterVersion = 4;		// 名册版本
+}
+
+// 修改备注
+message ISReqUpdateNickName
+{
+	required uint64 userId = 1;		// 用户ID
+	required uint64 rosterId = 2;	// 好友ID
+	required string nickName = 3;	
+}
+
+message ISResUpdateNickName
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional uint64 version = 3;		// 名册版本
+}
+
+// 设置好友阻止或取消阻止
+message ISReqBlockRoster
+{
+	required uint64 userId = 1;
+	required uint64 rosterId = 2;
+	required int32 block = 3;		// 1:阻止 0:不阻止
+}
+
+message ISResBlockRoster
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional uint64 version = 3;		// 名册版本
+}
+
+// 更新显示名 接口废弃
+message ISReqUpdateDisplayName
+{
+	required uint64 userId = 1;
+	required string displayName = 2;
+}
+
+message ISResUpdateDisplayName
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional uint64 version = 3;		// 用户版本
+}
+
+// 是否显示显示名 接口废弃
+message ISReqEnableDisplayName
+{
+	required uint64 userId = 1;
+	required int32 enable = 2;
+}
+
+message ISResEnableDisplayName
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional uint64 version = 3;		// 用户版本
+}
+
+// 更新隐私策略 接口废弃
+message ISReqUpdatePrivacy
+{
+	required uint64 userId = 1;
+	required string privacy = 2;	// 隐私策略
+}
+
+message ISResUpdatePrivacy
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional uint64 version = 3;		// 用户版本
+}
+
+// 请求加好友
+message ISReqAddFriend
+{
+	required uint64 fromId = 1;
+	required uint64 toId = 2;
+	required uint32 groupId = 3;
+	optional string nickName = 4;
+	optional string description = 5;	
+}
+
+message ISResAddFriend
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;	
+	optional uint64 messageId = 3;
+	optional uint64 groupVersion = 4;
+	optional uint64 rosterVersion = 5;		// 名册版本
+	optional int32 isAutoDeal = 6;			// 1：对方已加好友 messageId为空
+	optional uint64 dealMessageId = 7;		// 对方加自己为好友的系统消息ID
+}
+
+// 批量添加好友
+message ISReqBatchAddFriend
+{
+	required uint64 userid    = 1;         // 请求用户ID
+	repeated uint64 friendIds = 2;         // 批量添加的好友列表
+	required uint32 groupId   = 3;         // 请求加入的组
+}
+message ISResBatchAddFriend
+{
+	required int32 retcode        = 1;     // 错误码
+	repeated uint64 messageIds    = 2;     // 好友请求系统消息列表【对方已加好友，messageId为0】
+	repeated uint64 dealMessageId = 3;     // 对方加自己的好友请求消息【对方没有加自己，messageId为0】
+	optional uint64 groupVersion  = 4;     // 用户组版本号
+	optional uint64 rosterVersion = 5;		 // 名册版本号
+}
+
+// 增加陌生人
+message ISReqAddStranger
+{
+	required uint64 userId = 1;
+	required uint64 strangerId = 2;
+}
+
+message ISResAddStranger
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional uint32 groupId = 3;
+	optional uint64 groupVersion = 4;
+	optional uint64 userRosterVersion = 5;		// 名册版本
+	optional uint64 strangerRosterVersion = 6;  // 0:对方已加为好友或陌生人
+	
+}
+
+// 忽略加好友
+message ISReqIgnoreFriend
+{
+	required uint64 userId = 1;		
+	repeated uint64 messageId = 2;	
+}
+
+message ISResIgnoreFriend
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+}
+
+// 接受加好友
+// 逻辑:1.组是否存在，不存在创建组 2. 组中新增好友 3 组版本递增
+message ISReqAcceptFriend
+{
+	required uint64 userId = 1;
+	repeated uint64 messageId = 2;
+	required uint32 groupId = 3;
+}
+
+message ISResAcceptFriend
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;	
+	optional uint64 groupVersion = 3;	
+	optional uint64 rosterVersion = 4;		// 名册版本
+	repeated uint64 friendIdList  = 5;		// 好友ID列表
+}
+
+// 查询系统消息 【接口已废弃】
+message ISReqQuerySysMsg
+{
+	required uint64 userId = 1;
+	required SM.TYPE_SYSMSG type = 2;
+	optional uint64 lastMessageId = 3;
+	optional int32 lastCount     = 4; // 不赋值就表示不取具体内容
+	optional bool all             = 5;
+	optional bool read            = 6;
+	optional uint64 afterTime     = 7; // 此时间以后的消息 单位:毫秒
+}
+message ISResQuerySysMsg
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional uint32 total = 3;
+	repeated SM.SMSysMsgFriend msgFriend =  4;
+	repeated SM.SMSysMsgRoom msgRoom = 5;
+}
+
+// 查询单个系统消息【接口已废弃】
+message ISReqQuerySysMsgOne
+{
+	required uint64 userId = 1;
+	required uint64 messageId = 2;
+}
+
+message ISResQuerySysMsgOne
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional SM.SMSysMsgFriend msgFriend = 3;
+	optional SM.SMSysMsgRoom msgRoom = 4;
+}
+
+// 查询未读系统消息【接口已废弃】
+message ISReqQuerySysMsgUnRead
+{
+	required uint64 userId = 1;
+	required SM.TYPE_SYSMSG type     = 2;
+}
+
+message ISResQuerySysMsgUnRead
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional uint32 countTotal = 3;
+}
+
+// 查询申请入群记录
+message ISReqQueryApplyRoom
+{
+	required uint64 userId = 1;
+	required uint64 roomId = 2;	
+}
+
+message ISResQueryApplyRoom
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional bool applied = 3;
+}
+
+// 查询多条手机系统消息【接口已废弃】
+message ISReqQuerySysMsgMobile
+{
+	required uint64 userId = 1;
+	required SM.TYPE_SYSMSG type = 2;
+	optional uint64 lastMessageId = 3;
+	optional int32 lastCount     = 4; // 不赋值就表示不取具体内容
+	optional bool all             = 5;
+	optional bool read            = 6;
+	optional uint64 afterTime     = 7; // 此时间以后的消息 单位:毫秒
+}
+message ISResQuerySysMsgMobile
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional uint32 totalFriend = 3;
+	optional uint32 totalRoom = 4;
+	repeated SM.SMSysMsgFriend msgFriend =  5;
+	repeated SM.SMSysMsgRoom msgRoom = 6;
+}
+
+// 查询单条手机系统消息【接口已废弃】
+message ISReqQuerySysMsgOneMobile
+{
+	required uint64 userId = 1;
+	required uint64 messageId = 2;
+}
+message ISResQuerySysMsgOneMobile
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional SM.SMSysMsgFriend msgFriend = 3;
+	optional SM.SMSysMsgRoom msgRoom = 4;
+}
+
+// 查询手机未读系统消息【接口已废弃】
+message ISReqQuerySysMsgUnReadMobile
+{
+	required uint64 userId = 1;
+	required SM.TYPE_SYSMSG type     = 2;
+}
+message ISResQuerySysMsgUnReadMobile
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional uint32 countTotalFriend = 3;
+	optional uint32 countTotalRoom = 4;
+}
+
+// 设置手机系统消息为已读【接口已废弃】
+message ISReqSetSysMsgReadMobile
+{
+	required uint64 userId = 1;
+	repeated uint64 messageId = 2;	
+}
+
+message ISResSetSysMsgReadMobile
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;	
+}
+
+// 设置客户端自定义的key-value对
+message ISReqChangeConfig
+{
+	required uint64 userId = 1;
+	repeated string key = 2;
+	repeated bytes value = 3;   
+}
+
+message ISResChangeConfig
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	repeated string key = 3;           // 无效字段，返回空
+	repeated uint64 version = 4;		   // 无效字段，返回空
+}
+
+// 获取客户端自定义的key-value对
+message ISReqConfigInfo
+{
+	required uint64 userId = 1;
+	repeated string key = 2;
+	repeated uint64 version = 3;
+}
+
+message ISResConfigInfo
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	repeated string key = 3;
+	repeated bytes value = 4;   
+	repeated uint64 version = 5;
+}
+
+//客户端向服务器请求群成员列表	
+message ISReqUserRoomInfo	
+{
+	required uint64 userId      = 1;
+	repeated uint64 roomId      = 2;
+	repeated uint64 version     = 3;
+	required bool reqMember     = 4;
+	optional bool reqOwner      = 5;
+}	
+	
+message ISResUserRoomInfo	
+{	
+	required int32 retcode      = 1;
+	optional bytes error_desc   = 2;
+	repeated SM.SMRoom roomInfo = 3;
+	repeated bool isComplete    = 4; // 是否为全量
+}	
+
+// 获取群的完整信息
+message ISGetRoomInfoReq
+{
+	repeated uint64 roomId       = 1; // 群ID
+}
+message ISGetRoomInfoRsp
+{
+	required int32 retcode       = 1; // 错误码
+	repeated ISRoomInfo roomInfo = 2; // 群完整信息
+}
+
+message ISReqRoomList
+{
+	required uint64 userId       = 1;
+	required uint64 version      = 2;
+}
+
+message ISResRoomList	
+{	
+	required int32 retcode       = 1;
+	optional bytes error_desc    = 2;
+	optional uint64 version      = 3;
+	repeated uint64 roomId       = 4;
+	repeated uint64 roomVersion  = 5;
+	repeated uint64 removeRoomId = 6;
+	optional bool isComplete     = 7; // 是否为全量
+}	
+
+// 新增群
+message ISReqAddRoom
+{
+	required uint64 userId = 1;
+	required string roomName = 2;
+	required SM.RoomType type = 3;
+	optional string description = 4;	
+}
+
+message ISResAddRoom
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional uint64 roomId = 3;
+	optional uint64 roomVersion = 4;
+	optional string right = 5;
+	optional uint64 createtime = 6;		// 毫秒
+	optional string roomNumber = 7; 
+}
+
+// 新增群 支持邀请
+message ISReqAddRoom2
+{
+	required uint64 userId      = 1;        // 用户ID
+	required string roomName    = 2;        // 群名称
+	required SM.RoomType type   = 3;        // 群类型
+	optional string description = 4;        // 群描述
+	repeated uint64 friendId    = 5;        // 添加用户列表
+}
+
+message ISResAddRoom2
+{
+	required int32 retcode      = 1;        // 错误码
+	optional bytes error_desc   = 2;        // 错误描述
+	optional uint64 roomId      = 3;        // 群ID
+	optional uint64 roomVersion = 4;        // 群版本
+	repeated uint64 friendId    = 5;        // 邀请群成员列表
+	repeated uint64 messageId   = 6;        // 邀请群成员系统消息列表
+	optional string right       = 7;        // 群主权限
+	optional uint64 createtime  = 8;        // 创建时间
+	optional string roomNumber  = 9;        // 群号
+	repeated uint64 autoAddId   = 10;       // 自动添加成员列表
+	optional string memberRight = 11;       // 群成员权限
+}
+
+// 更新群
+message ISReqUpdateRoom
+{	
+	required uint64 userId = 1;
+	required uint64 roomId = 2;
+	optional string roomName = 3;
+	optional string description = 4;
+	optional string notice = 5;
+	optional bool openSearch = 6;
+}
+
+message ISResUpdateRoom
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional uint64 version = 3;		// 群版本
+}
+
+// 设置开放搜索
+message ISReqOpenSearch
+{
+	required uint64 userId = 1;
+	required uint64 roomId = 2;
+	required bool openSearch = 3;
+}
+
+message ISResOpenSearch
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional uint64 version = 3;		// 群版本
+}
+
+// 阻止群
+message ISReqBlockRoom
+{
+	required uint64 userId = 1;
+	required uint64 roomId = 2;
+	required int32 block = 3;		// 1:阻止 0:不阻止
+}
+
+message ISResBlockRoom
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional uint64 version = 3;		// 群版本
+}
+
+// 删除群
+message ISReqDelRoom
+{
+	required uint64 userId    = 1; // 请求用户ID
+	required uint64 roomId    = 2; // 删除的群ID
+}
+message ISResDelRoom
+{
+	required int32 retcode    = 1; // 错误码
+	optional bytes error_desc = 2; // 错误描述
+	repeated uint64 memberId  = 3; // 群成员列表
+	repeated uint64 ntyUser   = 4; // 系统消息改变通知的用户列表
+	repeated uint64 sysMsgId  = 5; // 系统消息ID列表【与用户列表匹配】
+}
+
+// 退出群
+message ISReqQuitRoom
+{
+	required uint64 userId = 1;
+	required uint64 roomId = 2;
+}
+
+message ISResQuitRoom
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional uint64 version = 3;
+}
+
+// 请求加入群
+message ISReqJoinRoom
+{
+	required uint64 userId         = 1;  // 用户ID   
+	required uint64 roomId         = 2;  // 群ID
+	optional string description    = 3;  // 附言
+}
+
+message ISResJoinRoom
+{
+	required int32 retcode          = 1;  // 错误码
+	optional bytes error_desc       = 2;  // 错误描述
+	repeated uint64 roomManagerId   = 3;  // 该群的管理员列表
+	optional uint64 messageId       = 4;  // 群申请的系统消息ID
+	optional uint64 inviteMessageId = 5;  // 该用户被邀请的群系统消息ID
+	optional bool isAutoDeal        = 6;  // 是否自动处理，如果用户被邀请过，则自动加入
+	optional uint64 version         = 7;  // 群版本
+	optional string right           = 8;  // 用户加入群的权限
+	optional uint64 createtime      = 9;  // 用户加入时间
+	optional bool isReReq           = 10; // 是否为重复请求
+}
+
+// 忽略加入群请求
+message ISReqIgnoreJoinRoom
+{
+	required uint64 userId = 1;
+	required uint64 messageId = 2;	
+}
+
+message ISResIgnoreJoinRoom
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	repeated uint64 roomManagerId = 3;	// 管理员ID 排除操作管理员
+}
+
+// 批准加入群
+message ISReqAcceptRoomMember
+{
+	required uint64 userId = 1;
+	required uint64 messageId = 2;
+}
+
+message ISResAcceptRoomMember
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;	
+	optional uint64 roomId = 3;
+	optional uint64 roomVersion = 4;	
+	optional uint64 roomMemberId = 5;
+	repeated uint64 roomManagerId = 6;
+	optional uint64 inviteMessageId = 7;   // 无效字段
+	optional string right = 8;
+	optional uint64 createtime = 9;
+}
+
+// 群成员管理
+message ISReqManagerRoom
+{
+	required uint64 userId = 1;
+	required uint64 roomId = 2;
+	repeated SM.SMRoomMember memberInfo = 3;
+	repeated uint64 delMember = 4;
+}
+
+message ISResManagerRoom
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional uint64 roomVersion = 3;			
+}
+
+// 邀请加入群
+message ISReqInviteRoom
+{
+	required uint64 userId = 1;
+	required uint64 roomId = 2;
+	repeated uint64 friendId = 3;
+	optional bool noInviteMsg = 4;	// 不产生邀请消息
+}
+
+message ISResInviteRoom
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	repeated uint64 friendId = 3;
+	repeated uint64 messageId = 4;
+	repeated uint64 joinMessageId = 5;
+	repeated uint64 joinFriendId = 6;
+	optional uint64 version = 7;
+	optional string right = 8;
+	optional uint64 createtime = 9;
+}
+
+// 忽略邀请加入群
+message ISReqIgnoreInviteRoom
+{
+	required uint64 userId = 1;
+	required uint64 messageId = 2;
+}
+
+message ISResIgnoreInviteRoom
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+}
+
+// 接受邀请加入群
+message ISReqAcceptInviteRoom
+{
+	required uint64 userId = 1;
+	required uint64 messageId = 2;
+}
+
+message ISResAcceptInviteRoom
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional uint64 roomId = 3;
+	optional uint64 roomVersion = 4;
+	optional uint64 joinMessageId = 5;	 // 废弃字段
+	optional string right = 6;
+	optional uint64 createtime = 7;
+}
+// 请求机构列表
+message ISReqOrgType
+{
+	
+}
+
+message ISResOrgType
+{
+	required int32 retcode     = 1; // 错误码
+	optional bytes error_desc  = 2; // 错误描述
+	repeated string orgType    = 3; // 机构名称
+	repeated string bankNature = 4; // 机构类型
+}
+
+// 搜索(结果不包括自己的好友和群)【移至搜索服务器实现】
+message ISReqSearch
+{
+	required uint64 userId 	  = 1;
+	required string key       = 2;
+	optional string orgType   = 3;
+	optional string province  = 4;
+	optional string city      = 5;
+	optional uint32 limitUser = 6;
+	optional uint32 limitRoom = 7;
+	optional bool onlyStranger = 8;			// 仅搜索陌生人
+	optional bool onlyOnline   = 9;			// 仅搜索在线用户
+}
+
+message ISResSearch
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	repeated SM.SMSearchUser user      = 3;
+    repeated SM.SMSearchRoom room      = 4;
+}
+
+// 获取文件消息ID
+message ISReqGetFileSendMsgId
+{
+	required uint64 fromId = 1;
+	required uint64 toId = 2;
+}
+
+message ISResGetFileSendMsgId
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional uint64 fileMsgId = 3;
+}
+
+// 查询文件消息状态
+message ISReqQueryFileSendMsg
+{
+	required uint64 fileMsgId = 1;	
+	required uint64 userId = 2;
+}
+
+message ISResQueryFileSendMsg
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional SM.STATUS_FILE_SEND statusSend = 3;	// 文件发送状态
+	optional SM.STATUS_FILE_RCV statusRecv = 4;		// 文件接收状态
+}
+
+// 修改文件消息状态
+message ISReqModFileSendMsg
+{
+	required uint64 fileMsgId  	= 1;  // 文件消息ID
+	required uint64 fromId 		= 2;
+	required uint64 toId      	= 3;
+	required uint64 msgId      	= 4;  // 聊天消息ID	
+	optional SM.STATUS_FILE_SEND statusSend = 5;  // 文件发送状态
+	optional SM.STATUS_FILE_RCV statusRecv = 6;  // 文件接收状态
+	required uint64 userId 	 	= 7;
+	optional bool toIdOffline	= 8;			// 接收者离线
+}
+
+message ISResModFileSendMsg
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;	
+}
+
+// 用户掉线 文件传输失败
+message ISReqUpdateFileByOffline
+{
+	required uint64 userId 	= 1;  // 文件消息ID	
+}
+
+message ISResUpdateFileByOffline
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;	
+	repeated uint64 msgId = 3;
+	repeated uint64 friendId = 4;
+}
+
+message ISReqLocation
+{
+	
+}
+
+message ISResLocation
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;	
+	 repeated SM.SMLocation location = 3;
+}
+
+// 请求群发组列表
+message ISReqMassGroupList
+{
+	required uint64 userId           = 1;
+	required uint64 version          = 2;
+}
+
+message ISResMassGroupList	
+{	
+	required int32 retcode            = 1;
+	optional bytes error_desc         = 2;
+	optional uint64 version           = 3;
+	repeated SM.SMSendGroup groupInfo = 4;
+	optional bool isComplete          = 5; // 是否为全量
+}
+
+// 创建群发组
+message ISReqCreateMassGroup
+{
+	required uint64 userId = 1;
+	required string groupName = 2;
+	repeated uint64 memberId = 3;
+}
+
+message ISResCreateMassGroup	
+{	
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;
+	optional uint64 version = 3;
+	optional uint64 groupId = 4; 
+}
+
+// 更新群发组名
+message ISReqUpdateMassGroupName
+{
+	required uint64 userId = 1;
+	required uint64 groupId = 2;
+	required string displayName = 3;
+}
+
+message ISResUpdateMassGroupName
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;	
+	optional uint64 version = 3;	// 群发组版本
+}
+
+// 删除群发组
+message ISReqDelMassGroup
+{
+	required uint64 userId = 1;
+	required uint64 groupId = 2;
+}
+
+message ISResDelMassGroup
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;	
+	optional uint64 version = 3;	// 群发组版本
+}
+
+// 管理群发组成员
+message ISReqManagerMember
+{
+	required uint64 userId = 1;
+	required uint64 groupId = 2;
+	repeated uint64 memberId = 3;
+	repeated uint64 removeMemberId = 4;
+}
+
+message ISResManagerMember
+{
+	required int32 retcode = 1;
+	optional bytes error_desc = 2;	
+	optional uint64 version = 3;	// 群发组版本
+}
+
+
+//////// 用户配置相关接口
+
+// 设置用户配置
+message ISReqSetUserConfig
+{
+	required uint64 userId             = 1;  // 用户ID
+	required SM.SMUserConfig userCfg   = 2;  // 用户配置
+}
+message ISResSetUserConfig
+{
+	required uint32 errorCode          = 1;  // 错误码
+}
+
+// 获取用户配置
+message ISReqGetUserConfig
+{
+	repeated uint64 userId             = 1;  // 用户ID
+}
+message ISResGetUserConfig
+{
+	required uint32 errorCode          = 1;  // 错误码
+	repeated SM.SMUserConfig userCfg   = 2;  // 用户配置
+}
+
+enum EISRelationType
+{
+	ISRelationType_Friend         = 0; // 好友
+	ISRelationType_Stranger_Group = 1; // 陌生人分组
+	ISRelationType_Stranger       = 2; // 陌生人
+}
+
+// 获取用户的关系类型
+message ISReqRelationType
+{
+	repeated uint64 userId1       = 1; // 用户1
+	repeated uint64 userId2       = 2; // 用户2【用户1和用户2的大小要匹配】
+}
+message ISResRelationType
+{
+	required uint32 errorCode     = 1; // 错误码
+	repeated EISRelationType type = 2; // 关系类型 
+}
+
+// 初始化账号关系
+message ISReqInitAccountInfo
+{
+	required SM.SMUserDetailInfo userInfo = 1; // 用户
+}
+message ISResInitAccountInfo
+{
+	required uint32 errorCode             = 1; // 错误码
+}
+
+
+/////////////////////////   infoserver内部数据存储  ///////////////////////////////////
+
+message ISRoomMemberInfo
+{
+	required uint64 memberid           = 1; // 群成员ID
+	required SM.SMRoomMember.ROLE role = 2; // 群成员角色
+	required string right              = 3; // 群成员权限
+	required uint64 joinTime           = 4; // 入群时间
+	required bool block                = 5; // 群成员是否阻止群
+	required uint64 version            = 6; // 群成员自身的群版本【随群的阻止状态发生变化】
+}
+
+message ISRoomInfo
+{
+	required uint64 roomId               = 1; // 群ID
+	required uint64 version              = 2; // 群版本
+	required string roomName             = 3; // 群名称
+	required string roomNum              = 4; // 群号
+	required string description          = 5; // 群描述
+	required string notice               = 6; // 群公告
+	required SM.RoomType type            = 7; // 群类型
+	required bool openInSearch           = 8; // 是否开放搜索
+	repeated ISRoomMemberInfo memberInfo = 9; // 群成员信息
+}
+
+message ISUserExtInfo
+{
+	required uint64 userId = 1; // 用户ID
+	optional uint32 flag   = 2; // 引导标识
+	repeated string uuids  = 3; // UUID列表
+}
+
+
+// 查询关注公众号的联系人列表
+message ISReqPubAccountFriends
+{
+	required uint64 pubAccountId = 1; // 公众号
+}
+message ISResPubAccountFriends
+{
+	required uint32 errorCode    = 1; // 错误码
+	repeated uint64 users        = 2; // 用户列表
+}
+
+// 导入手机联系人
+message ISLoadMobileRosterReq
+{
+	required uint64 userId        = 1; // 用户ID
+	repeated string mobiles       = 2; // 手机号列表
+}
+message ISLoadMobileRosterRsp
+{
+	required uint32 errorCode     = 1; // 错误码
+	optional uint32 groupId       = 2; // “导入好友”组的ID
+	repeated uint64 friendIds     = 3; // 匹配的好友列表
+	repeated uint64 sysMsgIds     = 4; // 好友请求系统消息列表【0表示没有系统消息】
+	repeated uint64 oldSysMsgIds  = 5; // 对方加自己的系统消息列表
+	optional uint64 groupVersion  = 6; // 用户组版本
+	optional uint64 rosterVersion = 7; // 名册版本
+}
+
+// 获取QQ绑定的联系人
+message ISGetQQUserReq
+{
+	repeated string qqList   = 1; // QQ列表
+}
+message ISGetQQUserRsp
+{
+	repeated uint64 userIds  = 1; // 用户ID列表【0代表没有匹配的用户】
+	repeated string nickName = 2; // QQ昵称
+	repeated string contact	 = 3; // 联系方式
+	repeated string phone	 = 4; // 固话
+	repeated string mobile	 = 5; // 手机
+	repeated string province = 6; // 省份
+	repeated string orgType  = 7; // 机构类型
+}
+
+message ISQQRoomInfo
+{
+	required string qqRoom   = 1; // QQ群
+	optional uint64 roomId   = 2; // 绑定的QM群
+	optional string roomName = 3; // 名称
+	optional uint64 userId   = 4; // 虚拟发送方用户ID
+}
+
+// 设置QQ群对应的QM群
+message ISSetQQRoomBindRoomReq
+{
+	required string qqRoom     = 1; // QQ群
+	required string qqRoomName = 2; // QQ群名称
+	required string roomNum    = 3; // QM群号
+}
+message ISSetQQRoomBindRoomRsp
+{
+	required uint32 errorCode = 1; // 错误码
+}
+
+// 获取QQ群对应的QM群
+message ISGetQQRoomBindRoomReq
+{
+	repeated string qqRoomList         = 1; // QQ群列表
+}
+message ISGetQQRoomBindRoomRsp
+{
+	repeated ISQQRoomInfo roomInfoList = 1; // QM群列表
+}
+
+// 设置QQ昵称
+message ISSetQQNickNameReq
+{
+	repeated string qqList    = 1; // QQ列表
+	repeated string nickNames = 2; // 昵称列表
+	repeated string contact	  = 3; // 联系方式
+	repeated string phone	  = 4; // 固话
+	repeated string mobile	  = 5; // 手机
+	repeated string province  = 6; // 省份
+	repeated string orgType   = 7; // 机构类型
+}
+message ISSetQQNickNameRsp
+{
+	required uint32 errorCode = 1; // 错误码
+}
+
+message ISQQInfo
+{
+	required string qq    	  = 1; // QQ
+	optional string nickName  = 2; // 昵称
+	optional string contact	  = 3; // 联系方式
+	optional string phone	  = 4; // 固话
+	optional string mobile	  = 5; // 手机
+	optional string province  = 6; // 省份
+	optional string orgType   = 7; // 机构类型
+}
+
+///////////////////////////   客户端直接请求接口  /////////////////////////////////////
+
+//////// 好友导入相关接口
+
+// 好友导入类型
+enum ISFriendLoadType 
+{
+	IS_FriendLoadType_QQ   = 0;        // QQ联系人
+	IS_FriendLoadType_RM   = 1;        // RM联系人
+	IS_FriendLoadType_Room = 2;        // 群导入
+	IS_FriendLoadType_QQRoom = 3;      // QQ群导入
+}
+
+// 申请导入好友
+message ISReqFriendLoad
+{
+	required uint64 userId             = 1;  // 用户ID
+	required ISFriendLoadType loadType = 2;  // 导入类型
+}
+message ISResFriendLoad
+{
+	required uint32 errorCode          = 1;  // 错误码
+	optional string uuid               = 2;  // 文件上传UUID
+}
+
+// 上传导入好友文件
+message ISReqUploadFile
+{
+	required string uuid        = 1;  // 导入UUID
+	required bytes content      = 2;  // 文件内容
+	required bool bFinished     = 3;  // 是否上传完成
+}
+message ISResUploadFile
+{
+	required uint32 errorCode   = 1;  // 错误码
+}
+
+// 查询导入进度
+message ISReqQueryFriendLoadProgress
+{
+	required string uuid         = 1;  // 导入UUID
+}
+message ISResQueryFriendLoadProgress
+{
+	required uint32 errorCode    = 1;  // 错误码
+	optional uint32 totalNum     = 2;  // 好友总数
+	optional uint32 doneNum      = 3;  // 已导入数
+	repeated uint64 friendIdList = 4;  // 匹配好友列表
+}
+
+// 取消好友导入
+message ISReqCancelFriendLoad
+{
+	required string uuid         = 1;  // 导入UUID
+}
+message ISResCancelFriendLoad
+{
+	required uint32 errorCode    = 1;  // 错误码
+}
+
+//////// 系统消息查询相关接口
+
+// 系统消息类型
+enum EISSysMsgType
+{
+	IS_SysMsgType_Friend           = 1; // 好友系统消息
+	IS_SysMsgType_Room             = 2; // 群系统消息
+	IS_SysMsgType_ALL              = 3; // 全部种类
+}
+
+// 系统消息状态
+enum EISSysMsgStatus
+{
+	IS_SysMsgStatus_UnTreate       = 1; // 未处理
+	IS_SysMsgStatus_Agree          = 2; // 已同意
+	IS_SysMsgStatus_Refuse         = 3; // 已拒绝/已忽略
+}
+
+// 好友系统消息
+message ISSysMsgFriend
+{
+	required uint64 messageId       = 1; // 系统消息ID
+	optional uint64 fromId          = 2; // 申请方
+	optional uint64 toId            = 3; // 接收方
+	optional uint64 time            = 4; // 时间
+	optional string description     = 5; // 附言
+	optional EISSysMsgStatus status = 6; // 系统消息状态
+}
+
+// 群系统消息
+message ISSysMsgRoom
+{
+	enum TYPE_ACTION{
+    	 TYPE_INVITE = 1;                // 群邀请
+    	 TYPE_APPLY  = 2;                // 群申请
+    };
+	required uint64 messageId       = 1; // 系统消息ID
+	optional uint64 adminId         = 2; // 管理员ID
+	optional uint64 userId          = 3; // 用户ID
+	optional uint64 roomId          = 4; // 群ID
+	optional TYPE_ACTION actionType = 5; // 种类
+	optional uint64 time            = 6; // 时间
+	optional string description     = 7; // 附言
+	optional EISSysMsgStatus status = 8; // 系统消息状态
+}
+
+
+// 查询未处理的系统消息数目
+message ISReqGetUnTreatedSysMsgNum
+{
+	required uint64 userId            = 1; // 用户ID
+	required EISSysMsgType msgType    = 2; // 系统消息类型
+}
+message ISResGetUnTreatedSysMsgNum
+{
+	required uint32 errorCode         = 1; // 错误码
+	optional uint32 totalNum          = 2; // 未读系统消息数
+}
+
+// 查询一段时间内的系统消息
+message ISReqQuerySysMsgWithTime
+{
+	required uint64 userId            = 1; // 用户ID
+	required EISSysMsgType msgType    = 2; // 系统消息类型
+	required uint64 afterTime         = 3; // 返回此时间之后的系统消息
+}
+message ISResQuerySysMsgWithTime
+{
+	required uint32 errorCode         = 1; // 错误码
+	repeated ISSysMsgFriend msgFriend = 2; // 好友系统消息
+	repeated ISSysMsgRoom msgRoom     = 3; // 群的系统消息
+}
+
+// 查询单条系统消息
+message ISReqQueryOneSysMsg
+{
+	required uint64 userId            = 1;  // 用户ID
+	required uint64 messageId         = 2;  // 系统消息ID
+}
+message ISResQueryOneSysMsg
+{
+	required uint32 errorCode         = 1; // 错误码
+	optional ISSysMsgFriend msgFriend = 2; // 好友系统消息
+	optional ISSysMsgRoom msgRoom     = 3; // 群的系统消息
+}
+
+
+//////// 公众号相关接口
+
+message ISPubAccountInfo
+{
+	required uint64 pubAccountId = 1; // 公众号
+	required string companyId    = 2; // 公司ID
+	required string pubName      = 3; // 公众号名称
+	required string desc         = 4; // 公众号描述
+	optional int32 avatarId      = 5; // 公众号头像ID
+	optional bytes avatar        = 6; // 公众号自定义头像
+	repeated uint64 users        = 7; // 公众号客服列表
+	repeated uint64 roomId       = 8; // 公众号绑定的群ID 
+	repeated uint64 roomNumber   = 9; // 公众号绑定的群号 
+}
+
+// 创建公众号
+message ISReqCreatePubAccount
+{
+	required ISPubAccountInfo info = 1; // 公众号信息【如果指定固定区间的公众号，服务端采用指定公众号，否则服务端自动生成公众号】
+}
+message ISResCreatePubAccount
+{
+	required uint32 errorCode      = 1; // 错误码
+	optional uint64 pubAccountId   = 2; // 公众号
+}
+
+// 删除公众号
+message ISReqDelPubAccount
+{
+	required uint64 pubAccountId = 1; // 公众号
+}
+message ISResDelPubAccount
+{
+	required uint32 errorCode    = 1; // 错误码
+}
+
+// 更新公众号
+message ISReqUpdatePubAccount
+{
+	required ISPubAccountInfo info = 1; // 公众号信息
+}
+message ISResUpdatePubAccount
+{
+	required uint32 errorCode      = 1; // 错误码
+}
+
+// 查询公众号
+message ISReqGetPubAccountInfo
+{
+	required uint64 pubAccountId   = 1; // 公众号【0代表获取所有公众号信息】
+	optional bool removeAvatar	   = 2; // 是否移除头像
+}
+message ISResGetPubAccountInfo
+{
+	required uint32 errorCode      = 1; // 错误码
+	repeated ISPubAccountInfo info = 2; // 公众号信息
+}
+
+
+//////// 公司相关接口
+
+// 获取公司里面的所有成员
+message ISReqAllCompanyMembers
+{
+	required string companyId = 1; // 公司ID
+}
+message ISResAllCompanyMembers
+{
+	required uint32 errorCode = 1; // 错误码
+	repeated uint64 userids   = 2; // 用户列表
+}
+
+
+//////// 测试相关接口
+
+// 数据包应答测试
+message ISPacketTestReq
+{
+	required uint32 packetSize = 1; // 数据包大小
+}
+message ISPacketTestRsp
+{
+	required bytes content     = 1; // 数据包
+}
+
+
+//////// 登录相关接口
+
+// 好友信息
+message ISRosterInfo
+{
+	required uint64 rosterId = 1; // 好友ID
+	optional string nickName = 2; // 昵称
+	optional bool isFriend   = 3; // 是否为好友
+	optional bool block      = 4; // 是否阻止该联系人
+}
+
+// 获取用户名册信息
+message ISGetRosterInfoReq
+{
+	required uint64 userId           = 1; // 用户ID
+	required uint64 version          = 2; // 客户端本地名册版本
+}
+message ISGetRosterInfoRsp
+{
+	required uint32 errorCode        = 1; // 错误码
+	optional uint64 version          = 2; // 名册最新版本
+	repeated ISRosterInfo rosterInfo = 3; // 名册列表【版本一致返回空，版本不一致返回所有好友列表】
+}
+
+// 获取用户信息
+message ISGetUserInfoReq
+{
+	repeated uint64 userId                = 1; // 用户ID
+	repeated uint64 version               = 2; // 用户版本
+	required bool reqDetail               = 3; // 是否请求详细信息
+	optional uint64 ownerId               = 4; // 请求用户ID
+	optional bool removeAvatar			  = 5; // 移除头像数据
+}
+message ISGetUserInfoRsp
+{
+	required uint32 errorCode             = 1; // 错误码
+	repeated SM.SMUserDetailInfo userInfo = 2; // 有变化的用户信息
+	optional uint32 disposeNum            = 3; // 实际处理的用户数目【小于或等于 userId 的大小，有可能数据包太大，只返回一部分用户信息】
+}
+
+// 获取用户客户经理信息
+message ISGetCustomerManagerReq
+{
+	required uint64 userId                = 1; // 用户ID
+}
+message ISGetCustomerManagerRsp
+{
+	required uint32 errorCode             = 1; // 错误码
+	optional uint64 manager               = 2; // 经理id
+	optional string name                  = 3; // 名称
+	optional string telephone             = 4; // 固定电话
+	optional string mobile                = 5; // 移动电话
+	optional string hotline               = 6; // 热线电话
+}
+
+// 获取用户绑定的内部群
+message ISGetBindingRoomReq
+{
+	required uint64 userId                = 1; // 用户ID【填0表示获取所有的绑定信息】
+}
+message ISGetBindingRoomRsp
+{
+	required uint32 errorCode             = 1; // 错误码
+	repeated uint64 roomId                = 2; // 绑定群
+	repeated uint64 userId                = 3; // 绑定群
+}
+
+// 设置用户绑定的内部群
+message ISSetBindingRoomReq
+{
+	required uint64 userId                = 1; // 用户ID
+	required uint64 roomId                = 2; // 群ID
+}
+message ISSetBindingRoomRsp
+{
+	required uint32 errorCode             = 1; // 错误码
+}
+
+
+// 获取链接地址
+message ISGetLinkReq
+{
+	required uint64 userId                = 1; // 用户ID
+}
+message ISGetLinkRsp
+{
+	required uint32 errorCode             = 1; // 错误码
+	optional string quotation             = 2; // QB报价链接
+	optional string importFriendsMore     = 3; // 导入联系人更多解释
+}
+
+// 用户资料变更申请
+message ISModUserInfoReq
+{
+	required uint64 userId    = 1; // 用户ID
+	optional string mobile    = 2; // 手机
+	optional string phone     = 3; // 电话
+	optional string city      = 4; // 城市
+	optional string email     = 5; // 邮件
+	optional string addr      = 6; // 地址
+}
+message ISModUserInfoRsp
+{
+	required uint32 errorCode = 1; // 错误码
+}
+
+// 获取申请的资料变更信息
+message ISGetModUserInfoReq
+{
+	required uint64 userId    = 1; // 用户ID
+}
+message ISGetModUserInfoRsp
+{
+	required uint32 errorCode = 1; // 错误码
+	optional string mobile    = 2; // 手机
+	optional string phone     = 3; // 电话
+	optional string city      = 4; // 城市
+	optional string email     = 5; // 邮件
+	optional string addr      = 6; // 地址
+}
+
+// 获取所有用户列表
+message ISGetAllUserIdReq
+{
+}
+message ISGetAllUserIdRsp
+{
+	repeated uint64 userId = 1; // 用户ID列表
+}
+
+
+// 设置用户的引导信息
+message ISSetUserGuideInfoReq
+{
+	repeated uint64 userIds   = 1; // 用户ID列表
+	required uint32 flag      = 2; // 标志位
+	repeated string uuids     = 3; // 图片UUID
+}
+message ISSetUserGuideInfoRsp
+{
+	required uint32 errorCode = 1; // 错误码
+}
+
+// 获取用户的引导信息
+message ISGetUserGuideInfoReq
+{
+	required uint64 userId 	= 1; // 用户ID
+}
+message ISGetUserGuideInfoRsp
+{
+	required uint32 flag   = 1; // 标志位
+	repeated string uuid   = 2; // UUID
+}
+
+// 获取全局配置
+message ISGetGlobalConfigReq
+{
+	repeated string key 		= 1;
+}
+
+message ISGetGlobalConfigRsp
+{
+	required uint32 errorCode 	= 1; // 错误码
+	repeated string value   	= 2; 
+}
+
+// 更新全局配置，key不存在则新增
+message ISUpdateGlobalConfigReq
+{
+	repeated string key 		= 1;
+	repeated string value 		= 2;
+}
+
+message ISUpdateGlobalConfigRsp
+{
+	required uint32 errorCode 	= 1; // 错误码	
+}
+
+// 获取所有全局配置
+message ISGetAllGlobalConfigReq
+{	
+}
+
+message ISGetAllGlobalConfigRsp
+{
+	required uint32 errorCode 	= 1; // 错误码
+	repeated string key 		= 2;
+	repeated string value   	= 3; 
+}
+
+// 批量邀请好友
+message ISBatchInviteFriendReq
+{
+	required uint64 userid    	= 1;         // 请求用户ID
+	repeated uint64 friendIds 	= 2;         // 批量邀请的好友列表	
+}
+message ISBatchInviteFriendRsp
+{
+	required int32 errorCode    = 1;     // 错误码
+	repeated uint64 messageIds  = 2;     // 好友请求系统消息列表【对方已加好友，messageId为0】	
+}
+
+// 查询好友免打扰关系
+message ISGetFriendBlockReq
+{
+	required uint64 userId 		= 1;
+	repeated uint64 friendIdList= 2;
+}
+
+message ISGetFriendBlockRsp
+{
+	required int32 errorCode    = 1;     // 错误码
+	repeated bool block  		= 2;     // 免打扰关系
+	optional string displayName	= 3;	 // 用户显示名	
+}
+
+// 查询群非免打扰关系
+message ISGetRoomNoBlockReq
+{
+	required uint64 userId 		= 1;
+	repeated uint64 roomList= 2;
+}
+
+message ISGetRoomNoBlockRsp
+{
+	required int32 errorCode    = 1;     // 错误码
+	repeated ISRoomNoBlock roomNoBlockList= 2;     // 非免打扰群列表
+	optional string displayName	= 3;	// 用户显示名	
+}
+
+message ISRoomNoBlock
+{
+	required uint64 roomId 			= 1;
+	repeated uint64 roomMemberList 	= 2;	
+	optional string roomName  		= 3;	
+}
+
+// 获取头像数据
+message ISGetAvatarListReq
+{
+	repeated uint64 userIdList		= 1;
+	repeated uint32 avatarIdList	= 2;
+}
+
+message ISGetAvatarListRsp
+{
+	required int32 errorCode    		= 1;     // 错误码
+	repeated uint64 changeUserIdList	= 2;	 // 头像ID有变化用户ID列表
+	repeated uint32 avatarIdList		= 3;
+	repeated bytes avatarDataList 		= 4;	 // 头像数据列表 没有头像数据返回为空
+}

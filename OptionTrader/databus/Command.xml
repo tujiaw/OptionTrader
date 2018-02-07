@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AppList>
+  <AppServer id="0" name="DataBus" desc="Data Bus">
+    <function id="0" request="MsgExpress.ErrMessage" response="MsgExpress.ErrMessage" desc=""></function>
+    <function id="1" request="MsgExpress.StartupApplication" response="MsgExpress.CommonResponse" desc=""></function>
+    <function id="2" request="MsgExpress.PublishData" response="MsgExpress.CommonResponse" desc=""></function>
+    <function id="3" request="MsgExpress.LoginInfo" response="MsgExpress.LoginResponse" desc=""></function>
+    <function id="4" request="MsgExpress.Logout" response="MsgExpress.CommonResponse" desc=""></function>
+    <function id="5" request="MsgExpress.HeartBeat" response="MsgExpress.HeartBeatResponse"></function>
+    <function id="6" request="MsgExpress.StopBroker" response="MsgExpress.CommonResponse" desc=""></function>
+
+	<function id="11" request="MsgExpress.SimpleSubscription" response="MsgExpress.CommonResponse" desc=""></function>
+    <function id="12" request="MsgExpress.SubscribeData" response="MsgExpress.CommonResponse" desc=""></function>
+    <function id="13" request="MsgExpress.UnSubscribeData" response="MsgExpress.CommonResponse" desc=""></function>
+    <function id="14" request="MsgExpress.ComplexSubscribeData" response="MsgExpress.CommonResponse"></function>
+    <function id="15" request="MsgExpress.GetAppList" response="MsgExpress.AppList"></function>
+    <function id="16" request="MsgExpress.GetAppInfo" response="MsgExpress.AppInfo"></function>
+    <function id="17" request="MsgExpress.UpdateAppStatus" response="MsgExpress.CommonResponse"></function>
+    <function id="18" request="MsgExpress.KickOffApp" response="MsgExpress.CommonResponse" desc=""></function>
+    <function id="19" request="MsgExpress.RestartApp" response="MsgExpress.CommonResponse" desc=""></function>
+  </AppServer>
+  <AppServer id="1" name="Gateway" desc="">
+    <function id="1" request="Gateway.Login" response="Gateway.CommonResponse" desc=""></function>
+    <function id="2" request="Gateway.Logout" response="Gateway.CommonResponse" desc=""></function>
+    <function id="3" request="Gateway.Subscribe" response="Gateway.SubscribeResult" desc=""></function>
+  </AppServer>
+  <AppServer id="2" name="Security" desc="">
+    <function id="1" request="Security.ReqSessionValid" response="Security.ResSessionValid" desc=""></function>
+  </AppServer> 
+  <AppServer id="888" name="Trade" desc="">
+    <function id="1" request="Trade.LoginReq" response="Trade.LoginResp" desc=""></function>
+    <function id="2" request="Trade.LogoutReq" response="Trade.LogoutResp" desc=""></function>
+	<function id="3" request="Trade.OrderReq" response="Trade.OrderResp" desc=""></function>
+	<function id="4" request="Trade.CancelReq" response="Trade.CancelResp" desc=""></function>
+	<function id="5" request="Trade.ModifyReq" response="Trade.ModifyResp" desc=""></function>
+	<function id="6" request="Trade.MarketDataReq" response="Trade.MarketDataResp"  desc=""></function>
+	
+    <function id="10" request="Trade.TradingAccount" response="MsgExpress.CommonResponse" ispublish="true" desc=""></function>
+	<function id="11" request="Trade.MarketData" response="MsgExpress.CommonResponse" ispublish="true" desc=""></function>
+	<function id="12" request="Trade.Position" response="MsgExpress.CommonResponse" ispublish="true" desc=""></function>
+	<function id="13" request="Trade.Order" response="MsgExpress.CommonResponse" ispublish="true" desc=""></function>
+	<function id="14" request="Trade.Trade" response="MsgExpress.CommonResponse" ispublish="true" desc=""></function>
+	<function id="15" request="Trade.ErrorInfo" response="MsgExpress.CommonResponse" ispublish="true" desc=""></function>
+  </AppServer>
+</AppList>

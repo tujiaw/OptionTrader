@@ -1,128 +1,362 @@
-//订阅变量配置，服务心跳、日志、网关、聊天消息统计；
-export var APPID = 0x00B;
+export const AppList=[
+  {
+    "$": {
+      "id": "0",
+      "name": "DataBus",
+      "desc": "Data Bus"
+    },
+    "function": [
+      {
+        "$": {
+          "id": "0",
+          "request": "MsgExpress.ErrMessage",
+          "response": "MsgExpress.ErrMessage",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "1",
+          "request": "MsgExpress.StartupApplication",
+          "response": "MsgExpress.CommonResponse",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "2",
+          "request": "MsgExpress.PublishData",
+          "response": "MsgExpress.CommonResponse",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "3",
+          "request": "MsgExpress.LoginInfo",
+          "response": "MsgExpress.LoginResponse",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "4",
+          "request": "MsgExpress.Logout",
+          "response": "MsgExpress.CommonResponse",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "5",
+          "request": "MsgExpress.HeartBeat",
+          "response": "MsgExpress.HeartBeatResponse"
+        }
+      },
+      {
+        "$": {
+          "id": "6",
+          "request": "MsgExpress.StopBroker",
+          "response": "MsgExpress.CommonResponse",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "11",
+          "request": "MsgExpress.SimpleSubscription",
+          "response": "MsgExpress.CommonResponse",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "12",
+          "request": "MsgExpress.SubscribeData",
+          "response": "MsgExpress.CommonResponse",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "13",
+          "request": "MsgExpress.UnSubscribeData",
+          "response": "MsgExpress.CommonResponse",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "14",
+          "request": "MsgExpress.ComplexSubscribeData",
+          "response": "MsgExpress.CommonResponse"
+        }
+      },
+      {
+        "$": {
+          "id": "15",
+          "request": "MsgExpress.GetAppList",
+          "response": "MsgExpress.AppList"
+        }
+      },
+      {
+        "$": {
+          "id": "16",
+          "request": "MsgExpress.GetAppInfo",
+          "response": "MsgExpress.AppInfo"
+        }
+      },
+      {
+        "$": {
+          "id": "17",
+          "request": "MsgExpress.UpdateAppStatus",
+          "response": "MsgExpress.CommonResponse"
+        }
+      },
+      {
+        "$": {
+          "id": "18",
+          "request": "MsgExpress.KickOffApp",
+          "response": "MsgExpress.CommonResponse",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "19",
+          "request": "MsgExpress.RestartApp",
+          "response": "MsgExpress.CommonResponse",
+          "desc": ""
+        }
+      }
+    ]
+  },
+  {
+    "$": {
+      "id": "1",
+      "name": "Gateway",
+      "desc": ""
+    },
+    "function": [
+      {
+        "$": {
+          "id": "1",
+          "request": "Gateway.Login",
+          "response": "Gateway.CommonResponse",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "2",
+          "request": "Gateway.Logout",
+          "response": "Gateway.CommonResponse",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "3",
+          "request": "Gateway.Subscribe",
+          "response": "Gateway.SubscribeResult",
+          "desc": ""
+        }
+      }
+    ]
+  },
+  {
+    "$": {
+      "id": "2",
+      "name": "Security",
+      "desc": ""
+    },
+    "function": [
+      {
+        "$": {
+          "id": "1",
+          "request": "Security.ReqSessionValid",
+          "response": "Security.ResSessionValid",
+          "desc": ""
+        }
+      }
+    ]
+  },
+  {
+    "$": {
+      "id": "888",
+      "name": "Trade",
+      "desc": ""
+    },
+    "function": [
+      {
+        "$": {
+          "id": "1",
+          "request": "Trade.LoginReq",
+          "response": "Trade.LoginResp",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "2",
+          "request": "Trade.LogoutReq",
+          "response": "Trade.LogoutResp",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "3",
+          "request": "Trade.OrderReq",
+          "response": "Trade.OrderResp",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "4",
+          "request": "Trade.CancelReq",
+          "response": "Trade.CancelResp",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "5",
+          "request": "Trade.ModifyReq",
+          "response": "Trade.ModifyResp",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "6",
+          "request": "Trade.MarketDataReq",
+          "response": "Trade.MarketDataResp",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "10",
+          "request": "Trade.TradingAccount",
+          "response": "MsgExpress.CommonResponse",
+          "ispublish": "true",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "11",
+          "request": "Trade.MarketData",
+          "response": "MsgExpress.CommonResponse",
+          "ispublish": "true",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "12",
+          "request": "Trade.Position",
+          "response": "MsgExpress.CommonResponse",
+          "ispublish": "true",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "13",
+          "request": "Trade.Order",
+          "response": "MsgExpress.CommonResponse",
+          "ispublish": "true",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "14",
+          "request": "Trade.Trade",
+          "response": "MsgExpress.CommonResponse",
+          "ispublish": "true",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "15",
+          "request": "Trade.ErrorInfo",
+          "response": "MsgExpress.CommonResponse",
+          "ispublish": "true",
+          "desc": ""
+        }
+      }
+    ]
+  }
+]
 
-export var SUBID_TO_LOG = 1;
-export var SUBID_TO_LOGIN = 2;
-export var SUBID_TO_LOGOUT = 3;
-export var SUBID_TO_HEARTBEAT = 4;
-export var SUBID_TO_GATEWAY = 5;
-export var SUBID_TO_MSG = 6;
-
-export var TOPIC_LOGIN = 0x00001;
-export var TOPIC_LOGOUT = 0x00002;
-export var TOPIC_HEARTBEAT = 0x00003;
-export var TOPIC_LOG = 0x00004;
-
-export var TOPIC_GATEWAY = (0x045 << 20) | 0x00001 ;
-export var TOPIC_MSG = (0x03C<<20) | 0x00001;
-
-export var msgExpress = {
-    KEY_UUID: 1,KEY_AUTH: 2,KEY_ADDR: 3,KEY_NAME: 4,KEY_TYPE: 5,KEY_GROUP: 6,
-    KEY_IP: 7,KEY_STARTTIME: 8,KEY_LOGINTIME: 9,KEY_SERVICE: 10,KEY_HBTIME: 20,
-    KEY_CPU: 21,KEY_TOPMEM: 22,KEY_MEM: 23,KEY_CSQUEUE: 24,KEY_CRQUEUE: 25,
-    KEY_QUEUELENGTH: 29,KEY_RECVREQUEST: 30,KEY_SENTREQUEST: 31,KEY_RECVRESPONSE: 32,
-    KEY_SENTRESPONSE: 33,KEY_RECVPUBLISH: 34,KEY_SENTPUBLISH: 35,KEY_RECVREQUESTB: 36,
-    KEY_SENTREQUESTB: 37,KEY_RECVRESPONSEB: 38,KEY_SENTRESPONSEB: 39,KEY_RECVPUBLISHB: 40,
-    KEY_SENTPUBLISHB: 41,KEY_LOGLEVEL: 61,KEY_LOGDATA: 62, KEY_TIME: 11 ,KEY_BROKER:12
-};
-export var msgExpressGateway = {KEY_TOKEN: 2,KEY_USERID: 3};
-export var gatewayTopic = {1048577: "GATEWAY_TOPIC_OFFLINE", 1048579: "GATEWAY_TOPIC_LOGOUT", 1048580: "GATEWAY_TOPIC_LOGIN"};
-
-//各个应用的command配置
-export var COMMAND_MONITOR_LOGIN = (500 << 20) | 4;
-export var COMMAND_ACCOUNT_LOGIN = (5 << 20) | 8;
-export var COMMAND_GATEWAY_LOGIN = (1 << 20) | 1;
-export var COMMAND_SUBSCRIBE = (500 << 20) | 5;
-export var COMMAND_APPINFO = (0 << 20) | 16;
-export var COMMAND_MONITOR_HISTORY = (68 << 20) | 2;
-export var COMMAND_USER_ONLINE_OFFLINE = (68 << 20) | 1;
-export var COMMAND_SERVER_ONLINE_OFFLINE = (68 << 20) | 3;
-export var COMMAND_SEARCH_COMPANY = (65 << 20) | 2;
-export var COMMAND_SEARCH_USER = (65 << 20) | 1;
-export var COMMAND_SEARCH_ROOM = (65 << 20) | 1;
-export var COMMAND_GET_ALL_BIND_ROOM = (64 << 20) | 82;
-export var COMMAND_ADD_BIND_ORG_GROUP = (64 << 20) | 83;
-export var COMMAND_REQUEST_USER = (64 << 20) | 1;
-export var COMMAND_REQUEST_ROOM = (64 << 20) | 22;
-export var COMMAND_SET_GUIDE = (64 << 20) | 93;
-export var COMMAND_GET_ALL_USERS = (64 << 20) | 87;
-export var COMMAND_GET_ALL_COMPANYS = (64 << 20) | 17;
-export var COMMAND_SET_BIND_QQ = (64 << 20) | 91;
-export var COMMAND_GET_BIND_QQ = (64 << 20) | 92;
-export var COMMAND_GET_ROOM_INFO = (64 << 20) | 88;
-
-export var COMMAND_GET_PUB_ACCOUNT = (64 << 20) | 75;
-export var COMMAND_ADD_PUB_ACCOUNT = (64 << 20) | 72;
-export var COMMAND_UPDATE_PUB_ACCOUNT = (64 << 20) | 74;
-export var COMMAND_DEL_PUB_ACCOUNT = (64 << 20) | 73;
-
-export var COMMAND_GET_USER_INFO = (64 << 20) | 80;
-export var COMMAND_GET_ORG_TYPE = (64 << 20) | 40;//ISReqOrgType
-export var COMMAND_GET_PROVINCE_CITY = (64 << 20) | 48;//ISReqLocation
-
-export var COMMAND_QM_NO_CHANGE = (64 << 20) | 104;//ISReqLocation
-
-export var COMMAND_GET_PNPUB_ACCOUNT = (67 << 20) | 11;
-
-export var COMMAND_ADD_MONITOR_ACCOUNT = (5 << 20) | 23;
-export var COMMAND_GET_MONITOR_ACCOUNT = (5 << 20) | 28;
-
-export var COMMAND_GET_ACCOUNT_RIGHT = (5 << 20) | 25;
-
-export var COMMAND_ALTER_MONITOR_ACCOUNT = (5 << 20) | 24;
-
-export var COMMAND_PNS_PRODUCTSKILL = (67 << 20) | 10;
-export var COMMAND_FS_RESOURCE = (952 << 20) | 1;
-export var COMMAND_FS_UPLOAD = (952 << 20) | 2;
-export var COMMAND_SM_GET_ONLINE_USERINFO = (11 << 20) | 75;
-export var COMMAND_SM_GET_LOGIN_STATISTICS = (68 << 20) | 12;
-export var COMMAND_IS_SET_QQ_NICKNAME = (64 << 20) | 95;
-
-export var COMMAND_GET_GLOBAL_VAR = (64 << 20) | 98;
-export var COMMAND_UPDATE_GLOBAL_VAR = (64 << 20) | 97;
-export var COMMAND_GET_GLOBAL_VAR_EX = (64 << 20) | 96;
-
-export var COMMAND_GET_MOBILE_UPDATE_INFO = (3 << 20) | 5;
-export var COMMAND_SET_MOBILE_UPDATE_INFO = (3 << 20) | 10;
-export var COMMAND_GET_ALL_MOBILE_UPDATE_INFO = (3 << 20) | 11;
-
-export var COMMAND_GATEWAY_HISTORY = (68 << 20) | 4;
-
-export var COMMAND_MSG_STATISTICS = (69 << 20) | 1;
-export var COMMAND_MSG_LOG_STATISTICS = (69 << 20) | 2;
-
-export var COMMAND_GET_MONITORSTATUS = (70 << 20) | 1;
-export var COMMAND_SET_MONITORSTATUS = (70 << 20) | 2;
-
-export var COMMAND_GATEWAY_LIST = (68 << 20) | 5;
-export var COMMAND_SERVICE_DETAILS = (68 << 20) | 6;
-export var COMMAND_SERVICE_RESTART = (68 << 20) | 7;
-export var COMMAND_GET_GATEWAY = (68 << 20) | 9;
-export var COMMAND_GATEWAY_RESTART = (68 << 20) | 8;
-
-export var COMMAND_GET_USERINFO_CHANGE = (68 << 20) | 10;
-export var COMMAND_AUDIT_USERINFO_CHANGE = (68 << 20) | 11;
-
-export var COMMAND_GET_QQ_DETAIL = (64 << 20) | 90;
-
-export var COMMAND_DATABUS_HEART_BEAT = (0 << 20) | 5;
-
-export var COMMAND_GET_ALL_RECOMMAND = (64 << 20) | 105;
-export var COMMAND_UPDATE_RECOMMAND = (64 << 20) | 106;
-
-export var COMMAND_GET_ROOM_AVATAR = (64 << 20) | 103;
-
-export var COMMAND_REQUEST_COMPANY_INFO = (64 << 20) | 17;
-
-export var COMMAND_GET_RESOURCE_LIST = (6 << 20) | 1;
-export var COMMAND_SET_RESOURCE_LIST = (6 << 20) | 2;
-
-export var COMMAND_SET_MASSGROUP_LIMIT = (64 << 20) | 126;
-export var COMMAND_GET_AD_LIST = (64 << 20) | 128;
-export var COMMAND_DEL_AD = (64 << 20) | 129;
-export var COMMAND_SET_AD = (64 << 20) | 127;
-
-/////////////////////////////////////////////////////
-export var COMMAND_DATABUS_SUBSCRIBE = (0 << 20) | 14;
-export var COMMAND_DATABUS_LOGININFO = (0 << 20) | 3;
-export var COMMAND_GET_APP_INFO = (0 << 20) | 16;
+ export const FileList=[
+  {
+    "filename": "QMClient",
+    "package": "QMClient"
+  },
+  {
+    "filename": "accountserver",
+    "package": "AccountServer"
+  },
+  {
+    "filename": "clientcommunicate",
+    "package": "ClientCommunicate"
+  },
+  {
+    "filename": "crm",
+    "package": "Crm"
+  },
+  {
+    "filename": "fileserver",
+    "package": "FileServer"
+  },
+  {
+    "filename": "gateway",
+    "package": "Gateway"
+  },
+  {
+    "filename": "infoserver",
+    "package": "InfoServer"
+  },
+  {
+    "filename": "monitor",
+    "package": "monitor"
+  },
+  {
+    "filename": "monitorserver",
+    "package": "MonitorServer"
+  },
+  {
+    "filename": "msgexpress",
+    "package": "MsgExpress"
+  },
+  {
+    "filename": "msgstatistics",
+    "package": "MsgStatistics"
+  },
+  {
+    "filename": "pnserver",
+    "package": "PNServer"
+  },
+  {
+    "filename": "qmppsm",
+    "package": "SM"
+  },
+  {
+    "filename": "searchserver",
+    "package": "SearchServer"
+  },
+  {
+    "filename": "trade",
+    "package": "Trade"
+  },
+  {
+    "filename": "update",
+    "package": "Update"
+  }
+]

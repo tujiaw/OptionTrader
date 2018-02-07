@@ -1,11 +1,10 @@
 (function(global, factory) {
-
-    /* CommonJS */ if (typeof require === 'function' && typeof module === "object" && module && module["exports"])
-        module['exports'] = (function() {
-            return factory(require('bytebuffer'), require('pako'));
-        })();
-    /* Global */ else
-        global["DataBusPackage"] = factory(global.dcodeIO.ByteBuffer, global.pako);
+  /* CommonJS */ if (typeof require === 'function' && typeof module === "object" && module && module["exports"])
+      module['exports'] = (function() {
+          return factory(require('bytebuffer'), require('pako'));
+      })();
+  /* Global */ else
+      global["DataBusPackage"] = factory(global.dcodeIO.ByteBuffer, global.pako);
 })(this, function(ByteBuffer, pako) {
 	var DataBusPackage = function() {
 		this.flag1 = DataBusPackage.PACKAGE_START;
@@ -69,12 +68,19 @@
 		return this.type;
 	};
 
+	DataBusPackage.prototype.isPublishNewMsg = function() {
+		if (this.options && (((this.options >> 7) & 1) === 1)) {
+			return true
+		}
+		return false
+	}
+
 	DataBusPackage.encodePackage = function(serialNum, command, body) {
 		var pk = new DataBusPackage();
 		pk.setSerialNumber(serialNum);
 		pk.setCommand(command);
-        pk.setBody(body);
-        pk.setBodySize(body.limit);
+    pk.setBody(body);
+    pk.setBodySize(body.limit);
 
 		var buffer = new ByteBuffer(DataBusPackage.SIZE_OF_HEAD + pk.getBodySize());
 		buffer.writeByte(pk.flag1);
@@ -131,59 +137,59 @@
 
     DataBusPackage.decodePackageInternal = function (packages, buffer) {
     	var i = 0;
-        while (buffer.remaining() > 0) {
-        	if(buffer.remaining < DataBusPackage.SIZE_OF_HEAD) {
-        		break;
-			}
-            // read util 'P'
-            if (!(buffer.readByte() === DataBusPackage.PACKAGE_START && buffer.readByte() === DataBusPackage.PACKAGE_START)) {
-                continue;
-            }
-            var start = buffer.offset - 2;
-            var headerBytes = buffer.copy(start, start + DataBusPackage.SIZE_OF_HEAD);
-            buffer.skip(DataBusPackage.SIZE_OF_HEAD - 2);
-            var header = DataBusPackage.decodeHeader(headerBytes);
-            var offset  = header.getOffset() - DataBusPackage.SIZE_OF_HEAD;
-            if (offset > 0) {
-                buffer.skip(offset);
-            }
-            var bodySize = header.getBodySize();
-            var bodyStart = buffer.offset;
-            var bodyBytes = buffer.copy(bodyStart, bodyStart + bodySize);
-            if(buffer.remaining < bodySize) {
-                break;
-            }
-            buffer.skip(bodySize);
-            if(!header.getIsZip()) {
-                header.body = bodyBytes;
-            } else {
-				header.body = ByteBuffer.wrap(pako.inflate(new Uint8Array(bodyBytes.toArrayBuffer())));
-            }
-            i += (DataBusPackage.SIZE_OF_HEAD + offset + bodySize);
-            packages.push(header);
+      while (buffer.remaining() > 0) {
+        if(buffer.remaining < DataBusPackage.SIZE_OF_HEAD) {
+          break;
         }
-        return i;
+			  // read util 'P'
+        if (!(buffer.readByte() === DataBusPackage.PACKAGE_START && buffer.readByte() === DataBusPackage.PACKAGE_START)) {
+          continue;
+        }
+        var start = buffer.offset - 2;
+        var headerBytes = buffer.copy(start, start + DataBusPackage.SIZE_OF_HEAD);
+        buffer.skip(DataBusPackage.SIZE_OF_HEAD - 2);
+        var header = DataBusPackage.decodeHeader(headerBytes);
+        var offset  = header.getOffset() - DataBusPackage.SIZE_OF_HEAD;
+        if (offset > 0) {
+          buffer.skip(offset);
+        }
+        var bodySize = header.getBodySize();
+        var bodyStart = buffer.offset;
+        var bodyBytes = buffer.copy(bodyStart, bodyStart + bodySize);
+        if(buffer.remaining < bodySize) {
+          break;
+        }
+        buffer.skip(bodySize);
+        if(!header.getIsZip()) {
+          header.body = bodyBytes;
+        } else {
+          header.body = ByteBuffer.wrap(pako.inflate(new Uint8Array(bodyBytes.toArrayBuffer())));
+        }
+        i += (DataBusPackage.SIZE_OF_HEAD + offset + bodySize);
+        packages.push(header);
+      }
+      return i;
     }
 
     DataBusPackage.decodePackage = function(buffer) {
-        var packages = [];
-       	if(buffer === undefined || buffer.remaining() === 0) {
-       		return packages;
-		}
-		if(recData !== undefined && recData.remaining() > 0) {
-       		var buffers = [buffer, recData];
-			var newBuffer = ByteBuffer.concat(buffers);
-			recData = newBuffer;
-		}else {
-       		recData = buffer;
-		}
-        recData.mark();
-		var i = this.decodePackageInternal(packages, recData);
-		recData.reset();
-		if(i > 0) {
-			recData.skip(i);
-		}
+      var packages = [];
+      if(buffer === undefined || buffer.remaining() === 0) {
         return packages;
+      }
+      if(recData !== undefined && recData.remaining() > 0) {
+        var buffers = [buffer, recData];
+        var newBuffer = ByteBuffer.concat(buffers);
+        recData = newBuffer;
+      } else {
+        recData = buffer;
+      }
+      recData.mark();
+      var i = this.decodePackageInternal(packages, recData);
+      recData.reset();
+      if(i > 0) {
+        recData.skip(i);
+      }
+      return packages;
     };
 
 	DataBusPackage.decodeHeader = function(buffer) {

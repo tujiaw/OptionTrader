@@ -1,0 +1,103 @@
+package FileServer;
+
+option java_package = "com.sumscope";
+option java_outer_classname = "FileServer";
+
+// 从fileserver申请资源（uuid）
+// fileserver会向客户端返回uuid
+message FSReqResource
+{
+    required string filename   = 1; // 文件名
+	required uint32 size       = 2; // 文件大小
+}
+
+message FSResResource
+{
+    required int32 retcode     = 1; // 0表示成功，其他表示失败
+	optional string error_desc = 2; // 错误描述
+	optional string uuid       = 3; // 传给客户端（唯一标示文件）
+}
+
+// 文件上传
+message FSReqFileUpload 
+{
+    required string uuid       = 1;
+    required int32 start       = 2; // 上传文件的起始位置
+    required uint32 size       = 3; // 上传数据的大小
+	required bytes data        = 4; // 上传数据的内容
+	required string checksum   = 5; // 块数据校验码
+}
+
+message FSResFileUpload 
+{
+    required string uuid       = 1;
+    required int32 retcode     = 2; // 0表示成功，其他表示失败
+}
+
+// 文件下载
+message FSReqFileDownload
+{
+    required string uuid       = 1;
+    required int32 start       = 2; // 请求下载文件的起始位置
+    required uint32 size       = 3; // 请求下载的数据大小
+}
+
+message FSResFileDownload 
+{
+    required string uuid       = 1;
+	required int32 retcode     = 2; // 0表示成功，其他表示失败
+    optional int32 start       = 3; // 下载文件的起始位置
+    optional uint32 size       = 4; // 下载数据的大小
+	optional bytes data        = 5; // 下载数据的内容
+	optional string checksum   = 6; // 块数据校验码
+	optional uint32 uploadsize = 7; // 文件已经上传的大小
+}
+
+// 查询文件已经上传大小
+message FSReqFileUploadSize
+{
+    required string uuid       = 1;
+}
+
+message FSResFileUploadSize
+{
+    required int32 retcode     = 1; // 0表示成功，其他表示失败
+	required uint32 uploadsize = 2; // 文件已经上传的大小
+}
+
+// 文件取消
+message FSReqFileCancel
+{
+     required string uuid      = 1;
+}
+
+message FSResFileCancel
+{
+     required string uuid      = 1;
+     required int32 retcode    = 2; // 0表示成功，其他表示失败
+}
+
+// 文件删除
+message FSReqFileDel
+{
+     required string uuid      = 1;
+}
+
+message FSResFileDel
+{
+     required string uuid      = 1;
+     required int32 retcode    = 2; // 0表示成功，其他表示失败
+}
+
+// 文件上传、下载操作结束
+message FSReqFileOpFinish
+{
+     required string uuid      = 1;
+     required string checksum  = 2; // 整个文件的校验码
+}
+
+message FSResFileOpFinish
+{
+     required string uuid      = 1;
+     required int32 retcode    = 2; // 0表示成功，其他表示失败
+}
