@@ -1,0 +1,562 @@
+{
+  "nested": {
+    "MsgExpress": {
+      "options": {
+        "java_package": "com.sumscope",
+        "java_outer_classname": "MsgExpress"
+      },
+      "nested": {
+        "ErrMessage": {
+          "fields": {
+            "errcode": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            },
+            "errmsg": {
+              "rule": "required",
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "StartupApplication": {
+          "fields": {
+            "exefullname": {
+              "rule": "required",
+              "type": "string",
+              "id": 1
+            },
+            "args": {
+              "rule": "repeated",
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "StopBroker": {
+          "fields": {
+            "dummy": {
+              "type": "string",
+              "id": 1
+            }
+          }
+        },
+        "CommonResponse": {
+          "fields": {
+            "retcode": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            },
+            "msg": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "LoginInfo": {
+          "fields": {
+            "type": {
+              "type": "int32",
+              "id": 1
+            },
+            "name": {
+              "type": "string",
+              "id": 2
+            },
+            "group": {
+              "type": "int32",
+              "id": 3
+            },
+            "uuid": {
+              "type": "string",
+              "id": 4
+            },
+            "auth": {
+              "type": "string",
+              "id": 5
+            },
+            "starttime": {
+              "type": "int64",
+              "id": 6
+            },
+            "serviceid": {
+              "rule": "repeated",
+              "type": "int32",
+              "id": 7,
+              "options": {
+                "packed": false
+              }
+            },
+            "ip": {
+              "type": "string",
+              "id": 8
+            }
+          }
+        },
+        "LoginResponse": {
+          "fields": {
+            "addr": {
+              "type": "int32",
+              "id": 1
+            }
+          }
+        },
+        "Logout": {
+          "fields": {
+            "reserve": {
+              "type": "int32",
+              "id": 1
+            }
+          }
+        },
+        "GetAppList": {
+          "fields": {
+            "serviceid": {
+              "rule": "repeated",
+              "type": "int32",
+              "id": 1,
+              "options": {
+                "packed": false
+              }
+            }
+          }
+        },
+        "GetAppInfo": {
+          "fields": {
+            "addr": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            }
+          }
+        },
+        "AppStatus": {
+          "values": {
+            "None": 0,
+            "Connected": 1,
+            "Authing": 2,
+            "Authed": 3
+          }
+        },
+        "AppInfo": {
+          "fields": {
+            "loginInfo": {
+              "rule": "required",
+              "type": "LoginInfo",
+              "id": 1
+            },
+            "addr": {
+              "rule": "required",
+              "type": "int32",
+              "id": 2
+            },
+            "logintime": {
+              "type": "int64",
+              "id": 3
+            },
+            "status": {
+              "type": "AppStatus",
+              "id": 4
+            },
+            "token": {
+              "type": "string",
+              "id": 5
+            }
+          }
+        },
+        "UpdateAppStatus": {
+          "fields": {
+            "addr": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            },
+            "status": {
+              "rule": "required",
+              "type": "AppStatus",
+              "id": 2
+            },
+            "token": {
+              "rule": "required",
+              "type": "string",
+              "id": 3
+            }
+          }
+        },
+        "AppList": {
+          "fields": {
+            "appinfo": {
+              "rule": "repeated",
+              "type": "AppInfo",
+              "id": 1
+            }
+          }
+        },
+        "KickOffApp": {
+          "fields": {
+            "addr": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            }
+          }
+        },
+        "HeartBeat": {
+          "fields": {
+            "cpu": {
+              "type": "int32",
+              "id": 1
+            },
+            "topmemory": {
+              "type": "int32",
+              "id": 2
+            },
+            "memory": {
+              "type": "int32",
+              "id": 3
+            },
+            "sendqueue": {
+              "type": "int32",
+              "id": 4
+            },
+            "receivequeue": {
+              "type": "int32",
+              "id": 5
+            }
+          }
+        },
+        "HeartBeatResponse": {
+          "fields": {
+            "retcode": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            }
+          }
+        },
+        "DataType": {
+          "values": {
+            "STRING": 1,
+            "INT32": 2,
+            "UINT32": 3,
+            "INT64": 4,
+            "UINT64": 5,
+            "FLOAT": 6,
+            "DOUBLE": 7,
+            "DATETIME": 8,
+            "BINARY": 9,
+            "BOOL": 10
+          }
+        },
+        "DataItem": {
+          "fields": {
+            "key": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            },
+            "type": {
+              "rule": "required",
+              "type": "DataType",
+              "id": 2
+            },
+            "value": {
+              "rule": "repeated",
+              "type": "bytes",
+              "id": 3
+            },
+            "strVal": {
+              "rule": "repeated",
+              "type": "string",
+              "id": 4
+            },
+            "iVal": {
+              "rule": "repeated",
+              "type": "int32",
+              "id": 5,
+              "options": {
+                "packed": false
+              }
+            },
+            "uiVal": {
+              "rule": "repeated",
+              "type": "uint32",
+              "id": 6,
+              "options": {
+                "packed": false
+              }
+            },
+            "lVal": {
+              "rule": "repeated",
+              "type": "int64",
+              "id": 7,
+              "options": {
+                "packed": false
+              }
+            },
+            "ulVal": {
+              "rule": "repeated",
+              "type": "uint64",
+              "id": 8,
+              "options": {
+                "packed": false
+              }
+            },
+            "fVal": {
+              "rule": "repeated",
+              "type": "float",
+              "id": 9,
+              "options": {
+                "packed": false
+              }
+            },
+            "dVal": {
+              "rule": "repeated",
+              "type": "double",
+              "id": 10,
+              "options": {
+                "packed": false
+              }
+            },
+            "bVal": {
+              "rule": "repeated",
+              "type": "bool",
+              "id": 11,
+              "options": {
+                "packed": false
+              }
+            },
+            "rawVal": {
+              "rule": "repeated",
+              "type": "bytes",
+              "id": 12
+            },
+            "tVal": {
+              "rule": "repeated",
+              "type": "uint64",
+              "id": 13,
+              "options": {
+                "packed": false
+              }
+            },
+            "isPK": {
+              "type": "bool",
+              "id": 14
+            }
+          }
+        },
+        "Operator": {
+          "values": {
+            "Equal": 1,
+            "NotEqual": 2,
+            "Less": 3,
+            "LessOrEqual": 4,
+            "Bigger": 5,
+            "BiggerOrEqual": 6
+          }
+        },
+        "ConditionValue": {
+          "fields": {
+            "operator": {
+              "rule": "required",
+              "type": "Operator",
+              "id": 1
+            },
+            "value": {
+              "rule": "required",
+              "type": "bytes",
+              "id": 2
+            }
+          }
+        },
+        "ConditionItem": {
+          "fields": {
+            "key": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            },
+            "type": {
+              "rule": "required",
+              "type": "DataType",
+              "id": 2
+            },
+            "value": {
+              "rule": "repeated",
+              "type": "ConditionValue",
+              "id": 3
+            }
+          }
+        },
+        "SimpleSubscription": {
+          "fields": {
+            "topic": {
+              "rule": "repeated",
+              "type": "int32",
+              "id": 1,
+              "options": {
+                "packed": false
+              }
+            }
+          }
+        },
+        "SubscribeData": {
+          "fields": {
+            "subid": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            },
+            "topic": {
+              "rule": "required",
+              "type": "int32",
+              "id": 2
+            },
+            "condition": {
+              "rule": "repeated",
+              "type": "DataItem",
+              "id": 3
+            },
+            "excondition": {
+              "rule": "repeated",
+              "type": "ConditionItem",
+              "id": 4
+            },
+            "index": {
+              "rule": "repeated",
+              "type": "int32",
+              "id": 5,
+              "options": {
+                "packed": false
+              }
+            },
+            "useraddr": {
+              "type": "int32",
+              "id": 6,
+              "options": {
+                "default": 0
+              }
+            }
+          }
+        },
+        "UnSubscribeData": {
+          "fields": {
+            "subid": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            },
+            "useraddr": {
+              "type": "int32",
+              "id": 2,
+              "options": {
+                "default": 0
+              }
+            }
+          }
+        },
+        "ComplexSubscribeData": {
+          "fields": {
+            "unsub": {
+              "rule": "repeated",
+              "type": "UnSubscribeData",
+              "id": 1
+            },
+            "sub": {
+              "rule": "repeated",
+              "type": "SubscribeData",
+              "id": 2
+            }
+          }
+        },
+        "PublishData": {
+          "fields": {
+            "topic": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            },
+            "item": {
+              "rule": "repeated",
+              "type": "DataItem",
+              "id": 2
+            },
+            "subid": {
+              "rule": "repeated",
+              "type": "int32",
+              "id": 3,
+              "options": {
+                "packed": false
+              }
+            },
+            "uuid": {
+              "type": "string",
+              "id": 4
+            },
+            "id": {
+              "type": "uint64",
+              "id": 5
+            }
+          }
+        },
+        "TokenInfo": {
+          "fields": {
+            "token": {
+              "rule": "required",
+              "type": "bytes",
+              "id": 1
+            },
+            "userid": {
+              "rule": "required",
+              "type": "int64",
+              "id": 2
+            }
+          }
+        },
+        "Header": {
+          "fields": {
+            "packageType": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            },
+            "iszip": {
+              "type": "int32",
+              "id": 2
+            },
+            "compratio": {
+              "type": "int32",
+              "id": 3
+            },
+            "serialnum": {
+              "rule": "required",
+              "type": "int32",
+              "id": 4
+            },
+            "command": {
+              "rule": "required",
+              "type": "int32",
+              "id": 5
+            }
+          }
+        },
+        "Pack": {
+          "fields": {
+            "header": {
+              "rule": "required",
+              "type": "Header",
+              "id": 1
+            },
+            "body": {
+              "rule": "required",
+              "type": "bytes",
+              "id": 2
+            }
+          }
+        }
+      }
+    }
+  }
+}

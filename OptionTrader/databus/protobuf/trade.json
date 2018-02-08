@@ -1,0 +1,447 @@
+{
+  "nested": {
+    "Trade": {
+      "nested": {
+        "LoginReq": {
+          "fields": {
+            "userid": {
+              "rule": "required",
+              "type": "string",
+              "id": 1
+            },
+            "passwd": {
+              "rule": "required",
+              "type": "string",
+              "id": 2
+            },
+            "instruments": {
+              "rule": "repeated",
+              "type": "string",
+              "id": 3
+            }
+          }
+        },
+        "LoginResp": {
+          "fields": {
+            "retCode": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            },
+            "msg": {
+              "type": "string",
+              "id": 2
+            },
+            "instruments": {
+              "rule": "repeated",
+              "type": "string",
+              "id": 3
+            }
+          }
+        },
+        "LogoutReq": {
+          "fields": {}
+        },
+        "LogoutResp": {
+          "fields": {
+            "retCode": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            },
+            "msg": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "OrderReq": {
+          "fields": {
+            "code": {
+              "rule": "required",
+              "type": "string",
+              "id": 1
+            },
+            "price": {
+              "rule": "required",
+              "type": "double",
+              "id": 2
+            },
+            "type": {
+              "rule": "required",
+              "type": "int32",
+              "id": 3
+            }
+          }
+        },
+        "OrderResp": {
+          "fields": {
+            "retCode": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            },
+            "msg": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "CancelReq": {
+          "fields": {
+            "orderid": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            }
+          }
+        },
+        "CancelResp": {
+          "fields": {
+            "retCode": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            },
+            "msg": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "ModifyReq": {
+          "fields": {
+            "orderid": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            },
+            "price": {
+              "rule": "required",
+              "type": "double",
+              "id": 2
+            }
+          }
+        },
+        "ModifyResp": {
+          "fields": {
+            "retCode": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            },
+            "msg": {
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "MarketDataReq": {
+          "fields": {
+            "code": {
+              "rule": "required",
+              "type": "string",
+              "id": 1
+            },
+            "date": {
+              "rule": "required",
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "MarketDataResp": {
+          "fields": {
+            "code": {
+              "rule": "required",
+              "type": "string",
+              "id": 1
+            },
+            "date": {
+              "rule": "required",
+              "type": "string",
+              "id": 2
+            },
+            "data": {
+              "rule": "repeated",
+              "type": "MarketData",
+              "id": 3
+            }
+          }
+        },
+        "TradingAccount": {
+          "fields": {
+            "dPreBalance": {
+              "type": "double",
+              "id": 1
+            },
+            "dPositionProfit": {
+              "type": "double",
+              "id": 2
+            },
+            "dCloseProfit": {
+              "type": "double",
+              "id": 3
+            },
+            "dCommission": {
+              "type": "double",
+              "id": 4
+            },
+            "dCurrentMargin": {
+              "type": "double",
+              "id": 5
+            },
+            "dFrozenCapital": {
+              "type": "double",
+              "id": 6
+            },
+            "dAvaiableCapital": {
+              "type": "double",
+              "id": 7
+            },
+            "dDynamicEquity": {
+              "type": "double",
+              "id": 8
+            }
+          }
+        },
+        "MarketData": {
+          "fields": {
+            "szINSTRUMENT": {
+              "type": "string",
+              "id": 1
+            },
+            "dBidPrice1": {
+              "type": "double",
+              "id": 2
+            },
+            "nBidVolume1": {
+              "type": "int32",
+              "id": 3
+            },
+            "dAskPrice1": {
+              "type": "double",
+              "id": 4
+            },
+            "nAskVolume1": {
+              "type": "int32",
+              "id": 5
+            },
+            "dLastPrice": {
+              "type": "double",
+              "id": 6
+            },
+            "dAvgPrice": {
+              "type": "double",
+              "id": 7
+            },
+            "nVolume": {
+              "type": "int32",
+              "id": 8
+            },
+            "dOpenInt": {
+              "type": "double",
+              "id": 9
+            },
+            "dUpperLimitPrice": {
+              "type": "double",
+              "id": 10
+            },
+            "dLowerLimitPrice": {
+              "type": "double",
+              "id": 11
+            },
+            "szUpdateTime": {
+              "type": "string",
+              "id": 12
+            },
+            "nUpdateMillisec": {
+              "type": "int32",
+              "id": 13
+            }
+          }
+        },
+        "Position": {
+          "fields": {
+            "szINSTRUMENT": {
+              "type": "string",
+              "id": 1
+            },
+            "nTradeDir": {
+              "type": "int32",
+              "id": 2
+            },
+            "dAvgPrice": {
+              "type": "double",
+              "id": 3
+            },
+            "nPosition": {
+              "type": "int32",
+              "id": 4
+            },
+            "nYesterdayPosition": {
+              "type": "int32",
+              "id": 5
+            },
+            "nTodayPosition": {
+              "type": "int32",
+              "id": 6
+            },
+            "dMargin": {
+              "type": "double",
+              "id": 7
+            },
+            "dPositionProfit": {
+              "type": "double",
+              "id": 8
+            }
+          }
+        },
+        "Order": {
+          "fields": {
+            "nSessionID": {
+              "type": "int32",
+              "id": 1
+            },
+            "nOrderID": {
+              "type": "int32",
+              "id": 2
+            },
+            "nOrderSysID": {
+              "type": "int32",
+              "id": 3
+            },
+            "szINSTRUMENT": {
+              "type": "string",
+              "id": 4
+            },
+            "szExchangeID": {
+              "type": "string",
+              "id": 5
+            },
+            "nTradeType": {
+              "type": "int32",
+              "id": 6
+            },
+            "nTradeDir": {
+              "type": "int32",
+              "id": 7
+            },
+            "nTradeOperate": {
+              "type": "int32",
+              "id": 8
+            },
+            "nOrderStatus": {
+              "type": "int32",
+              "id": 9
+            },
+            "dLimitPrice": {
+              "type": "double",
+              "id": 10
+            },
+            "dAvgPrice": {
+              "type": "double",
+              "id": 11
+            },
+            "nVolume": {
+              "type": "int32",
+              "id": 12
+            },
+            "nTradeVolume": {
+              "type": "int32",
+              "id": 13
+            },
+            "nTradeVolumeLeft": {
+              "type": "int32",
+              "id": 14
+            },
+            "szInsertDateTime": {
+              "type": "string",
+              "id": 15
+            },
+            "szTradeDateTime": {
+              "type": "string",
+              "id": 16
+            },
+            "szOrderRefCustom": {
+              "type": "string",
+              "id": 17
+            },
+            "nRequestID": {
+              "type": "int32",
+              "id": 18
+            },
+            "nTimestampCreate": {
+              "type": "int32",
+              "id": 19
+            },
+            "nTimestampUpdate": {
+              "type": "int32",
+              "id": 20
+            }
+          }
+        },
+        "Trade": {
+          "fields": {
+            "szTradeID": {
+              "type": "string",
+              "id": 1
+            },
+            "nOrderID": {
+              "type": "int32",
+              "id": 2
+            },
+            "nSystemID": {
+              "type": "int32",
+              "id": 3
+            },
+            "szINSTRUMENT": {
+              "type": "string",
+              "id": 4
+            },
+            "szExchangeID": {
+              "type": "string",
+              "id": 5
+            },
+            "nTradeDir": {
+              "type": "int32",
+              "id": 6
+            },
+            "nTradeOperate": {
+              "type": "int32",
+              "id": 7
+            },
+            "dPrice": {
+              "type": "double",
+              "id": 8
+            },
+            "nVolume": {
+              "type": "int32",
+              "id": 9
+            },
+            "szTradeTime": {
+              "type": "string",
+              "id": 10
+            },
+            "szTradingDay": {
+              "type": "string",
+              "id": 11
+            },
+            "nRequestID": {
+              "type": "int32",
+              "id": 12
+            }
+          }
+        },
+        "ErrorInfo": {
+          "fields": {
+            "nRequestID": {
+              "type": "int32",
+              "id": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}

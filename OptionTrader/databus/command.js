@@ -296,10 +296,6 @@ export const AppList=[
 
  export const FileList=[
   {
-    "filename": "QMClient",
-    "package": "QMClient"
-  },
-  {
     "filename": "accountserver",
     "package": "AccountServer"
   },
@@ -342,6 +338,10 @@ export const AppList=[
   {
     "filename": "pnserver",
     "package": "PNServer"
+  },
+  {
+    "filename": "QMClient",
+    "package": "QMClient"
   },
   {
     "filename": "qmppsm",

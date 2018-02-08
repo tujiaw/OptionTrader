@@ -10,13 +10,21 @@ import store from './utils/store'
 import testStart from './databus/test'
 import appClient from './databus'
 
-// appClient.open('47.100.7.224', '55555')
-// .then((json) => {
-//   console.log('start web socket ok')
-// })
-// .catch((err) => {
-//   console.log(JSON.stringify(err))
-// })
+function onPublishCallback(name, content) {
+  console.log('on publish:' + name)
+}
+
+appClient.initProtoJson()
+appClient.setHeartBeatIntervalSecond(100)
+
+appClient.open('47.100.7.224', '55555')
+.then((json) => {
+  console.log('start web socket ok')
+  appClient.subscribe(['Trade.TradingAccount'], onPublishCallback)
+})
+.catch((err) => {
+  console.log(JSON.stringify(err))
+})
 
 testStart()
 const MainTab = TabNavigator(

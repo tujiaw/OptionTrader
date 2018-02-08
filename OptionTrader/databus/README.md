@@ -21,3 +21,16 @@ import appClient from '../databus'
 
 appClient.open(...)
 ```
+
+# 使用url路径的proto
+更改protobufjs源码库中的root.js, 191行
+```
+for (var i = 0, resolved; i < filename.length; ++i)
+    if (typeof filename[i] === 'string' && (filename[i].indexOf('http://') === 0 || filename[i].indexOf('https://'))) {
+        fetch(filename[i])
+    } else if (resolved = self.resolvePath("", filename[i])) {
+        fetch(resolved);
+    }
+```
+
+

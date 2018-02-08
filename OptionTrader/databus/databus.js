@@ -3,8 +3,11 @@
   module['exports'] = (function() {
     var DataBusPackage = require('./DataBusPackage');
     var observer = require('./observer');
-
-    return factory(require("protobufjs"), require('bytebuffer'), DataBusPackage, observer);
+    var ProtoBuf = require("protobufjs");
+    var Long = require("long");
+    ProtoBuf.util.Long = Long;
+    ProtoBuf.configure();
+    return factory(ProtoBuf, require('bytebuffer'), DataBusPackage, observer);
   })();
 /* Global */ else
   global["databus"] = factory(
@@ -21,6 +24,7 @@
   var pushDataFactory = undefined;
   var mIp, mPort, mPath;
   var PREFIX_DATABUS = "DATABUS";
+  var PROTO_FILE_DIR = '/protobuf/'
 
   var databus = {
     close: function () {
@@ -55,7 +59,7 @@
       }
       ws.binaryType = "arraybuffer";
       ws.onopen = function () {
-        console.log("WebSocket Open Success:" + mIp + ":" + mPort + mPath);
+        console.log("WebSocket Open Success, Ip:%s, Port:%s, Path:%s", ip, port, path);
         if (!!settings.onConnectSuccess) {
           settings.onConnectSuccess();
         }
@@ -134,6 +138,17 @@
         }
       };
     },
+
+    // 可以使用json格式直接初始化
+    addProtoBuilder: function(protoFileName, requireObj) {
+      try {
+        var root = ProtoBuf.Root.fromJSON(requireObj)
+        protobufBuilders[protoFileName] = root
+      } catch(err) {
+        console.error('addProtoBuilder error', protoFileName, err)
+      }
+    },
+
     /**
      * 构建一个protobuf包
      */
@@ -143,7 +158,12 @@
           return resolve(protobufBuilders[proto_package])
         }
 
-        ProtoBuf.load("/protobuf/" + proto_package + ".proto").then((root) => {
+        if (PROTO_FILE_DIR[PROTO_FILE_DIR.length - 1] !== '/') {
+          PROTO_FILE_DIR += '/'
+        }
+        const protoFilePath = PROTO_FILE_DIR + proto_package + ".proto"
+        console.log('buildProtoPackage:' + protoFilePath)
+        ProtoBuf.load(protoFilePath).then((root) => {
           protobufBuilders[proto_package] = root;
           return resolve(root)
         }).catch((err) => {
@@ -162,6 +182,7 @@
         return this.buildProtoPackage(packageName).then((root) => {
           const obj = root.lookupTypeOrEnum(objectName)
           if (obj) {
+            console.error(obj)
             return resolve(obj)
           }
           const errStr = 'builerProtoObject ' + objectName + ' failed'
@@ -264,6 +285,9 @@
         parent[p] = child[p];
       }
       return parent;
+    },
+    setProtoFileDir: function(dir) {
+      PROTO_FILE_DIR = dir
     }
   }
   return databus;
