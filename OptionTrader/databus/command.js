@@ -296,67 +296,11 @@ export const AppList=[
 
  export const FileList=[
   {
-    "filename": "accountserver",
-    "package": "AccountServer"
-  },
-  {
-    "filename": "clientcommunicate",
-    "package": "ClientCommunicate"
-  },
-  {
-    "filename": "crm",
-    "package": "Crm"
-  },
-  {
-    "filename": "fileserver",
-    "package": "FileServer"
-  },
-  {
-    "filename": "gateway",
-    "package": "Gateway"
-  },
-  {
-    "filename": "infoserver",
-    "package": "InfoServer"
-  },
-  {
-    "filename": "monitor",
-    "package": "monitor"
-  },
-  {
-    "filename": "monitorserver",
-    "package": "MonitorServer"
-  },
-  {
     "filename": "msgexpress",
     "package": "MsgExpress"
   },
   {
-    "filename": "msgstatistics",
-    "package": "MsgStatistics"
-  },
-  {
-    "filename": "pnserver",
-    "package": "PNServer"
-  },
-  {
-    "filename": "QMClient",
-    "package": "QMClient"
-  },
-  {
-    "filename": "qmppsm",
-    "package": "SM"
-  },
-  {
-    "filename": "searchserver",
-    "package": "SearchServer"
-  },
-  {
     "filename": "trade",
     "package": "Trade"
-  },
-  {
-    "filename": "update",
-    "package": "Update"
   }
 ]

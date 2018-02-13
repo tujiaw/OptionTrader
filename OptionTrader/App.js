@@ -9,18 +9,59 @@ import { Provider } from 'react-redux'
 import store from './utils/store'
 import testStart from './databus/test'
 import appClient from './databus'
+import Config from './config'
+
+import * as capitalStateAction from './actions/capitalStateAction'
+import * as marketAction from './actions/marketAction'
+import * as orderAction from './actions/orderAction'
+import * as tradeAction from './actions/tradeAction'
 
 function onPublishCallback(name, content) {
-  console.log('on publish:' + name)
+  console.log('on publish', name, content)
+  if (name === 'Trade.TradingAccount') {
+    const tradingAccount = {
+      dynamicEquity: content.dDynamicEquity || 0,
+      frozenCapital: dFrozenCapital || 0,
+      avaiableCapital: dAvaiableCapital || 0
+    }
+    console.log('yyyyyyy', tradingAccount)
+    store.dispatch(capitalStateAction.update(tradingAccount))
+  } else if (name === 'Trade.MarketData') {
+    if (content.szINSTRUMENT && content.szINSTRUMENT.length) {
+      const marketData = {
+        dataType: MARKET_TITLE,
+        instId: content.szINSTRUMENT,
+        code: 'IC180',
+        price: '1279.2',
+        dir: '空',
+        total: 0,
+        yesday: 1,
+        today: 0,
+        avgPrice: '6307.2',
+        profit: '880',
+      }
+      store.dispatch(marketAction.update(initList))
+    }
+  }
 }
 
 appClient.initProtoJson()
-appClient.setHeartBeatIntervalSecond(100)
-
+appClient.setHeartBeatIntervalSecond(10)
 appClient.open('47.100.7.224', '55555')
 .then((json) => {
-  console.log('start web socket ok')
-  appClient.subscribe(['Trade.TradingAccount'], onPublishCallback)
+  console.log('start web socket ok', json)
+  return appClient.post('Trade.LoginReq', 'Trade.LoginResp', {
+    userid: 'admin', 
+    passwd: 'admin',
+    instruments: Config.instruments
+  })
+})
+.then((json) => {
+  console.log('LoginResp', json)
+  return appClient.subscribe(['Trade.TradingAccount'], onPublishCallback)
+})
+.then((json) => {
+  console.log('subscribe', json)
 })
 .catch((err) => {
   console.log(JSON.stringify(err))

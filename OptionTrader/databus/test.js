@@ -6,14 +6,14 @@ import * as tradeAction from '../actions/tradeAction'
 import { MARKET_TITLE, ORDER_TITLE } from '../constants'
 
 export default function testStart() {
-    setInterval(() => {
-        const initData = {
-            dynamicEquity: Math.round(Math.random() * 10000),
-            frozenCapital: Math.round(Math.random() * 1000),
-            avaiableCapital: Math.round(Math.random() * 100),
-        }
-        store.dispatch(capitalStateAction.update(initData))
-    }, 3000)
+    // setInterval(() => {
+    //     const initData = {
+    //         dynamicEquity: Math.round(Math.random() * 10000),
+    //         frozenCapital: Math.round(Math.random() * 1000),
+    //         avaiableCapital: Math.round(Math.random() * 100),
+    //     }
+    //     store.dispatch(capitalStateAction.update(initData))
+    // }, 3000)
 
     setInterval(() => {
         const item = {

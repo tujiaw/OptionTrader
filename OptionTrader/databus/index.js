@@ -118,7 +118,7 @@ function dispatchPublishMessage(topic, content) {
       const decodedMsg = Msg.decode(content)
       appClient.onPublishCallback(proto.request, decodedMsg)
     } catch (e) {
-      console.error(e)
+      console.log('dispatchPublishMessage', e)
     }
   }) 
 }
@@ -148,7 +148,7 @@ class AppClient {
 
   initProtoJson() {
     databus.addProtoBuilder('msgexpress', require('./protobuf/msgexpress.json'))
-    //databus.addProtoBuilder('trade', require('./protobuf/trade.json'))
+    databus.addProtoBuilder('trade', require('./protobuf/trade.json'))
   }
 
 	// 初始化连接
@@ -164,6 +164,7 @@ class AppClient {
             self.startHeartBeat()
             self.loginBus().then((json) => {
               self.addr = json.addr
+              console.log('login bus success', json)
               return resolve('success')
             }).catch((err) => {
               return reject(err)
@@ -205,22 +206,21 @@ class AppClient {
       for (let i = 0, count = protoList.length; i < count; i++) {
         const cmd = getCommandFromProto(protoList[i])
         if (cmd) {
-          let newObj = {...obj}
-          newObj.subid = self._subIdStart++
-          newObj.topic = cmd
-          objList.push(newObj)
+          obj.subid = self._subIdStart++
+          obj.topic = cmd
+          objList.push(obj)
         }
       }
       return Promise.resolve(objList)
     }).then((objList) => {
       return self.post("MsgExpress.ComplexSubscribeData", "MsgExpress.CommonResponse", {
         sub: objList
-      }).then((response) => {
-        if (response && response.retcode === 0) {
-          console.log('subscribe success')
+      }).then((res) => {
+        if (res && res.retcode === 0) {
+          console.log('subscribe success.')
           return Promise.resolve()
         } else {
-          return Promise.reject(response)
+          return Promise.reject(res)
         }
       })
     })
@@ -246,7 +246,8 @@ class AppClient {
 			if (!cmd) {
 				console.error('command error, request:' + protoRequest + ', response:' + protoResponse)
 				return reject()
-			}
+      }
+      console.log('111111 request cmd:' + cmd + ', file:' + protoFilename + ', request:' + protoRequest + ', response:' + protoRequest) 
 			databus.requestOnce(cmd, protoFilename, protoRequest, protoResponse, {
 				fillRequest: function(request) {
 					Object.assign(request, requestObj)
@@ -260,6 +261,7 @@ class AppClient {
           } else {
             console.error(err)
           }
+          return resolve(err)
         }
 			})
 		})

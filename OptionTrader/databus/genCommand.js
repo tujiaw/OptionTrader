@@ -23,7 +23,7 @@ fs.readFile(__dirname + '/Command.xml', function(err, data) {
 });
 
 function writeFileList() {
-  const protoDir = '../../public/protobuf'
+  const protoDir = './protobuf'
   const files = fs.readdirSync(protoDir)
   const FileList = []
   for (let file of files) {

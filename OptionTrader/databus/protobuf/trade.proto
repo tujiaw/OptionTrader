@@ -1,7 +1,5 @@
 package Trade;
 
-
-
 message LoginReq { 
   required string userid = 1; //用户id
   required string passwd = 2; //密码
@@ -72,8 +70,7 @@ message MarketDataReq {
 message MarketDataResp { 
   required string code = 1;
   required string date = 2;
-  repeated MarketData data = 3;
-}
+  repeated MarketData data = 3;}
 
 message TradingAccount { 
     optional double dPreBalance=1;                            // 上次结算准备金

@@ -59,7 +59,7 @@
       }
       ws.binaryType = "arraybuffer";
       ws.onopen = function () {
-        console.log("WebSocket Open Success, Ip:%s, Port:%s, Path:%s", ip, port, path);
+        console.log("WebSocket Open Success,", ip, ":", port, path);
         if (!!settings.onConnectSuccess) {
           settings.onConnectSuccess();
         }
@@ -67,7 +67,7 @@
       var ref = this;
       ws.onmessage = function (evt) {
         if (typeof (evt.data) === "string") {
-          console.log("Receive String Data : " + evt.data);
+          console.log("Receive String Data");
           return;
         }
 
@@ -132,7 +132,7 @@
         }
       };
       ws.onclose = function (event) {
-        console.log("Client Notify WebSocket Has Closed...", event);
+        console.error("Client Notify WebSocket Has Closed...");
         if (settings.onConnectClose) {
           settings.onConnectClose();
         }
@@ -154,6 +154,7 @@
      */
     buildProtoPackage: function(proto_package) {
       return new Promise((resolve, reject) => {
+        console.log('buildProtoPackage', proto_package)
         if (protobufBuilders[proto_package]) {
           return resolve(protobufBuilders[proto_package])
         }
@@ -162,7 +163,6 @@
           PROTO_FILE_DIR += '/'
         }
         const protoFilePath = PROTO_FILE_DIR + proto_package + ".proto"
-        console.log('buildProtoPackage:' + protoFilePath)
         ProtoBuf.load(protoFilePath).then((root) => {
           protobufBuilders[proto_package] = root;
           return resolve(root)
@@ -182,7 +182,7 @@
         return this.buildProtoPackage(packageName).then((root) => {
           const obj = root.lookupTypeOrEnum(objectName)
           if (obj) {
-            console.error(obj)
+            console.log('buildProtoObject', proto_package, proto_objectname)
             return resolve(obj)
           }
           const errStr = 'builerProtoObject ' + objectName + ' failed'
@@ -198,7 +198,8 @@
         // 验证填充的数据是否有效
         var errMsg = obj.verify(payload);
         if (errMsg) {
-            throw Error(errMsg);
+          console.error('requestOnce verify err', errMsg)
+          throw Error(errMsg);
         }
         // 创建消息对象
         var message = obj.create(payload); // or use .fromObject if conversion is necessary
@@ -206,6 +207,7 @@
         var buffer = obj.encode(message).finish();
         // 包装成ByteBuffer
         buffer = ByteBuffer.wrap(buffer, "binary");
+        console.log('222222 requestOnce', proto_package, proto_request)
         this.sendmsg(cmd, buffer, proto_package, proto_response, callback, false);
       })
     },
