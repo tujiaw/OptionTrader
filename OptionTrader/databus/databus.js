@@ -207,7 +207,6 @@
         var buffer = obj.encode(message).finish();
         // 包装成ByteBuffer
         buffer = ByteBuffer.wrap(buffer, "binary");
-        console.log('222222 requestOnce', proto_package, proto_request)
         this.sendmsg(cmd, buffer, proto_package, proto_response, callback, false);
       })
     },

@@ -78,33 +78,6 @@ function getProtoFilename(proto) {
 	return ''
 }
 
-// 解析推送的消息，老协议
-// export function parsePublishMessage(protoFilename, jsonContent) {
-// 	return new Promise((resolve, reject) => {
-// 		if (jsonContent.length < 2) {
-// 			return reject('json content error')
-// 		}
-
-// 		const name = jsonContent[0].value
-// 		const content = jsonContent[1].value
-// 		const arr = content.split(',')
-// 		var bb = new Uint8Array(arr.length)
-// 			for (let i = 0, count = arr.length; i < count; i++) {
-// 				bb[i] = arr[i]
-// 			}
-		
-// 			databus.buildProtoObject(protoFilename, name)
-// 			.then((Msg) => {
-// 				try {
-// 					const decodedMsg = Msg.decode(bb)
-// 					return resolve(decodedMsg)
-// 				} catch (e) {
-// 					return reject(e)
-// 				}
-// 			})
-// 	})
-// }
-
 function dispatchPublishMessage(topic, content) {
   const proto = getProtoFromCommand(topic)
   if (!proto || !content || !content.length) {
@@ -201,27 +174,28 @@ class AppClient {
 	subscribe(protoList, publishCallback) {
     const self = this
     this._publishCallback = publishCallback
-    return databus.buildProtoObject("msgexpress", "MsgExpress.SubscribeData").then(obj => {
+    const buildProtoObjList = []
+    for (let i = 0, count = protoList.length; i < count; i++) {
+      buildProtoObjList.push(databus.buildProtoObject("msgexpress", "MsgExpress.SubscribeData"))
+    }
+
+    Promise.all(buildProtoObjList).then(values => {
       let objList = []
-      for (let i = 0, count = protoList.length; i < count; i++) {
+      for (let i = 0, count = values.length; i < count; i++) {
         const cmd = getCommandFromProto(protoList[i])
         if (cmd) {
-          obj.subid = self._subIdStart++
-          obj.topic = cmd
-          objList.push(obj)
+          values[i].subid = self._subIdStart++
+          values[i].topic = cmd
+          objList.push(values[i])
         }
       }
-      return Promise.resolve(objList)
-    }).then((objList) => {
       return self.post("MsgExpress.ComplexSubscribeData", "MsgExpress.CommonResponse", {
         sub: objList
       }).then((res) => {
         if (res && res.retcode === 0) {
           console.log('subscribe success.')
-          return Promise.resolve()
-        } else {
-          return Promise.reject(res)
         }
+        return Promise.resolve(res)
       })
     })
   }

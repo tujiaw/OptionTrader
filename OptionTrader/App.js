@@ -17,15 +17,16 @@ import * as orderAction from './actions/orderAction'
 import * as tradeAction from './actions/tradeAction'
 
 function onPublishCallback(name, content) {
-  console.log('on publish', name, content)
   if (name === 'Trade.TradingAccount') {
-    const tradingAccount = {
-      dynamicEquity: content.dDynamicEquity || 0,
-      frozenCapital: dFrozenCapital || 0,
-      avaiableCapital: dAvaiableCapital || 0
+    const obj = {
+      dynamicEquity: content.dDynamicEquity || 0 ,
+      frozenCapital: content.dFrozenCapital || 0,
+      avaiableCapital: content.dAvaiableCapital || 0
     }
-    console.log('yyyyyyy', tradingAccount)
-    store.dispatch(capitalStateAction.update(tradingAccount))
+    obj.dynamicEquity = obj.dynamicEquity.toFixed(2)
+    obj.frozenCapital = obj.frozenCapital.toFixed(2)
+    obj.avaiableCapital = obj.avaiableCapital.toFixed(2)
+    store.dispatch(capitalStateAction.update(obj))
   } else if (name === 'Trade.MarketData') {
     if (content.szINSTRUMENT && content.szINSTRUMENT.length) {
       const marketData = {
