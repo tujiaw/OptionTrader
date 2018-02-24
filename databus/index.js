@@ -1,5 +1,5 @@
 var databus = require('./databus')
-var { AppList, FileList } = require('./Command')
+var { AppList, FileList } = require('./command')
 var ByteBuffer = require('bytebuffer')
 
 // 根据proto获取command值

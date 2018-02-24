@@ -1,10 +1,11 @@
 # 安装依赖库
+protobufjs要用6.7.0老版本的，否则enum会出错  
 将下面第三方库加入到项目的package.json的dependencies中，然后: npm install
 ```
 "bytebuffer": "^5.0.1",
 "long": "^3.2.0",
 "pako": "^1.0.6",
-"protobufjs": "^6.8.3",
+"protobufjs": "^6.7.0",
 "xml2js": "^0.4.19"
 ```
 

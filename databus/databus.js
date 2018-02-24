@@ -167,7 +167,7 @@
           protobufBuilders[proto_package] = root;
           return resolve(root)
         }).catch((err) => {
-          console.error('buildProtoPackage ' + proto_package + ' failed, err:' + err)
+          console.error('buildProtoPackage ', proto_package, err, protoFilePath)
           return reject(err)
         });
       })
