@@ -16,8 +16,14 @@ import * as marketAction from './actions/marketAction'
 import * as orderAction from './actions/orderAction'
 import * as tradeAction from './actions/tradeAction'
 
+let tradingAccountCount = 0
 function onPublishCallback(name, content) {
+  console.log('publish', name)
   if (name === 'Trade.TradingAccount') {
+    tradingAccountCount++
+    if (tradingAccountCount > 3) {
+      return 
+    }
     const obj = {
       dynamicEquity: content.dDynamicEquity || 0 ,
       frozenCapital: content.dFrozenCapital || 0,
@@ -59,10 +65,17 @@ appClient.open('47.100.7.224', '55555')
 })
 .then((json) => {
   console.log('LoginResp', json)
-  return appClient.subscribe(['Trade.TradingAccount'], onPublishCallback)
+  return appClient.subscribe([
+    'Trade.TradingAccount', 
+    'Trade.MarketData',
+    'Trade.Position',
+    'Trade.Order',
+    'Trade.Trade',
+    'Trade.ErrorInfo'
+  ], onPublishCallback)
 })
 .then((json) => {
-  console.log('subscribe', json)
+  console.log('subscribe result', json)
 })
 .catch((err) => {
   console.log(JSON.stringify(err))

@@ -1,6 +1,7 @@
 var databus = require('./databus')
 var { AppList, FileList } = require('./command')
 var ByteBuffer = require('bytebuffer')
+import * as _ from 'lodash/core'
 
 // 根据proto获取command值
 const commandCache = {}
@@ -174,28 +175,20 @@ class AppClient {
 	subscribe(protoList, publishCallback) {
     const self = this
     this._publishCallback = publishCallback
-    const buildProtoObjList = []
-    for (let i = 0, count = protoList.length; i < count; i++) {
-      buildProtoObjList.push(databus.buildProtoObject("msgexpress", "MsgExpress.SubscribeData"))
-    }
 
-    Promise.all(buildProtoObjList).then(values => {
+    return databus.buildProtoObject("msgexpress", "MsgExpress.SubscribeData").then(obj => {
       let objList = []
-      for (let i = 0, count = values.length; i < count; i++) {
+      for (let i = 0, count = protoList.length; i < count; i++) {
         const cmd = getCommandFromProto(protoList[i])
         if (cmd) {
-          values[i].subid = self._subIdStart++
-          values[i].topic = cmd
-          objList.push(values[i])
+          const newObj = _.clone(obj)
+          newObj.subid = self._subIdStart++
+          newObj.topic = cmd
+          objList.push(newObj)
         }
       }
       return self.post("MsgExpress.ComplexSubscribeData", "MsgExpress.CommonResponse", {
         sub: objList
-      }).then((res) => {
-        if (res && res.retcode === 0) {
-          console.log('subscribe success.')
-        }
-        return Promise.resolve(res)
       })
     })
   }
@@ -224,17 +217,13 @@ class AppClient {
       console.log('111111 request cmd:' + cmd + ', file:' + protoFilename + ', request:' + protoRequest + ', response:' + protoRequest) 
 			databus.requestOnce(cmd, protoFilename, protoRequest, protoResponse, {
 				fillRequest: function(request) {
-					Object.assign(request, requestObj)
+          Object.assign(request, requestObj)
 				},
 				handleResponse: function(response) {
 					return resolve(response)
         },
         handlerError: function(err) {
-          if (err === 'disconnect') {
-            self._isConnect = false
-          } else {
-            console.error(err)
-          }
+          console.error(err)
           return resolve(err)
         }
 			})
@@ -246,6 +235,7 @@ class AppClient {
     this.closeHeartBeat()
     this._heartBeatTimer = setInterval(() => {
       if (!this._isConnect) {
+        console.log('will reconnect...')
         databus.reconnect()
         return
       }

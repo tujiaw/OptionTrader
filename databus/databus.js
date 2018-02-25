@@ -154,7 +154,6 @@
      */
     buildProtoPackage: function(proto_package) {
       return new Promise((resolve, reject) => {
-        console.log('buildProtoPackage', proto_package)
         if (protobufBuilders[proto_package]) {
           return resolve(protobufBuilders[proto_package])
         }
@@ -182,7 +181,7 @@
         return this.buildProtoPackage(packageName).then((root) => {
           const obj = root.lookupTypeOrEnum(objectName)
           if (obj) {
-            console.log('buildProtoObject', proto_package, proto_objectname)
+            // console.log('buildProtoObject', proto_package, proto_objectname)
             return resolve(obj)
           }
           const errStr = 'builerProtoObject ' + objectName + ' failed'
@@ -203,6 +202,7 @@
         }
         // 创建消息对象
         var message = obj.create(payload); // or use .fromObject if conversion is necessary
+        console.log('333333', message)
         // 编码二进制流
         var buffer = obj.encode(message).finish();
         // 包装成ByteBuffer
@@ -246,8 +246,6 @@
       }
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(pack.toArrayBuffer());
-      } else if (callback.handlerError) {
-        callback.handlerError('disconnect')
       }
     },
     setPushDataFactory: function (factory) {
