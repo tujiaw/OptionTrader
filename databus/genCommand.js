@@ -10,7 +10,7 @@ fs.readFile(__dirname + '/Command.xml', function(err, data) {
     }
 
     var content = 'export const AppList=' + JSON.stringify(result['AppList']['AppServer'], undefined, 2)
-    var w = fs.createWriteStream(__dirname + '/Command.js')
+    var w = fs.createWriteStream(__dirname + '/command.js')
     w.write(content, function(err, data) {
       if (err) {
         console.error(err)
@@ -44,7 +44,7 @@ function writeFileList() {
   }
   
   const fileListStr = '\n\n export const FileList=' + JSON.stringify(FileList, undefined, 2)
-  var w = fs.createWriteStream(__dirname + '/Command.js', { flags: 'a+'})
+  var w = fs.createWriteStream(__dirname + '/command.js', { flags: 'a+'})
   w.write(fileListStr, function(err, data) {
     if (err) {
       console.error(err)

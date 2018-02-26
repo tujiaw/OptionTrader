@@ -1,7 +1,7 @@
 var databus = require('./databus')
 var { AppList, FileList } = require('./command')
 var ByteBuffer = require('bytebuffer')
-import * as _ from 'lodash/core'
+var _ = require('lodash/core')
 
 // 根据proto获取command值
 const commandCache = {}
