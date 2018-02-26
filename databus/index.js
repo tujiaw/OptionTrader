@@ -177,7 +177,7 @@ class AppClient {
     this._publishCallback = publishCallback
 
     return databus.buildProtoObject("msgexpress", "MsgExpress.SubscribeData").then(obj => {
-      let objList = []
+      const objList = []
       for (let i = 0, count = protoList.length; i < count; i++) {
         const cmd = getCommandFromProto(protoList[i])
         if (cmd) {
