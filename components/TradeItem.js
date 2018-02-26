@@ -82,7 +82,7 @@ export default class TradeItem extends React.Component {
 
   render() {
     const { data } = this.props
-    const buttons = ['B IH18C2', 'S IH18C2', 'X']
+    const buttons = ['B ' + data.code, 'S ' + data.code, 'X']
     return (
       <View style={styles.root}>
         <View style={styles.row1}>
@@ -100,7 +100,7 @@ export default class TradeItem extends React.Component {
             textStyle={styles.buttonText}
           />
         </View>
-        <Text style={styles.tips}>{'Trade:{ IC1802  SellOpen  6207.2 }'}</Text>
+        <Text style={styles.tips}>{'tips'}</Text>
       </View>
     )
   }

@@ -66,24 +66,24 @@ export default function testStart() {
         }
     }, 5000)
 
-    let s_tradeCodeList = ['IC1802', 'IF1802', 'IH1802', 'IH1803']
-    setInterval(() => {
-        for (let i = 0; i < s_tradeCodeList.length; i++) {
-            const newItem = {
-                code: s_tradeCodeList[i],
-                spotPrice: 'C0000',                 // 现货价格
-                futuresMinusPostPrice: '08',        // 期货价格-现货价格
-                morePosition: '2',             // 当前品种的多单仓位
-                emptyPosition: '1',           // 当前品种的空单仓位
-                lock: 'L',                          // 锁住或打开下单按钮和撤单按钮
-                sellPrice: 6000,                    // 卖价
-                buyPrice: 8000,                     // 买价
-                sellVolume: 0,                      // 卖量
-                buyVolume: 0,                       // 买量
-                dealPrice: 0,                       // 成交价
-                placeOrderPrice: '',                // 下单价格
-            }
-            store.dispatch(tradeAction.update(newItem))
-        }
-    }, 3000)
+    // let s_tradeCodeList = ['IC1802', 'IF1802', 'IH1802', 'IH1803']
+    // setInterval(() => {
+    //     for (let i = 0; i < s_tradeCodeList.length; i++) {
+    //         const newItem = {
+    //             code: s_tradeCodeList[i],
+    //             spotPrice: 'C0000',                 // 现货价格
+    //             futuresMinusPostPrice: '08',        // 期货价格-现货价格
+    //             morePosition: '2',             // 当前品种的多单仓位
+    //             emptyPosition: '1',           // 当前品种的空单仓位
+    //             lock: 'L',                          // 锁住或打开下单按钮和撤单按钮
+    //             sellPrice: 6000,                    // 卖价
+    //             buyPrice: 8000,                     // 买价
+    //             sellVolume: 0,                      // 卖量
+    //             buyVolume: 0,                       // 买量
+    //             dealPrice: 0,                       // 成交价
+    //             placeOrderPrice: '',                // 下单价格
+    //         }
+    //         store.dispatch(tradeAction.update(newItem))
+    //     }
+    // }, 3000)
 }
