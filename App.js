@@ -33,7 +33,6 @@ appClient.open('47.100.7.224', '55555')
     'Trade.Trade',
     'Trade.ErrorInfo'
   ], (name, content) => {
-    console.log('publish', name)
     if (dispatchObj[name]) {
       dispatchObj[name](content)
     }
@@ -46,6 +45,7 @@ appClient.open('47.100.7.224', '55555')
   console.log(JSON.stringify(err))
 })
 
+// testStart()
 const MainTab = TabNavigator(
   {
     Show: {

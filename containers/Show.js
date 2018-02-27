@@ -11,12 +11,12 @@ import { MARKET_TITLE, ORDER_TITLE } from '../constants'
 import * as _ from 'lodash/core'
 
 class Show extends React.Component {
-  shouldComponentUpdate(nextProps, nextState) {
-    if (_.isEqual(this.props, nextProps)) {
-      return false
-    }
-    return true
-  }
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   if (_.isEqual(this.props, nextProps)) {
+  //     return false
+  //   }
+  //   return true
+  // }
 
   _renderHeader = ({section}) => {
     if (section.title.name === MARKET_TITLE) {
@@ -55,7 +55,7 @@ class Show extends React.Component {
           renderItem={this._renderItem}
           renderSectionHeader={this._renderHeader}
           sections={this.props.dataList}
-          keyExtractor={(item, index) => ('i-' + index + item)}
+          keyExtractor={(item, index) => ('i-' + index)}
         />
       </View>
     )        

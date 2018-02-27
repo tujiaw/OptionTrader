@@ -8,6 +8,7 @@ project.ext.vectoricons = [
 apply from: "../../react-native-vector-icons/fonts.gradle"
 
 
+
 14:25:08: Trade.Trade Object {
 14:25:08:   "dPrice": 5998.4,
 14:25:08:   "nOrderID": 6099,

@@ -80,7 +80,22 @@ const dispatchObj = {
       console.error('Trade.Order', content)
       return
     }
+    console.log('order', content)
     htOrder[content.nOrderID] = content
+
+    const orderData = {
+      dataType: ORDER_TITLE,
+      orderId: content.nOrderID,
+      orderTime: content.szInsertDateTime,
+      code: content.szINSTRUMENT,
+      price: content.dLimitPrice,
+      dir: content.nTradeDir,
+      operate: content.nTradeOperate,
+      status: content.nOrderStatus,
+      tradeTime: content.szTradeDateTime,
+      cancel: 'wait'
+    }
+    store.dispatch(orderAction.update(orderData))
   },
   'Trade.Trade': (content) => {
     if (!(content.nOrderID)) {
@@ -90,6 +105,7 @@ const dispatchObj = {
     htTrade[content.nOrderID] = content
   },
   'Trade.Position': (content) => {
+    console.log('position', content)
     if (!(content.szINSTRUMENT && content.szINSTRUMENT.length && content.hasOwnProperty('nTradeDir'))) {
       console.error('Trade.Position', content)
       return
@@ -111,4 +127,4 @@ const dispatchObj = {
   }
 }
 
-module.export = dispatchObj
+export default dispatchObj

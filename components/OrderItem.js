@@ -14,13 +14,13 @@ export default class OrderItem extends React.Component {
     const {data} = this.props
     return (
       <View style={styles.root}>
-        <Text style={styles.column}>{data.orderTime || ''}</Text>
-        <Text style={styles.column}>{data.code || ''}</Text>
-        <Text style={styles.column}>{data.price || ''}</Text>
-        <Text style={styles.column}>{data.dir || ''}</Text>
-        <Text style={styles.column}>{data.operate || ''}</Text>
-        <Text style={styles.column}>{data.status || ''}</Text>
-        <Text style={styles.column}>{data.tradeTime || ''}</Text>
+        <Text style={styles.column}>{data.orderTime || '--'}</Text>
+        <Text style={styles.column}>{data.code || '--'}</Text>
+        <Text style={styles.column}>{data.price || '--'}</Text>
+        <Text style={styles.column}>{data.dir || '--'}</Text>
+        <Text style={styles.column}>{data.operate || '--'}</Text>
+        <Text style={styles.column}>{data.status || '--'}</Text>
+        <Text style={styles.column}>{data.tradeTime || '--'}</Text>
         {data.cancel==='wait' && 
           <RemoveButton onPress={this._onCancel} />
         }

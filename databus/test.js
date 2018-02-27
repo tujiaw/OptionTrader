@@ -21,20 +21,14 @@ export default function testStart() {
     //         instId: '',
     //         code: 'IC180',
     //         price: '1279.2',
-    //         dir: '空',
+    //         dir: '1',
     //         total: 0,
     //         yesday: 1,
     //         today: 0,
     //         avgPrice: '6307.2',
     //         profit: '880',
     //     }
-    //     const initList = []
-    //     for (let i = 0; i < 4; i++) {
-    //         const obj = {...item}
-    //         obj.code += i
-    //         initList.push(obj)
-    //     }
-    //     store.dispatch(marketAction.update(initList))
+    //     store.dispatch(marketAction.update(item))
     // }, 3000)
 
     let s_orderId = 1
@@ -45,7 +39,7 @@ export default function testStart() {
             orderTime: '14:37:31',
             code: 'IC',
             price: '6307.2',
-            dir: '买',
+            dir: '1',
             operate: 'close',
             status: 'traded',
             tradeTime: '14:37:54',
