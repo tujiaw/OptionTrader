@@ -80,7 +80,6 @@ const dispatchObj = {
       console.error('Trade.Order', content)
       return
     }
-    console.log('order', content)
     htOrder[content.nOrderID] = content
 
     const orderData = {
@@ -105,7 +104,6 @@ const dispatchObj = {
     htTrade[content.nOrderID] = content
   },
   'Trade.Position': (content) => {
-    console.log('position', content)
     if (!(content.szINSTRUMENT && content.szINSTRUMENT.length && content.hasOwnProperty('nTradeDir'))) {
       console.error('Trade.Position', content)
       return

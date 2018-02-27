@@ -16,15 +16,6 @@ appClient.initProtoJson()
 appClient.setHeartBeatIntervalSecond(10)
 appClient.open('47.100.7.224', '55555')
 .then((json) => {
-  console.log('start web socket ok', json)
-  return appClient.post('Trade.LoginReq', 'Trade.LoginResp', {
-    userid: 'admin', 
-    passwd: 'admin',
-    instruments: Config.instruments
-  })
-})
-.then((json) => {
-  console.log('LoginResp', json)
   return appClient.subscribe([
     'Trade.TradingAccount', 
     'Trade.MarketData',
@@ -33,6 +24,7 @@ appClient.open('47.100.7.224', '55555')
     'Trade.Trade',
     'Trade.ErrorInfo'
   ], (name, content) => {
+    console.log('publish', name)
     if (dispatchObj[name]) {
       dispatchObj[name](content)
     }
@@ -40,6 +32,14 @@ appClient.open('47.100.7.224', '55555')
 })
 .then((json) => {
   console.log('subscribe result', json)
+  return appClient.post('Trade.LoginReq', 'Trade.LoginResp', {
+    userid: 'admin', 
+    passwd: 'admin',
+    instruments: Config.instruments
+  })
+})
+.then((json) => {
+  console.log('login trade', json)
 })
 .catch((err) => {
   console.log(JSON.stringify(err))
