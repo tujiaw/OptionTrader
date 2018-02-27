@@ -1,4 +1,4 @@
-import { UPDATE_MARKET_DATA } from '../constants/actionTypes'
+import { UPDATE_MARKET_DATA, UPDATE_EXIST_MARKET_DATA } from '../constants/actionTypes'
 import { MARKET_TITLE } from '../constants'
 import { isArray } from '../utils/tools'
 
@@ -25,8 +25,9 @@ export default function marketData(state = initData, action) {
         for (let i = 0; i < newList.length; i++) {
             let isFind = false
             for (let j = 0; j < oldState.data.length; j++) {
-                if (newList[i].code === oldState.data[j].code) {
-                    oldState.data[j] = newList[i]
+                // code与dir确定唯一键
+                if (newList[i].code === oldState.data[j].code && newList[i].dir === oldState.data[j].dir) {
+                    Object.assign(oldState.data[j], newList[i])
                     isFind = true
                     break
                 }
@@ -36,6 +37,16 @@ export default function marketData(state = initData, action) {
             }
         }
         return oldState
+    }
+    case UPDATE_EXIST_MARKET_DATA:
+    {
+        const oldState = {...state}
+        for (let i = 0; i < oldState.data.length; i++) {
+            if (oldState.data[i].code === action.data.code && oldState.data[i].dir === action.data.dir) {
+                Object.assign(oldState.data[i], action.data)
+                return oldState
+            }
+        }
     }
     default:
       return state

@@ -15,27 +15,27 @@ export default function testStart() {
     //     store.dispatch(capitalStateAction.update(initData))
     // }, 3000)
 
-    setInterval(() => {
-        const item = {
-            dataType: MARKET_TITLE,
-            instId: '',
-            code: 'IC180',
-            price: '1279.2',
-            dir: '空',
-            total: 0,
-            yesday: 1,
-            today: 0,
-            avgPrice: '6307.2',
-            profit: '880',
-        }
-        const initList = []
-        for (let i = 0; i < 4; i++) {
-            const obj = {...item}
-            obj.code += i
-            initList.push(obj)
-        }
-        store.dispatch(marketAction.update(initList))
-    }, 3000)
+    // setInterval(() => {
+    //     const item = {
+    //         dataType: MARKET_TITLE,
+    //         instId: '',
+    //         code: 'IC180',
+    //         price: '1279.2',
+    //         dir: '空',
+    //         total: 0,
+    //         yesday: 1,
+    //         today: 0,
+    //         avgPrice: '6307.2',
+    //         profit: '880',
+    //     }
+    //     const initList = []
+    //     for (let i = 0; i < 4; i++) {
+    //         const obj = {...item}
+    //         obj.code += i
+    //         initList.push(obj)
+    //     }
+    //     store.dispatch(marketAction.update(initList))
+    // }, 3000)
 
     let s_orderId = 1
     setInterval(() => {

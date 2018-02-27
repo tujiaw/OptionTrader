@@ -10,65 +10,7 @@ import store from './utils/store'
 import testStart from './databus/test'
 import appClient from './databus'
 import Config from './config'
-
-import * as capitalStateAction from './actions/capitalStateAction'
-import * as marketAction from './actions/marketAction'
-import * as orderAction from './actions/orderAction'
-import * as tradeAction from './actions/tradeAction'
-import { MARKET_TITLE, ORDER_TITLE } from './constants'
-
-// Trade.MarketData
-  //  "dAskPrice1": 551,
-  //  "dAvgPrice": 54959.5811481107,
-  //  "dBidPrice1": 550.5,
-  //  "dLastPrice": 550.5,
-  //  "dLowerLimitPrice": 506,
-  //  "dOpenInt": 1476518,
-  //  "dUpperLimitPrice": 594,
-  //  "nAskVolume1": 3327,
-  //  "nBidVolume1": 1071,
-  //  "nUpdateMillisec": 0,
-  //  "nVolume": 253216,
-  //  "szINSTRUMENT": "i1805",
-  //  "szUpdateTime": "20180226 21:59:21",
-  
-let tradingAccountCount = 0
-function onPublishCallback(name, content) {
-  console.log('publish', name)
-  if (name === 'Trade.TradingAccount') {
-    tradingAccountCount++
-    if (tradingAccountCount > 3) {
-      return 
-    }
-    const obj = {
-      dynamicEquity: content.dDynamicEquity || 0 ,
-      frozenCapital: content.dFrozenCapital || 0,
-      avaiableCapital: content.dAvaiableCapital || 0
-    }
-    obj.dynamicEquity = obj.dynamicEquity.toFixed(2)
-    obj.frozenCapital = obj.frozenCapital.toFixed(2)
-    obj.avaiableCapital = obj.avaiableCapital.toFixed(2)
-    store.dispatch(capitalStateAction.update(obj))
-  } else if (name === 'Trade.MarketData') {
-    if (content.szINSTRUMENT && content.szINSTRUMENT.length) {
-      const obj = {
-          code: content.szINSTRUMENT,
-          spotPrice: '00000',                 // 现货价格
-          futuresMinusPostPrice: '00',        // 期货价格-现货价格
-          morePosition: '0',             // 当前品种的多单仓位
-          emptyPosition: '0',           // 当前品种的空单仓位
-          lock: 'L',                          // 锁住或打开下单按钮和撤单按钮
-          sellPrice: content.dAskPrice1,                    // 卖价
-          buyPrice: content.dBidPrice1,                     // 买价
-          sellVolume: content.nAskVolume1,                      // 卖量
-          buyVolume: content.nBidVolume1,                       // 买量
-          dealPrice: content.dLastPrice,                       // 成交价
-          placeOrderPrice: '',                // 下单价格
-      }
-      store.dispatch(tradeAction.update(obj))
-    }
-  }
-}
+import dispatchObj from './dispatch'
 
 appClient.initProtoJson()
 appClient.setHeartBeatIntervalSecond(10)
@@ -90,7 +32,12 @@ appClient.open('47.100.7.224', '55555')
     'Trade.Order',
     'Trade.Trade',
     'Trade.ErrorInfo'
-  ], onPublishCallback)
+  ], (name, content) => {
+    console.log('publish', name)
+    if (dispatchObj[name]) {
+      dispatchObj[name](content)
+    }
+  })
 })
 .then((json) => {
   console.log('subscribe result', json)
@@ -99,7 +46,6 @@ appClient.open('47.100.7.224', '55555')
   console.log(JSON.stringify(err))
 })
 
-testStart()
 const MainTab = TabNavigator(
   {
     Show: {

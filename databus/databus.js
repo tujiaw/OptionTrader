@@ -202,7 +202,7 @@
         }
         // 创建消息对象
         var message = obj.create(payload); // or use .fromObject if conversion is necessary
-        console.log('333333', message)
+        console.log('requestOnce', message)
         // 编码二进制流
         var buffer = obj.encode(message).finish();
         // 包装成ByteBuffer

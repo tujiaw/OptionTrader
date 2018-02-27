@@ -1,8 +1,11 @@
 // 更新资金状态
 export const UPDATE_CAPITALSTATE_DATA = 'UPDATE_CAPITALSTATE_DATA'
 
-// 更新当前持仓
+// 更新当前持仓，不存在就插入
 export const UPDATE_MARKET_DATA = 'UPDATE_MARKET_DATA'
+
+// 更新已存在的持仓
+export const UPDATE_EXIST_MARKET_DATA = 'UPDATE_EXIST_MARKET_DATA'
 
 // 更新当日订单
 export const UPDATE_ORDER_DATA = 'UPDATE_ORDER_DATA'

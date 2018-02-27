@@ -121,8 +121,8 @@ class AppClient {
   }
 
   initProtoJson() {
-    databus.addProtoBuilder('msgexpress', require('./protobuf/msgexpress.json'))
     databus.addProtoBuilder('trade', require('./protobuf/trade.json'))
+    databus.addProtoBuilder('msgexpress', require('./protobuf/msgexpress.json'))
   }
 
 	// 初始化连接
@@ -214,7 +214,7 @@ class AppClient {
 				console.error('command error, request:' + protoRequest + ', response:' + protoResponse)
 				return reject()
       }
-      console.log('111111 request cmd:' + cmd + ', file:' + protoFilename + ', request:' + protoRequest + ', response:' + protoRequest) 
+      console.log('postProto cmd:' + cmd + ', file:' + protoFilename + ', request:' + protoRequest + ', response:' + protoRequest) 
 			databus.requestOnce(cmd, protoFilename, protoRequest, protoResponse, {
 				fillRequest: function(request) {
           Object.assign(request, requestObj)
