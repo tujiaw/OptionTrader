@@ -4,7 +4,6 @@ import { CheckBox, Divider } from 'react-native-elements'
 import TradeItem from '../components/TradeItem'
 import { connect } from 'react-redux'
 import * as _ from 'lodash/core'
-import * as tradeSettingAction from '../actions/tradeSettingAction'
 import controller from '../controller'
 
 class Edit extends React.Component {
@@ -45,19 +44,23 @@ class Edit extends React.Component {
   }
 
   _onOfrAvailablePress = () => {
-    this.props.updateSetting({enableSellFirst: !this.props.setting.enableSellFirst})
+    const newSetting = Object.assign({}, this.props.setting, {enableSellFirst: !this.props.setting.enableSellFirst})
+    controller.updateSetting(newSetting)
   }
 
   _onEnableMultiPress = () => {
-    this.props.updateSetting({noLimitedNetPosition: !this.props.setting.noLimitedNetPosition})
+    const newSetting = Object.assign({}, this.props.setting, {noLimitedNetPosition: !this.props.setting.noLimitedNetPosition})
+    controller.updateSetting(newSetting)
   }
 
   _onOpenPress = () => {
-    this.props.updateSetting({open: !this.props.setting.open})
+    const newSetting = Object.assign({}, this.props.setting, {open: !this.props.setting.open})
+    controller.updateSetting(newSetting)
   }
 
   _onClosePress = () => {
-    this.props.updateSetting({close: !this.props.setting.close})
+    const newSetting = Object.assign({}, this.props.setting, {close: !this.props.setting.close})
+    controller.updateSetting(newSetting)
   }
 
   _renderItem = ({item}) => {
@@ -116,7 +119,6 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    updateSetting: (data) => { dispatch(tradeSettingAction.update(data)) }
   }
 }
 

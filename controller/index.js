@@ -1,7 +1,8 @@
 import appClient from '../databus'
 import store from '../utils/store'
 import * as tradeAction from '../actions/tradeAction'
-import { ToastAndroid } from 'react-native'
+import * as tradeSettingAction from '../actions/tradeSettingAction'
+import { ToastAndroid, AsyncStorage } from 'react-native'
 import dispatchObj from './dispatch'
 import { 
   enTradeDir,
@@ -12,6 +13,13 @@ import {
 class Controller {
   constructor(dispatch) {
     this.dispatch = dispatch
+    AsyncStorage.getItem('tradeSetting', (err, result) => {
+      if (err) {
+        console.log(err)
+      } else {
+        store.dispatch(tradeSettingAction.update(result))
+      }
+    })
   }
 
   // 处理推送
@@ -44,6 +52,11 @@ class Controller {
 
   updateTradeTips(code, tips) {
     store.dispatch(tradeAction.update({ code: code, tips: tips}))
+  }
+
+  updateSetting(data) {
+    AsyncStorage.setItem('tradeSetting', data)
+    store.dispatch(tradeSettingAction.update(data))
   }
 
   bid(code, price, setting) {
@@ -81,7 +94,7 @@ class Controller {
     if (!marketData) {
       return
     }
-    
+
     this.updateTradeTips(code, '')
     if (Math.abs(price - marketData.dLastPrice) / marketData.dLastPrice > 0.01) {
       this.updateTradeTips(code, '价格偏离正常值！')
