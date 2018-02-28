@@ -1,6 +1,7 @@
 import { UPDATE_ORDER_DATA, REMOVE_ORDER_FROM_ID } from '../constants/actionTypes'
 import { ORDER_TITLE } from '../constants'
 import { isArray } from '../utils/tools'
+import * as _ from 'lodash'
 
 const initData = {
     title: {
@@ -14,26 +15,21 @@ export default function orderData(state = initData, action) {
   switch(action.type) {
     case UPDATE_ORDER_DATA:
     {
-        const newState = {...state}
-        for (let i = 0; i < newState.data.length; i++) {
-            if (newState.data[i].orderId === action.data.orderId) {
-                Object.assign(newState.data[i], action.data)
-                return newState
-            }
+        const newState = _.cloneDeep(state)
+        const f = _.find(newState.data, item => item.orderId === action.data.orderId)
+        if (f) {
+            Object.assign(f, action.data)
+        } else {
+            newState.data.push(action.data)
         }
-        newState.data.push(action.data)
         return newState
     }
     case REMOVE_ORDER_FROM_ID:
     {
         if (action.orderId) {
-            const newState = {...state}
-            for (let i = 0; i < newState.data.length; i++) {
-                if (newState.data[i].orderId === action.orderId) {
-                    newState.data.splice(i, 1)
-                    return newState
-                }
-            }
+            const newState = _.cloneDeep(state)
+            _.remove(newState.data, item => item.orderId === action.orderId)
+            return newState
         }
         return state
     }

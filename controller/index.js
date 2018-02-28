@@ -17,13 +17,14 @@ class Controller {
       if (err) {
         console.log(err)
       } else {
-        store.dispatch(tradeSettingAction.update(result))
+        store.dispatch(tradeSettingAction.update(JSON.parse(result)))
       }
     })
   }
 
   // 处理推送
   handleDispatch(name, content) {
+    console.log('handleDispatch', name)
     if (this.dispatch[name]) {
       this.dispatch[name](content)
     }
@@ -55,13 +56,14 @@ class Controller {
   }
 
   updateSetting(data) {
-    AsyncStorage.setItem('tradeSetting', data)
+    AsyncStorage.setItem('tradeSetting', JSON.stringify(data))
     store.dispatch(tradeSettingAction.update(data))
   }
 
   bid(code, price, setting) {
     const marketData = this.dispatch.htQuote()[code]
     if (!marketData) {
+      console.log('market is not find', code)
       return
     }
     this.updateTradeTips(code, '')

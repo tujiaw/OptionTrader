@@ -1,14 +1,15 @@
-const x = {
-    a: '11',
-    b: '222',
-    c: '333',
-    d: '4444'
-}
+var _ = require('lodash')
 
-const y = {
-    b: '22222222',
-    d: '4444444'
-}
+var users = [
+    { 'user': 'barney',  'age': 36, 'active': true },
+    { 'user': 'fred',    'age': 40, 'active': false },
+    { 'user': 'pebbles', 'age': 1,  'active': true }
+  ];
 
-Object.assign(x, y)
-console.log(x)
+  const s = _.find(users, item => item.age === 36 && item.active === false)
+  if (s) {
+      Object.assign(s, {'active': false})
+  } else {
+      users.push({'user': 'hello'})
+  }
+  console.log(users)

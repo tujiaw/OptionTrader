@@ -1,4 +1,5 @@
 import { UPDATE_TRADE_DATA } from '../constants/actionTypes'
+import * as _ from 'lodash'
 
 const initData = []
 export default function orderData(state = initData, action) {
@@ -6,14 +7,13 @@ export default function orderData(state = initData, action) {
     case UPDATE_TRADE_DATA:
     {
       if (action.data.code) {
-        const oldList = [...state]
-        for (let i = 0; i < oldList.length; i++) {
-          if (oldList[i].code === action.data.code) {
-            Object.assign(oldList[i], action.data)
-            return oldList
-          }
+        const oldList = _.cloneDeep(state)
+        const f = _.find(oldList, item => item.code === action.data.code)
+        if (f) {
+          Object.assign(f, action.data)
+        } else {
+          oldList.push(action.data)
         }
-        oldList.push(action.data)
         return oldList
       }
       return state
