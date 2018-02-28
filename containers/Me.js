@@ -1,18 +1,25 @@
 import React from 'react'
-import { StyleSheet, View, Text } from 'react-native'
-import { FormLabel, 
-  FormInput, 
-  FormValidationMessage, 
-  Button,
-  Avatar
-} from 'react-native-elements'
+import { StyleSheet, View, Text, TouchableNativeFeedback } from 'react-native'
+import { Button } from 'react-native-elements'
+
+class SettingRow extends React.Component {
+  render() {
+    return (
+      <TouchableNativeFeedback onPress={this.props.onPress} background={TouchableNativeFeedback.SelectableBackground()} >
+        <View style={styles.rowContainer}>
+          <View style={styles.rowContent} >
+            <Text style={styles.title}>{this.props.title}</Text>
+            <Text style={styles.value}>{this.props.value}</Text>
+          </View>
+        </View>
+      </TouchableNativeFeedback>
+    )
+  }
+}
 
 export default class Me extends React.Component {
   state = {
     tips: '',
-    isLogined: false,
-    username: '',
-    password: '',
     loading: false,
   }
 
@@ -38,38 +45,24 @@ export default class Me extends React.Component {
     this.setState({tips: '', loading: true})
   }
 
+  _onCodePress = () => {
+    console.log('11111111111111')
+  }
+
   render() {
     return (
       <View style={styles.root}>
-        <View style={styles.avatar}>
-          <Avatar
-            large
-            rounded
-            source={require('../res/myavatar.jpg')}
-            onPress={() => console.log("Works!")}
-            activeOpacity={0.7}
-          />
-          <Text style={styles.avatarName}>{this.state.isLogined ? this.state.username : '用户'}</Text>
-        </View>
-
-        <FormLabel labelStyle={styles.username}>用户名</FormLabel>
-        <FormInput 
-          onChangeText={text => this.setState({ username: text})} 
-          editable={!this.state.isLogined} 
-        />
-        <FormLabel>密码</FormLabel>
-        <FormInput 
-          onChangeText={text => this.setState({password: text})} 
-          secureTextEntry={true} 
-          editable={!this.state.isLogined}
-        />
+        <Text style={styles.header}>设置</Text>
+        <SettingRow title="代码" value="IC1803;IF1803;IH1803;I1805" onPress={this._onCodePress}/>
+        <SettingRow title="地址" value="47.100.7.224" />
+        <SettingRow title="端口" value="55555" />
         <Button 
-          title={this.state.isLogined ? '退出' : '登录'} 
+          buttonStyle={styles.reconnect}
+          title={ '重连' } 
           raised={false} 
           onPress={this._onLogin} 
           loading={this.state.loading}
         />
-        <FormValidationMessage>{this.state.tips}</FormValidationMessage>
       </View>
     )        
   }
@@ -78,19 +71,35 @@ export default class Me extends React.Component {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    marginLeft: 50,
-    marginRight: 50,
-    justifyContent: 'center',
+    marginTop: 30,
   },
-  avatar: {
+  header: {
+    fontSize: 20,
+    marginBottom: 10,
+    marginLeft: 5,
+  },
+  rowContainer: {
     flex: 1,
+    paddingLeft: 10,
+    paddingRight: 10,
+    maxHeight: 40,
+  },
+  rowContent: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    maxHeight: 100,
+    borderBottomWidth: 1,
+    borderColor: 'grey',
   },
-  avatarName: {
-    fontSize: 14
+  title: {
+    color: 'black'
   },
-  username: {
-    // alignSelf: 'flex-start'
+  value: {
+    color: 'grey'
+  },
+  reconnect: {
+    marginTop: 20,
+    backgroundColor: 'red'
   }
 })
