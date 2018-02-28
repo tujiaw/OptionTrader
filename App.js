@@ -10,11 +10,11 @@ import store from './utils/store'
 import testStart from './databus/test'
 import appClient from './databus'
 import Config from './config'
-import dispatchObj from './dispatch'
+import controller from './controller'
 
 appClient.initProtoJson()
 appClient.setHeartBeatIntervalSecond(10)
-appClient.open('47.100.7.224', '55555')
+appClient.open(Config.wsip, Config.wsport)
 .then((json) => {
   return appClient.subscribe([
     'Trade.TradingAccount', 
@@ -24,10 +24,7 @@ appClient.open('47.100.7.224', '55555')
     'Trade.Trade',
     'Trade.ErrorInfo'
   ], (name, content) => {
-    console.log('publish', name)
-    if (dispatchObj[name]) {
-      dispatchObj[name](content)
-    }
+    controller.handleDispatch(name, content)
   })
 })
 .then((json) => {

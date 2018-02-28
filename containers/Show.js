@@ -1,22 +1,24 @@
 import React from 'react'
-import { StyleSheet, View, Text, SectionList } from 'react-native'
+import { StyleSheet, View, Text, SectionList, ToastAndroid } from 'react-native'
 import { connect } from 'react-redux'
 import MainHeader from '../components/MainHeader'
 import MarketHeader from '../components/MarketHeader'
 import OrderHeader from '../components/OrderHeader'
 import MarketItem from '../components/MarketItem'
 import OrderItem from '../components/OrderItem'
-import * as orderAction from '../actions/orderAction'
 import { MARKET_TITLE, ORDER_TITLE } from '../constants'
+import store from '../utils/store'
+import * as orderAction from '../actions/orderAction'
 import * as _ from 'lodash/core'
+import controller from '../controller'
 
 class Show extends React.Component {
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   if (_.isEqual(this.props, nextProps)) {
-  //     return false
-  //   }
-  //   return true
-  // }
+  shouldComponentUpdate(nextProps, nextState) {
+    if (_.isEqual(this.props, nextProps)) {
+      return false
+    }
+    return true
+  }
 
   _renderHeader = ({section}) => {
     if (section.title.name === MARKET_TITLE) {
@@ -43,7 +45,17 @@ class Show extends React.Component {
   }
 
   _onRemoveOrder = (orderId) => {
-    this.props.removeOrder(orderId)
+    if (orderId && orderId > 0) {
+      controller.cancelReq(orderId).then(json => {
+        if (json.retCode === 0) {
+          this.props.removeOrder(orderId)
+        } else {
+          ToastAndroid.show(json.msg, ToastAndroid.SHORT);
+        }
+      }).catch(err => {
+        ToastAndroid.show('error', ToastAndroid.SHORT);
+      })
+    }
   }
 
   render() {
@@ -71,7 +83,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    removeOrder: (orderId) => { dispatch(orderAction.remove(orderId)) }
+    removeOrder: (orderId) => { store.dispatch(orderAction.remove(orderId)) }
   }
 }
 

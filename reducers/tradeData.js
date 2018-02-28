@@ -9,7 +9,7 @@ export default function orderData(state = initData, action) {
         const oldList = [...state]
         for (let i = 0; i < oldList.length; i++) {
           if (oldList[i].code === action.data.code) {
-            oldList[i] = action.data
+            Object.assign(oldList[i], action.data)
             return oldList
           }
         }

@@ -16,3 +16,6 @@ export const REMOVE_ORDER_FROM_ID = 'REMOVE_ORDER_FROM_ID'
 
 // 更新交易信息
 export const UPDATE_TRADE_DATA = 'UPDATE_TRADE_DATA'
+
+// 更新交易设置
+export const UPDATE_TRADE_SETTING = 'UPDATE_TRADE_SETTING'

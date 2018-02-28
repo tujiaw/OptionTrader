@@ -80,6 +80,14 @@ export default class TradeItem extends React.Component {
     this.setState({ editPrice: '' + fsrc.toFixed(2) })
   }
 
+  _onButtonGroupPress = (index) => {
+    const { onButtonGroupPress } = this.props
+    if (onButtonGroupPress) {
+      const data = Object.assign({}, this.props.data, this.state)
+      onButtonGroupPress(index, data)
+    }
+  }
+
   render() {
     const { data } = this.props
     const buttons = ['B ' + data.code, 'S ' + data.code, 'X']
@@ -98,9 +106,10 @@ export default class TradeItem extends React.Component {
             buttons={buttons}
             containerStyle={styles.operButtonGroup}
             textStyle={styles.buttonText}
+            onPress={this._onButtonGroupPress}
           />
         </View>
-        <Text style={styles.tips}>{'tips'}</Text>
+        <Text style={styles.tips}>{data.tips || ''}</Text>
       </View>
     )
   }
