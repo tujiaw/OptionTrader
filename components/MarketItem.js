@@ -7,13 +7,13 @@ export default class MarketItem extends React.Component {
     return (
       <View style={styles.root}>
         <Text style={[styles.baseText, styles.code]}>{data.code}</Text>
-        <Text style={[styles.baseText]}>{data.price || '--'}</Text>
-        <Text style={[styles.baseText]}>{data.dir || '0'}</Text>
-        <Text style={[styles.baseText]}>{data.total || '--'}</Text>
-        <Text style={[styles.baseText]}>{data.yesday || '0'}</Text>
-        <Text style={[styles.baseText]}>{data.today || '0'}</Text>
-        <Text style={[styles.baseText]}>{data.avgPrice || '--'}</Text>
-        <Text style={[styles.baseText]}>{data.profit || '--'}</Text>
+        <Text style={[styles.baseText]}>{data.price || 0}</Text>
+        <Text style={[styles.baseText]}>{data.dir || 0}</Text>
+        <Text style={[styles.baseText]}>{data.total || 0}</Text>
+        <Text style={[styles.baseText]}>{data.yesday || 0}</Text>
+        <Text style={[styles.baseText]}>{data.today || 0}</Text>
+        <Text style={[styles.baseText]}>{data.avgPrice || 0}</Text>
+        <Text style={[styles.baseText]}>{data.profit || 0}</Text>
       </View>
     )
   }

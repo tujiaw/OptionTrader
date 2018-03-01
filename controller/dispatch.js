@@ -55,10 +55,10 @@ function getShowOperate(tradeOperate) {
 function getShowOrderStatus(status) {
   if (status === enTradeOrderStatus.TRADE_ORDER_STATUS_UNKNOW) {
     return 'unknow'
-  } else if (status === enTradeOrderStatus.TRADE_ORDER_STATUS_UNKNOW) {
+  } else if (status === enTradeOrderStatus.TRADE_ORDER_STATUS_WAIT) {
     return 'wait'
   } else if (status === enTradeOrderStatus.TRADE_ORDER_STATUS_NOTWAIT) {
-    return 'not wait'
+    return 'nowait'
   } else if (status === enTradeOrderStatus.TRADE_ORDER_STATUS_TRADED) {
     return 'traded'
   } else if (status === enTradeOrderStatus.TRADE_ORDER_STATUS_CANCELED) {
@@ -66,7 +66,7 @@ function getShowOrderStatus(status) {
   } else if (status === enTradeOrderStatus.TRADE_ORDER_STATUS_PARTIAL) {
     return 'partial'
   } else if (status === enTradeOrderStatus.TRADE_ORDER_STATUS_NOTPARTIAL) {
-    return 'not partial'
+    return 'nopartial'
   } else {
     return '--'
   }
@@ -109,9 +109,9 @@ const dispatchObj = {
       frozenCapital: content.dFrozenCapital || 0,
       avaiableCapital: content.dAvaiableCapital || 0
     }
-    obj.dynamicEquity = obj.dynamicEquity.toFixed(2)
-    obj.frozenCapital = obj.frozenCapital.toFixed(2)
-    obj.avaiableCapital = obj.avaiableCapital.toFixed(2)
+    obj.dynamicEquity = Math.round(obj.dynamicEquity)
+    obj.frozenCapital = Math.round(obj.frozenCapital)
+    obj.avaiableCapital = Math.round(obj.avaiableCapital)
     store.dispatch(capitalStateAction.update(obj))
   },
   'Trade.MarketData': (content) => {
@@ -133,20 +133,21 @@ const dispatchObj = {
 
     const key0 = getKey(code, 0)
     const key1 = getKey(code, 1)
+    const price = content.dLastPrice.toFixed(1)
     if (g_htPosition[key0]) {
       const p0 = g_htPosition[key0]
-      const marketData = { dataType: MARKET_TITLE, code: code, dir: getShowTraderDir(0), price: content.dLastPrice }
+      const marketData = { dataType: MARKET_TITLE, code: code, dir: getShowTraderDir(0), price: price }
       if (getPrice(code) > 0 && p0.nPosition > 0) {
-        marketData.profit = (content.dLastPrice - p0.dAvgPrice / getPrice(code) / p0.nPosition) * p0.nPosition
+        marketData.profit = (price - p0.dAvgPrice / getPrice(code) / p0.nPosition) * p0.nPosition
         marketData.profit = marketData.profit.toFixed(1)
       }
       store.dispatch(marketAction.updateIfExist(marketData))
     }
     if (g_htPosition[key1]) {
       const p1 = g_htPosition[key1]
-      const marketData = { dataType: MARKET_TITLE, code: code, dir: getShowTraderDir(1), price: content.dLastPrice }
+      const marketData = { dataType: MARKET_TITLE, code: code, dir: getShowTraderDir(1), price: price }
       if (getPrice(code) > 0 && p1.nPosition > 0) {
-        marketData.profit = (p1.dAvgPrice / getPrice(code) / p1.nPosition - content.dLastPrice) * p1.nPosition
+        marketData.profit = (p1.dAvgPrice / getPrice(code) / p1.nPosition - price) * p1.nPosition
         marketData.profit = marketData.profit.toFixed(1)
       }
       store.dispatch(marketAction.updateIfExist(marketData))
@@ -175,19 +176,20 @@ const dispatchObj = {
     }
     g_htOrder[content.nOrderID] = content
 
-    const orderData = {
-      dataType: ORDER_TITLE,
-      orderId: content.nOrderID,
-      orderTime: content.szInsertDateTime,
-      code: content.szINSTRUMENT,
-      price: content.dLimitPrice,
-      dir: getShowOrderDir(content.nTradeDir),
-      operate: getShowOperate(content.nTradeOperate),
-      status: getShowOrderStatus(content.nOrderStatus),
-      tradeTime: content.szTradeDateTime,
-      cancel: getShowOrderStatus(content.nOrderStatus),
+    if (content.nOrderStatus !== enTradeOrderStatus.TRADE_ORDER_STATUS_CANCELED) {
+      const orderData = {
+        dataType: ORDER_TITLE,
+        orderId: content.nOrderID,
+        orderTime: content.szInsertDateTime,
+        code: content.szINSTRUMENT,
+        price: content.dLimitPrice.toFixed(1),
+        dir: getShowOrderDir(content.nTradeDir),
+        operate: getShowOperate(content.nTradeOperate),
+        status: getShowOrderStatus(content.nOrderStatus),
+        tradeTime: content.szTradeDateTime,
+      }
+      store.dispatch(orderAction.update(orderData)) 
     }
-    store.dispatch(orderAction.update(orderData))
   },
   'Trade.Trade': (content) => {
     if (!(content.nOrderID)) {
@@ -210,6 +212,9 @@ const dispatchObj = {
       avgPrice /= 200
     } else {
       avgPrice /= 300
+    }
+    if (content.nPosition) {
+      avgPrice /= content.nPosition
     }
     avgPrice = avgPrice.toFixed(1)
 

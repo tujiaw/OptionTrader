@@ -29,6 +29,7 @@
   var databus = {
     close: function () {
       if (ws) {
+        console.log('xxxxxxxxxxxxxxxxxxxxxx')
         ws.onopen = function() {}
         ws.onmessage = function() {}
         ws.onclose = function() {}
@@ -199,7 +200,7 @@
         // 验证填充的数据是否有效
         var errMsg = obj.verify(payload);
         if (errMsg) {
-          console.error('requestOnce verify err', errMsg)
+          console.error('requestOnce verify err', errMsg, proto_request, payload)
           throw Error(errMsg);
         }
         // 创建消息对象
@@ -218,7 +219,7 @@
       try {
         pack = DataBusPackage.encodePackage(serialnum, cmd, byteBuffer);
       } catch(err) {
-        console.error(err + ', bytebuffer:' + byteBuffer)
+        console.error(err, serialnum, cmd)
         return;
       }
       

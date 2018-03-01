@@ -21,7 +21,7 @@ export default class OrderItem extends React.Component {
         <Text style={styles.column}>{data.operate || '--'}</Text>
         <Text style={styles.column}>{data.status || '--'}</Text>
         <Text style={styles.column}>{data.tradeTime || '--'}</Text>
-        {data.cancel==='wait' && 
+        {data.status==='wait' && 
           <RemoveButton onPress={this._onCancel} />
         }
       </View>

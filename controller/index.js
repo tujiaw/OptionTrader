@@ -41,9 +41,9 @@ class Controller {
   }
 
   start(config) {
-    config.codeList.forEach(code => {
-      store.dispatch(tradeAction.update({ code: code }))
-    })
+    // config.codeList.forEach(code => {
+    //   store.dispatch(tradeAction.update({ code: code }))
+    // })
 
     console.log('start', config)
     const self = this
@@ -57,6 +57,7 @@ class Controller {
         'Trade.Trade',
         'Trade.ErrorInfo'
       ], (name, content) => {
+        console.log('publish', name)
         self.handleDispatch(name, content)
       })
     })
@@ -79,10 +80,10 @@ class Controller {
   restart(config) {
     appClient.close()
     this.dispatch.clear()
-    capitalStateAction.clear()
-    marketAction.clear()
-    tradeAction.clear()
-    orderAction.clear()
+    store.dispatch(capitalStateAction.clear())
+    store.dispatch(marketAction.clear())
+    store.dispatch(tradeAction.clear())
+    store.dispatch(orderAction.clear())
     this.start(config)
   }
 
@@ -189,8 +190,8 @@ class Controller {
       this.modifyReq(orderData.orderId, price)
       return
     }
-
-    let type = ORDER_TYPE.SMARTSEL
+    
+    let type = ORDER_TYPE.SMARTSELL
     if (setting.close) {
       type = ORDER_TYPE.SELL
     } else if (setting.open) {

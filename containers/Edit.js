@@ -74,13 +74,13 @@ class Edit extends React.Component {
       <View style={styles.root}>
         <View style={styles.header}>
           <CheckBox
-            title='Ofr'
+            title='SellFirst'
             containerStyle={styles.cbContainer}
             checked={setting.enableSellFirst}
             onIconPress={this._onOfrAvailablePress}
           />
           <CheckBox
-            title='Mul'
+            title='NoLimit'
             containerStyle={styles.cbContainer}
             checked={setting.noLimitedNetPosition}
             onIconPress={this._onEnableMultiPress}
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   header: {
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-around',
     maxHeight: 30,
   },
   cbContainer: {

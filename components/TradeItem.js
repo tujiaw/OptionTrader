@@ -64,6 +64,7 @@ export default class TradeItem extends React.Component {
   }
 
   _onPriceChanged = (value) => {
+    value = value || 0
     this.setState({ editPrice: '' + value })
   }
 
@@ -121,6 +122,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     backgroundColor: 'aliceblue',
     padding: 5,
+    marginTop: 5,
     marginBottom: 5,
     borderWidth: 1,
     borderColor: 'darkgrey',

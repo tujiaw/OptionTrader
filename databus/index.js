@@ -1,7 +1,7 @@
 var databus = require('./databus')
 var { AppList, FileList } = require('./command')
 var ByteBuffer = require('bytebuffer')
-var _ = require('lodash/core')
+var _ = require('lodash')
 
 // 根据proto获取command值
 const commandCache = {}
@@ -154,6 +154,7 @@ class AppClient {
 	}
 
 	close() {
+    this.closeHeartBeat()
     return databus.close()
 	}
 
@@ -180,7 +181,7 @@ class AppClient {
       for (let i = 0, count = protoList.length; i < count; i++) {
         const cmd = getCommandFromProto(protoList[i])
         if (cmd) {
-          const newObj = _.clone(obj)
+          const newObj = _.cloneDeep(obj)
           newObj.subid = self._subIdStart++
           newObj.topic = cmd
           objList.push(newObj)
@@ -235,7 +236,7 @@ class AppClient {
     this._heartBeatTimer = setInterval(() => {
       if (!this._isConnect) {
         console.log('will reconnect...')
-        databus.reconnect()
+        // databus.reconnect()
         return
       }
 
@@ -246,7 +247,6 @@ class AppClient {
         console.log(err)
       })
     }, this._hearBeatIntervalSecond * 1000)
-    console.log(this._heartBeatTimer)
   }
   
   // 关闭心跳
