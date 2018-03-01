@@ -1,4 +1,4 @@
-import { UPDATE_MARKET_DATA, UPDATE_EXIST_MARKET_DATA } from '../constants/actionTypes'
+import { UPDATE_MARKET_DATA, UPDATE_EXIST_MARKET_DATA, CLEAR_MARKET_DATA } from '../constants/actionTypes'
 
 export const update = (data) => {
     return {
@@ -10,6 +10,13 @@ export const update = (data) => {
 export const updateIfExist = (data) => {
     return {
         type: UPDATE_EXIST_MARKET_DATA,
+        data
+    }
+}
+
+export const clear = (data) => {
+    return {
+        type: CLEAR_MARKET_DATA,
         data
     }
 }

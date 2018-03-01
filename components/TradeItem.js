@@ -1,6 +1,6 @@
 import React from 'react'
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
-import { FormInput, Button, ButtonGroup } from 'react-native-elements'
+import { Input, Button, ButtonGroup } from 'react-native-elements'
 
 function LeftTop(props) {
   const { data, onValueChanged } = props
@@ -39,12 +39,12 @@ function RightTop(props) {
   return (
     <View style={styles.rightTop}>
       <View style={styles.rightTopRow1}>
-        <Text>{'Buy:' + data.morePosition || 0}</Text>
-        <Text>{'Sell:' + data.emptyPosition || 0}</Text>
-        <Text>{data.lock || ''}</Text>
+        <Text>{'Buy:' + (data.morePosition || '0')}</Text>
+        <Text>{'Sell:' + (data.emptyPosition || '0')}</Text>
+        <Text>{data.lock || 'L'}</Text>
       </View>
       <View>
-        <FormInput value={editPrice || ''} onChangeText={onValueChanged} />
+        <Input value={editPrice || ''} onChangeText={onValueChanged} />
       </View>
       <View style={styles.rightTopRow3}>
         <ButtonGroup 

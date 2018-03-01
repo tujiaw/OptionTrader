@@ -1,6 +1,14 @@
 import React from 'react'
-import { StyleSheet, View, Text, TouchableNativeFeedback } from 'react-native'
-import { Button } from 'react-native-elements'
+import { StyleSheet, View, Text, TouchableNativeFeedback, Modal } from 'react-native'
+import { Button, Overlay, Input } from 'react-native-elements'
+import ModifyOverlay from '../components/ModifyOverlay'
+import { connect } from 'react-redux'
+import * as _ from 'lodash'
+import controller from '../controller'
+
+const CODE_TITLE = '修改代码'
+const WSIP_TITLE = '修改地址'
+const WSPORT_TITLE = '修改端口'
 
 class SettingRow extends React.Component {
   render() {
@@ -17,61 +25,127 @@ class SettingRow extends React.Component {
   }
 }
 
-export default class Me extends React.Component {
+class Me extends React.Component {
   state = {
     tips: '',
     loading: false,
+    overlayState: {
+      isVisible: false
+    }
   }
 
   _onLogin = () => {
-    if (this.state.isLogined) {
-      this.setState({isLogined: false})
-      return
-    }
+    // setTimeout(() => {
+    //   this.setState({isLogined: true, loading: false})
+    // }, 3000)
+    // this.setState({tips: '', loading: true})
+    controller.restart(this.props.localConfig)
+  }
 
-    if (this.state.username.length === 0) {
-      this.setState({ tips: '用户名不能为空!'})
-      return
-    }
-    if (this.state.password.length === 0) {
-      this.setState({ tips: '密码不能为空!'})
-      return
-    }
-
-
-    setTimeout(() => {
-      this.setState({isLogined: true, loading: false})
-    }, 3000)
-    this.setState({tips: '', loading: true})
+  getCodeStr = () => {
+    const { localConfig } = this.props
+    const codeStr = localConfig.codeList ? localConfig.codeList.join(';') : ''
+    return codeStr
   }
 
   _onCodePress = () => {
-    console.log('11111111111111')
+    this.setState({ 
+      overlayState: { 
+        isVisible: true,
+        title: CODE_TITLE,
+        text: this.getCodeStr()
+    }})
+  }
+
+  _onIpPress = () => {
+    this.setState({ 
+      overlayState: { 
+        isVisible: true,
+        title: WSIP_TITLE,
+        text: this.props.localConfig.wsip
+    }})
+  }
+
+  _onPortPress = () => {
+    this.setState({ 
+      overlayState: { 
+        isVisible: true,
+        title: WSPORT_TITLE,
+        text: this.props.localConfig.wsport
+    }})
+  }
+
+  _onOverlayChanged = (cmd, title, text) => {
+    this.setState({
+      overlayState: {
+        isVisible: false
+      }
+    })
+
+    if (cmd === 'ok') {
+      if (!(title && title.length && text && text.length)) {
+        return
+      }
+
+      const newConfig = _.cloneDeep(this.props.localConfig)
+      if (title === CODE_TITLE) {
+        Object.assign(newConfig, {
+          codeList: text.split(';')
+        })
+      } else if (title === WSIP_TITLE) {
+        Object.assign(newConfig, {
+          wsip: text
+        })
+      } else if (title === WSPORT_TITLE) {
+        Object.assign(newConfig, {
+          wsport: text
+        })
+      } else {
+        return
+      }
+      controller.updateLocalConfig(newConfig)
+    }
   }
 
   render() {
+    const { overlayState } = this.state
+    const { localConfig } = this.props
+    const codeStr = this.getCodeStr()
+
     return (
       <View style={styles.root}>
         <Text style={styles.header}>设置</Text>
-        <SettingRow title="代码" value="IC1803;IF1803;IH1803;I1805" onPress={this._onCodePress}/>
-        <SettingRow title="地址" value="47.100.7.224" />
-        <SettingRow title="端口" value="55555" />
+        <SettingRow title="代码" value={codeStr} onPress={this._onCodePress} />
+        <SettingRow title="地址" value={localConfig.wsip} onPress={this._onIpPress} />
+        <SettingRow title="端口" value={localConfig.wsport} onPress={this._onPortPress} />
         <Button 
           buttonStyle={styles.reconnect}
-          title={ '重连' } 
+          text="重新登录"
           raised={false} 
           onPress={this._onLogin} 
           loading={this.state.loading}
         />
+        <ModifyOverlay data={overlayState} onChanged={this._onOverlayChanged}/>
       </View>
     )        
+  }
+}
+
+function mapStateToProps(state) {
+  return {
+    localConfig: state.localConfig
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
   }
 }
 
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    marginTop: 30,
+    paddingTop: 30,
   },
   header: {
     fontSize: 20,
@@ -100,6 +174,8 @@ const styles = StyleSheet.create({
   },
   reconnect: {
     marginTop: 20,
-    backgroundColor: 'red'
+    width: 150
   }
 })
+
+export default connect(mapStateToProps, mapDispatchToProps)(Me)

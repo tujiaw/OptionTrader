@@ -29,15 +29,17 @@
   var databus = {
     close: function () {
       if (ws) {
-          ws.close();
-          ws = undefined;
+        ws.onopen = function() {}
+        ws.onmessage = function() {}
+        ws.onclose = function() {}
+        ws.close()
+        ws = undefined
       }
     },
     reconnect: function (options) {
       this.connect(mIp, mPort, mPath, options);
     },
     connect: function (ip, port, path, options) {
-      this.close();
       mIp = ip;
       mPort = port;
       mPath = path;
@@ -76,7 +78,7 @@
           bb = ByteBuffer.wrap(evt.data, "binary");
           packages = DataBusPackage.decodePackage(bb);
         } catch(err) {
-          console.error(err)
+          console.log(err)
           return;
         }
 
@@ -132,7 +134,7 @@
         }
       };
       ws.onclose = function (event) {
-        console.error("Client Notify WebSocket Has Closed...");
+        console.log("Client Notify WebSocket Has Closed...");
         if (settings.onConnectClose) {
           settings.onConnectClose();
         }

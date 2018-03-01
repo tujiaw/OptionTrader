@@ -15,7 +15,6 @@ class Edit extends React.Component {
   }
 
   _onButtonGroupPress = (index, data) => {
-    console.log('11111111111', index, data)
     if (!(data.code && data.code.length)) {
       return
     }
@@ -24,10 +23,10 @@ class Edit extends React.Component {
     if (data.editPrice && data.editPrice.length) {
       price = parseFloat(data.editPrice)
     } else {
-      if (index === 0 && data.sellPrice && data.sellPrice.length) {
-        price = parseFloat(data.sellPrice)
-      } else if (index === 1 && data.buyPrice && data.buyPrice.length) {
+      if (index === 0 && data.buyPrice && data.buyPrice.length) {
         price = parseFloat(data.buyPrice)
+      } else if (index === 1 && data.sellPrice && data.sellPrice.length) {
+        price = parseFloat(data.sellPrice)
       }
     }
     if (isNaN(price)) {

@@ -13,6 +13,10 @@ import * as _ from 'lodash/core'
 import controller from '../controller'
 
 class Show extends React.Component {
+  componentDidMount() {
+    controller.start(this.props.localConfig)
+  }
+
   shouldComponentUpdate(nextProps, nextState) {
     if (_.isEqual(this.props, nextProps)) {
       return false
@@ -76,6 +80,7 @@ class Show extends React.Component {
 
 function mapStateToProps(state) {
   return {
+    localConfig: state.localConfig,
     capitalStateData: state.capitalStateData,
     dataList: [state.marketData, state.orderData]
   }

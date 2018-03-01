@@ -1,4 +1,4 @@
-import { UPDATE_ORDER_DATA, REMOVE_ORDER_FROM_ID } from '../constants/actionTypes'
+import { UPDATE_ORDER_DATA, REMOVE_ORDER_FROM_ID, CLEAR_ORDER_DATA } from '../constants/actionTypes'
 import { ORDER_TITLE } from '../constants'
 import { isArray } from '../utils/tools'
 import * as _ from 'lodash'
@@ -32,6 +32,10 @@ export default function orderData(state = initData, action) {
             return newState
         }
         return state
+    }
+    case CLEAR_ORDER_DATA:
+    {
+        return initData
     }
     default:
       return state

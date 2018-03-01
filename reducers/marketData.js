@@ -1,4 +1,4 @@
-import { UPDATE_MARKET_DATA, UPDATE_EXIST_MARKET_DATA } from '../constants/actionTypes'
+import { UPDATE_MARKET_DATA, UPDATE_EXIST_MARKET_DATA, CLEAR_MARKET_DATA } from '../constants/actionTypes'
 import { MARKET_TITLE } from '../constants'
 import { isArray } from '../utils/tools'
 import * as _ from 'lodash'
@@ -21,9 +21,13 @@ export default function marketData(state = initData, action) {
         if (f) {
             Object.assign(f, action.data)
         } else if (action.type === UPDATE_MARKET_DATA) {
-            newState.push(action.data)
+            newState.data.push(action.data)
         }
         return newState
+    }
+    case CLEAR_MARKET_DATA:
+    {
+        return initData
     }
     default:
       return state

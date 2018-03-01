@@ -86,13 +86,12 @@ function dispatchPublishMessage(topic, content) {
     return
   }
 
-  return databus.buildProtoObject(getProtoFilename(proto.request), proto.request)
-  .then((Msg) => {
+  return databus.buildProtoObject(getProtoFilename(proto.request), proto.request).then(Msg => {
     try {
       const decodedMsg = Msg.decode(content)
       appClient.onPublishCallback(proto.request, decodedMsg)
     } catch (e) {
-      console.log('dispatchPublishMessage', e)
+      console.log('dispatchPublishMessage', proto.request, e)
     }
   }) 
 }
@@ -121,8 +120,8 @@ class AppClient {
   }
 
   initProtoJson() {
-    databus.addProtoBuilder('trade', require('./protobuf/trade.json'))
     databus.addProtoBuilder('msgexpress', require('./protobuf/msgexpress.json'))
+    databus.addProtoBuilder('trade', require('./protobuf/trade.json'))
   }
 
 	// 初始化连接
@@ -155,7 +154,7 @@ class AppClient {
 	}
 
 	close() {
-		databus.close();
+    return databus.close()
 	}
 
 	// 登录总线，连接成功后会默认登录

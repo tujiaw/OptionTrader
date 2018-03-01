@@ -8,39 +8,6 @@ import Me from './containers/Me'
 import { Provider } from 'react-redux'
 import store from './utils/store'
 import testStart from './databus/test'
-import appClient from './databus'
-import Config from './config'
-import controller from './controller'
-
-appClient.initProtoJson()
-appClient.setHeartBeatIntervalSecond(10)
-appClient.open(Config.wsip, Config.wsport)
-.then((json) => {
-  return appClient.subscribe([
-    'Trade.TradingAccount', 
-    'Trade.MarketData',
-    'Trade.Position',
-    'Trade.Order',
-    'Trade.Trade',
-    'Trade.ErrorInfo'
-  ], (name, content) => {
-    controller.handleDispatch(name, content)
-  })
-})
-.then((json) => {
-  console.log('subscribe result', json)
-  return appClient.post('Trade.LoginReq', 'Trade.LoginResp', {
-    userid: 'admin', 
-    passwd: 'admin',
-    instruments: Config.instruments
-  })
-})
-.then((json) => {
-  console.log('login trade', json)
-})
-.catch((err) => {
-  console.log(JSON.stringify(err))
-})
 
 // testStart()
 const MainTab = TabNavigator(

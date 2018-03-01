@@ -83,6 +83,7 @@ function getPrice(code) {
   }
 }
 
+let block = true
 const dispatchObj = {
   htQuote: () => {
     return g_htQuote
@@ -95,6 +96,12 @@ const dispatchObj = {
   },
   htTrade: () => {
     return g_htTrade
+  },
+  clear: () => {
+    g_htQuote = {}
+    g_htPosition = {}
+    g_htOrder = {}
+    g_htTrade = {}
   },
   'Trade.TradingAccount': (content) => {
     const obj = {
@@ -114,6 +121,15 @@ const dispatchObj = {
       return
     }
     g_htQuote[code] = content
+
+    // 3秒钟放一个
+    setInterval(() => {
+      block = false
+    }, 3000)
+    if (block) {
+      return
+    }
+    block = true
 
     const key0 = getKey(code, 0)
     const key1 = getKey(code, 1)
@@ -163,7 +179,7 @@ const dispatchObj = {
       dataType: ORDER_TITLE,
       orderId: content.nOrderID,
       orderTime: content.szInsertDateTime,
-      code: code,
+      code: content.szINSTRUMENT,
       price: content.dLimitPrice,
       dir: getShowOrderDir(content.nTradeDir),
       operate: getShowOperate(content.nTradeOperate),
