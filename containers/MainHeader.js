@@ -1,5 +1,6 @@
 import React from 'react'
-import { Header } from 'react-native-elements'
+import { Header, Button } from 'react-native-elements'
+import Icon from 'react-native-vector-icons/FontAwesome';
 import { CONNECT_STATUS } from '../constants'
 import { connect } from 'react-redux'
 
@@ -7,10 +8,12 @@ class MainHeader extends React.Component {
   render() {
     const { netStatus } = this.props.localConfig
     let netStatusText = '已断开'
+    let loading = true
     if (netStatus === CONNECT_STATUS.CONNECTING) {
       netStatusText = '连接中...'
     } else if (netStatus === CONNECT_STATUS.OPEN) {
       netStatusText = '已连接'
+      loading = false
     } else if (netStatus === CONNECT_STATUS.CLOSING) {
       netStatusText = '连接关闭中...'
     }
@@ -20,7 +23,10 @@ class MainHeader extends React.Component {
       outerContainerStyles={styles.innerContainer}
         leftComponent={{ icon: 'menu', color: '#fff' }}
         centerComponent={{ text: netStatusText, style: { color: '#fff' } }}
-        rightComponent={{ icon: 'home', color: '#fff' }}
+        rightComponent={<Button
+          text=''
+          loading={loading}
+        />}
       />
     )
   }

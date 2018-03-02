@@ -1,15 +1,8 @@
 var _ = require('lodash')
 
-var users = [
-    { 'user': 'barney',  'age': 36, 'active': true },
-    { 'user': 'fred',    'age': 40, 'active': false },
-    { 'user': 'pebbles', 'age': 1,  'active': true }
-  ];
+const x = [1, 2, 3, 4, 5]
 
-  const s = _.find(users, item => item.age === 36 && item.active === false)
-  if (s) {
-      Object.assign(s, {'active': false})
-  } else {
-      users.push({'user': 'hello'})
-  }
-  console.log(users)
+const y = _.filter(x, item => item !== 3)
+console.log(x === y)
+
+console.log(x)
