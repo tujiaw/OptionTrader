@@ -37,6 +37,12 @@
         ws = undefined
       }
     },
+    readyState: function() {
+      if (ws) {
+        return ws.readyState
+      }
+      return -1
+    },
     reconnect: function (options) {
       this.connect(mIp, mPort, mPath, options);
     },

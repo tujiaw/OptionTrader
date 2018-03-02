@@ -36,6 +36,10 @@ class Controller {
       }
     })
 
+    setInterval(() => {
+      store.dispatch(localConfigAction.updateReadyState(appClient.readyState()))
+    }, 1000)
+
     appClient.initProtoJson()
     appClient.setHeartBeatIntervalSecond(10)
   }
@@ -45,46 +49,67 @@ class Controller {
     //   store.dispatch(tradeAction.update({ code: code }))
     // })
 
-    console.log('start', config)
     const self = this
-    appClient.open(config.wsip, config.wsport)
-    .then((json) => {
-      return appClient.subscribe([
-        'Trade.TradingAccount', 
-        'Trade.MarketData',
-        'Trade.Position',
-        'Trade.Order',
-        'Trade.Trade',
-        'Trade.ErrorInfo'
-      ], (name, content) => {
-        console.log('publish', name)
-        self.handleDispatch(name, content)
+    console.log('start', config)
+    return new Promise((resolve, reject) => {
+      appClient.open(config.wsip, config.wsport)
+      .then((json) => {
+        return appClient.subscribe([
+          'Trade.TradingAccount', 
+          'Trade.MarketData',
+          'Trade.Position',
+          'Trade.Order',
+          'Trade.Trade',
+          'Trade.ErrorInfo'
+        ], (name, content) => {
+          console.log('publish', name)
+          self.handleDispatch(name, content)
+        })
       })
-    })
-    .then((json) => {
-      console.log('subscribe result', json)
-      return appClient.post('Trade.LoginReq', 'Trade.LoginResp', {
-        userid: 'admin', 
-        passwd: 'admin',
-        instruments: config.codeList
+      .then((json) => {
+        console.log('subscribe result', json)
+        return appClient.post('Trade.LoginReq', 'Trade.LoginResp', {
+          userid: config.username, 
+          passwd: config.password,
+          instruments: config.codeList
+        })
       })
-    })
-    .then((json) => {
-      console.log('login trade', json)
-    })
-    .catch((err) => {
-      console.log(JSON.stringify(err))
+      .then((json) => {
+        console.log('login trade', json)
+        resolve(json)
+      })
+      .catch((err) => {
+        console.log(JSON.stringify(err))
+        reject(err)
+      })
     })
   }
 
-  restart(config) {
-    appClient.close()
+  clearAllData() {
     this.dispatch.clear()
     store.dispatch(capitalStateAction.clear())
     store.dispatch(marketAction.clear())
     store.dispatch(tradeAction.clear())
     store.dispatch(orderAction.clear())
-    this.start(config)
+  }
+
+  restart(config) {
+    appClient.close()
+    this.clearAllData()
+    return this.start(config)
+  }
+
+  logout() {
+    return appClient.post('Trade.LogoutReq', 'Trade.LogoutResp', {})
+  }
+
+  relogin(config) {
+    this.clearAllData()
+    return appClient.post('Trade.LoginReq', 'Trade.LoginResp', {
+      userid: config.username, 
+      passwd: config.password,
+      instruments: config.codeList
+    })
   }
 
   // 处理推送
@@ -137,12 +162,12 @@ class Controller {
     }
     this.updateTradeTips(code, '')
     if (Math.abs(price - marketData.dLastPrice) / marketData.dLastPrice > 0.01) {
-      this.updateTradeTips(code, '价格偏离正常值！')
+      ToastAndroid.show('价格偏离正常值！', ToastAndroid.SHORT);
       return
     }
     const netPos = this.dispatch.getPosition(code)
     if (netPos > 0 && setting.noLimitedNetPosition === false) {
-      this.updateTradeTips(code, '仓位超限！')
+      ToastAndroid.show('仓位超限！', ToastAndroid.SHORT);
       return
     }
     const orderData = this.dispatch.getOrder(code, enTradeDir.TRADE_DIR_BUY, price)
@@ -172,17 +197,17 @@ class Controller {
 
     this.updateTradeTips(code, '')
     if (Math.abs(price - marketData.dLastPrice) / marketData.dLastPrice > 0.01) {
-      this.updateTradeTips(code, '价格偏离正常值！')
+      ToastAndroid.show('价格偏离正常值！', ToastAndroid.SHORT);
       return
     }
     const netPos = this.dispatch.getPosition(code)
     if (netPos < 0) {
-      this.updateTradeTips(code, '仓位超限！')
+      ToastAndroid.show('仓位超限！', ToastAndroid.SHORT);
       return
     }
 
     if (setting.enableSellFirst === false && netPos < 1) {
-      this.updateTradeTips(code, '禁止先开空单！')
+      ToastAndroid.show('禁止先开空单！', ToastAndroid.SHORT);
       return
     }
     const orderData = this.dispatch.getOrder(code, enTradeDir.TRADE_DIR_SELL, price)

@@ -70,3 +70,11 @@ export const ORDER_TYPE = {
     SMARTBUY: 5,			//没有今仓且有昨空头仓，则平空，如果有今仓或无空头仓，则多开
     SMARTSELL: 6,			//没有今仓且有昨多头仓，则平多，如果有今仓或无多头仓，则空开
 }
+
+// websocket连接状态
+export const CONNECT_STATUS = {
+    CONNECTING: 0,
+    OPEN: 1,
+    CLOSING: 2,
+    CLOSED: 3,
+}

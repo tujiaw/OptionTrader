@@ -13,15 +13,20 @@ export const UPDATE_ORDER_DATA = 'UPDATE_ORDER_DATA'
 // 移除订单
 export const REMOVE_ORDER_FROM_ID = 'REMOVE_ORDER_FROM_ID'
 
-
 // 更新交易信息
 export const UPDATE_TRADE_DATA = 'UPDATE_TRADE_DATA'
+
+// 更新交易提示信息
+export const UPDATE_TRADE_TIPS = 'UPDATE_TRADE_TIPS'
 
 // 更新交易设置
 export const UPDATE_TRADE_SETTING = 'UPDATE_TRADE_SETTING'
 
 // 更新本地配置
 export const UPDATE_LOCAL_CONFIG = 'UPDATE_LOCAL_CONFIG'
+
+// 更新连接状态
+export const UPDATE_READY_STATE = 'UPDATE_READY_STATE'
 
 // 清理
 export const CLEAR_CAPITALSTATE_DATA = 'CLEAR_CAPITALSTATE_DATA'

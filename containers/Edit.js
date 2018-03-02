@@ -5,6 +5,7 @@ import TradeItem from '../components/TradeItem'
 import { connect } from 'react-redux'
 import * as _ from 'lodash/core'
 import controller from '../controller'
+import MainHeader from './MainHeader'
 
 class Edit extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
@@ -72,6 +73,7 @@ class Edit extends React.Component {
     const { list, setting } = this.props
     return (
       <View style={styles.root}>
+        <MainHeader />
         <View style={styles.header}>
           <CheckBox
             title='SellFirst'
@@ -124,14 +126,13 @@ function mapDispatchToProps(dispatch) {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    marginTop: 28,
-    marginHorizontal: 2
   },
   header: {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-around',
-    maxHeight: 30,
+    alignItems: 'center',
+    maxHeight: 35,
   },
   cbContainer: {
     margin: 0,

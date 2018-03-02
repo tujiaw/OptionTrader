@@ -1,23 +1,31 @@
 import React from 'react'
-import { StyleSheet, View, Text, TouchableNativeFeedback, Modal } from 'react-native'
+import { StyleSheet, View, Text, TouchableNativeFeedback, ToastAndroid } from 'react-native'
 import { Button, Overlay, Input } from 'react-native-elements'
 import ModifyOverlay from '../components/ModifyOverlay'
 import { connect } from 'react-redux'
 import * as _ from 'lodash'
 import controller from '../controller'
+import MainHeader from './MainHeader'
 
 const CODE_TITLE = '修改代码'
 const WSIP_TITLE = '修改地址'
 const WSPORT_TITLE = '修改端口'
+const USERNAME_TITLE = '修改用户名'
+const PASSWORD_TITLE = '修改密码'
 
 class SettingRow extends React.Component {
   render() {
+    let { title, value, password } = this.props
+    if (password && value) {
+      value = _.pad('', value.length, '*')
+    }
+
     return (
       <TouchableNativeFeedback onPress={this.props.onPress} background={TouchableNativeFeedback.SelectableBackground()} >
         <View style={styles.rowContainer}>
           <View style={styles.rowContent} >
-            <Text style={styles.title}>{this.props.title}</Text>
-            <Text style={styles.value}>{this.props.value}</Text>
+            <Text style={styles.title}>{title || ''}</Text>
+            <Text style={styles.value}>{value || ''}</Text>
           </View>
         </View>
       </TouchableNativeFeedback>
@@ -27,19 +35,48 @@ class SettingRow extends React.Component {
 
 class Me extends React.Component {
   state = {
-    tips: '',
     loading: false,
     overlayState: {
       isVisible: false
     }
   }
 
+  _onLogout = () => {
+    controller.logout().then(json => {
+      if (json.retCode === 0) {
+        ToastAndroid.show('登出成功', ToastAndroid.SHORT);
+        controller.clearAllData();
+      } else {
+        ToastAndroid.show('登出失败:' + json.msg, ToastAndroid.SHORT);
+      }
+    }).catch(err => {
+      ToastAndroid.show('退出异常', ToastAndroid.SHORT);
+    })
+  }
+  
   _onLogin = () => {
-    // setTimeout(() => {
-    //   this.setState({isLogined: true, loading: false})
-    // }, 3000)
-    // this.setState({tips: '', loading: true})
-    controller.restart(this.props.localConfig)
+    if (this.isLoading) {
+      return
+    }
+
+    this.isLoading = true
+    this.setState({loading: true})
+    controller.relogin(this.props.localConfig).then(json => {
+      this.setState({isLogined: true, loading: false})
+      this.isLoading = false
+      if (json.retCode === 0) {
+        ToastAndroid.show('登录成功', ToastAndroid.SHORT);
+      } else if (json.msg) {
+        ToastAndroid.show('登录失败,' + json.msg, ToastAndroid.SHORT);
+      } else {
+        ToastAndroid.show('登录失败', ToastAndroid.SHORT);
+      }
+    }).catch((err) => {
+      this.setState({isLogined: true, loading: false})
+      this.isLoading = false
+      ToastAndroid.show('登录异常', ToastAndroid.SHORT);
+      console.error(err)
+    })
   }
 
   getCodeStr = () => {
@@ -75,6 +112,24 @@ class Me extends React.Component {
     }})
   }
 
+  _onUsernamePress = () => {
+    this.setState({ 
+      overlayState: { 
+        isVisible: true,
+        title: USERNAME_TITLE,
+        text: this.props.localConfig.username
+    }})
+  }
+
+  _onPasswordPress = () => {
+    this.setState({ 
+      overlayState: { 
+        isVisible: true,
+        title: PASSWORD_TITLE,
+        text: this.props.localConfig.password
+    }})
+  }
+
   _onOverlayChanged = (cmd, title, text) => {
     this.setState({
       overlayState: {
@@ -89,19 +144,17 @@ class Me extends React.Component {
 
       const newConfig = _.cloneDeep(this.props.localConfig)
       if (title === CODE_TITLE) {
-        Object.assign(newConfig, {
-          codeList: text.split(';')
-        })
+        Object.assign(newConfig, { codeList: text.split(';') })
       } else if (title === WSIP_TITLE) {
-        Object.assign(newConfig, {
-          wsip: text
-        })
+        Object.assign(newConfig, { wsip: text })
+        ToastAndroid.show('地址改变了，需要重启App才能生效', ToastAndroid.SHORT);
       } else if (title === WSPORT_TITLE) {
-        Object.assign(newConfig, {
-          wsport: text
-        })
-      } else {
-        return
+        Object.assign(newConfig, { wsport: text })
+        ToastAndroid.show('端口改变了，需要重启App才能生效', ToastAndroid.SHORT);
+      } else if (title === USERNAME_TITLE) {
+        Object.assign(newConfig, { username: text })
+      } else if (title === PASSWORD_TITLE) {
+        Object.assign(newConfig, { password: text })
       }
       controller.updateLocalConfig(newConfig)
     }
@@ -114,16 +167,27 @@ class Me extends React.Component {
 
     return (
       <View style={styles.root}>
+        <MainHeader />
         <Text style={styles.header}>设置</Text>
         <SettingRow title="代码" value={codeStr} onPress={this._onCodePress} />
         <SettingRow title="地址" value={localConfig.wsip} onPress={this._onIpPress} />
         <SettingRow title="端口" value={localConfig.wsport} onPress={this._onPortPress} />
+        <SettingRow title="用户名" value={localConfig.username} onPress={this._onUsernamePress} />
+        <SettingRow title="密码" value={localConfig.password} password={true} onPress={this._onPasswordPress} />
+        <Button 
+          buttonStyle={styles.reconnect}
+          text="登出"
+          raised={false} 
+          onPress={this._onLogout} 
+          loadingProps={{ size: "large", color: "rgba(111, 202, 186, 1)" }}
+        />
         <Button 
           buttonStyle={styles.reconnect}
           text="重新登录"
           raised={false} 
           onPress={this._onLogin} 
           loading={this.state.loading}
+          loadingProps={{ size: "large", color: "rgba(111, 202, 186, 1)" }}
         />
         <ModifyOverlay data={overlayState} onChanged={this._onOverlayChanged}/>
       </View>
@@ -145,7 +209,6 @@ function mapDispatchToProps(dispatch) {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    paddingTop: 30,
   },
   header: {
     fontSize: 20,
@@ -173,8 +236,8 @@ const styles = StyleSheet.create({
     color: 'grey'
   },
   reconnect: {
-    marginTop: 20,
-    width: 150
+    marginTop: 10,
+    width: 300
   }
 })
 

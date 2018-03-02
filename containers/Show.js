@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet, View, Text, SectionList, ToastAndroid } from 'react-native'
 import { connect } from 'react-redux'
-import MainHeader from '../components/MainHeader'
+import AccountHeader from '../components/AccountHeader'
 import MarketHeader from '../components/MarketHeader'
 import OrderHeader from '../components/OrderHeader'
 import MarketItem from '../components/MarketItem'
@@ -11,6 +11,7 @@ import store from '../utils/store'
 import * as orderAction from '../actions/orderAction'
 import * as _ from 'lodash/core'
 import controller from '../controller'
+import MainHeader from './MainHeader'
 
 class Show extends React.Component {
   componentDidMount() {
@@ -65,7 +66,8 @@ class Show extends React.Component {
   render() {
     return (
       <View style={styles.root}>
-        <MainHeader data={this.props.capitalStateData} />
+        <MainHeader />
+        <AccountHeader data={this.props.capitalStateData} />
         <SectionList
           style={styles.list}
           renderItem={this._renderItem}
@@ -96,7 +98,6 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     flexDirection: 'column',
-    marginTop: 22
   },
   list: {
   }

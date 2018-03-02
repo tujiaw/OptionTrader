@@ -100,8 +100,8 @@ class AppClient {
   constructor() {
     this._publishCallback = null
     this._subIdStart = 123
-    this._heartBeatTimer = 0
     this._clientName = 'test'
+    this._heartBeatTimer = 0
     this._hearBeatIntervalSecond = 5 // 心跳间隔5秒
     this._isConnect = false
     this._addr = 0
@@ -153,10 +153,14 @@ class AppClient {
 		})
 	}
 
+  readyState() {
+    return databus.readyState()
+  }
+
 	close() {
     this.closeHeartBeat()
     return databus.close()
-	}
+  }
 
 	// 登录总线，连接成功后会默认登录
 	loginBus() {

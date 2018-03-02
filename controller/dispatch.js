@@ -3,6 +3,7 @@ import * as capitalStateAction from '../actions/capitalStateAction'
 import * as marketAction from '../actions/marketAction'
 import * as orderAction from '../actions/orderAction'
 import * as tradeAction from '../actions/tradeAction'
+import * as _ from 'lodash'
 import { 
   MARKET_TITLE, 
   ORDER_TITLE,
@@ -190,6 +191,13 @@ const dispatchObj = {
       }
       store.dispatch(orderAction.update(orderData)) 
     }
+
+    const code = content.szINSTRUMENT
+    const dir = (content.nTradeDir === enTradeDir.TRADE_DIR_BUY ? 'Buy' : 'Sell')
+    const oper = (content.nTradeOperate === enTradeOperate.TRADE_OPERATE_OPEN ? 'Open' : 'Close')
+    const state = getShowOrderStatus(content.nOrderStatus)
+    const tips = `Order:(${code} ${dir} ${oper} ${content.dLimitPrice} ${state})`
+    store.dispatch(tradeAction.updateTips({code: code, tips: tips}))
   },
   'Trade.Trade': (content) => {
     if (!(content.nOrderID)) {
@@ -197,6 +205,12 @@ const dispatchObj = {
       return
     }
     g_htTrade[content.nOrderID] = content
+
+    const code = content.szINSTRUMENT
+    const dir = (content.nTradeDir === enTradeDir.TRADE_DIR_BUY ? 'Buy' : 'Sell')
+    const oper = (content.nTradeOperate === enTradeOperate.TRADE_OPERATE_OPEN ? 'Open' : 'Close')
+    const tips = `Trade:(${code} ${dir} ${oper} ${content.dPrice})`
+    store.dispatch(tradeAction.updateTips({code: code, tips: tips}))
   },
   'Trade.Position': (content) => {
     const code = content.szINSTRUMENT.trim()
@@ -244,13 +258,13 @@ const dispatchObj = {
   },
   getOrder: (code, dir, isWaitStatus = true) => {
     for (let key in g_htOrder) {
-      if (g_htOrder[key].code === code && g_htOrder[key].dir === dir) {
+      if (g_htOrder[key].szINSTRUMENT === code && g_htOrder[key].nTradeDir === dir) {
         if (isWaitStatus) {
-          if (g_htOrder[key].status === enTradeOrderStatus.TRADE_ORDER_STATUS_WAIT) {
-            return {...g_htOrder[key]}
+          if (g_htOrder[key].nOrderStatus === enTradeOrderStatus.TRADE_ORDER_STATUS_WAIT) {
+            return g_htOrder[key]
           }
         } else {
-          return {...g_htOrder[key]}
+          return g_htOrder[key]
         }
       }
     }
@@ -258,7 +272,7 @@ const dispatchObj = {
   },
   foreachOrder: (code, cb) => {
     for (let key in g_htOrder) {
-      if (g_htOrder[key].code === code) {
+      if (g_htOrder[key].szINSTRUMENT === code) {
         cb(g_htOrder[key])
       }
     }
