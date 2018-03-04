@@ -41,7 +41,6 @@ class Controller {
     }, 1000)
 
     appClient.initProtoJson()
-    appClient.setHeartBeatIntervalSecond(10)
   }
 
   start(config) {
@@ -93,9 +92,13 @@ class Controller {
     store.dispatch(orderAction.clear())
   }
 
-  restart(config) {
+  close() {
     appClient.close()
     this.clearAllData()
+  }
+
+  restart(config) {
+    this.close()
     return this.start(config)
   }
 

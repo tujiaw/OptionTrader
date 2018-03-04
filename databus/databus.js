@@ -214,9 +214,11 @@
         console.log('requestOnce', message)
         // 编码二进制流
         var buffer = obj.encode(message).finish();
+        // 一定要拷贝一份，否则byteOffset会一直累加（大概到250次）造成encodePackage错误
+        buffer = new Uint8Array(buffer)
         // 包装成ByteBuffer
-        buffer = ByteBuffer.wrap(buffer, "binary");
-        this.sendmsg(cmd, buffer, proto_package, proto_response, callback, false);
+        var binary = ByteBuffer.wrap(buffer, "binary");
+        this.sendmsg(cmd, binary, proto_package, proto_response, callback, false);
       })
     },
     sendmsg: function (cmd, byteBuffer, proto_package, proto_response, callback, forever) {
@@ -225,8 +227,8 @@
       try {
         pack = DataBusPackage.encodePackage(serialnum, cmd, byteBuffer);
       } catch(err) {
-        console.error(err, serialnum, cmd)
-        return;
+        console.error(serialnum, cmd, err)
+        return
       }
       
       if (forever === undefined || !forever) {
@@ -238,7 +240,7 @@
                 const msg = obj.decode(info.view);
                 callback.handleResponse(msg);
               } catch (e) {
-                console.error(e)
+                console.error(proto_response, e)
               }
             })
           } else if (callback.handlerError) {  // 处理错误
@@ -247,7 +249,7 @@
                 const msg = obj.decode(info.view);
                 callback.handlerError(msg);
               } catch (e) {
-                console.error(e)
+                console.error('ErrMessage', e)
               }
             })
           }

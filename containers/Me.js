@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, View, Text, TouchableNativeFeedback, ToastAndroid } from 'react-native'
+import { StyleSheet, View, Text, TouchableNativeFeedback, ToastAndroid, BackHandler } from 'react-native'
 import { Button, Overlay, Input } from 'react-native-elements'
 import ModifyOverlay from '../components/ModifyOverlay'
 import { connect } from 'react-redux'
@@ -77,6 +77,10 @@ class Me extends React.Component {
       ToastAndroid.show('登录异常', ToastAndroid.SHORT);
       console.error(err)
     })
+  }
+
+  _onExit = () => {
+    BackHandler.exitApp()
   }
 
   getCodeStr = () => {
@@ -167,8 +171,7 @@ class Me extends React.Component {
 
     return (
       <View style={styles.root}>
-        <MainHeader />
-        <Text style={styles.header}>设置</Text>
+        <MainHeader title='设置' />
         <SettingRow title="代码" value={codeStr} onPress={this._onCodePress} />
         <SettingRow title="地址" value={localConfig.wsip} onPress={this._onIpPress} />
         <SettingRow title="端口" value={localConfig.wsport} onPress={this._onPortPress} />
@@ -188,6 +191,12 @@ class Me extends React.Component {
           onPress={this._onLogin} 
           loading={this.state.loading}
           loadingProps={{ size: "large", color: "rgba(111, 202, 186, 1)" }}
+        />
+        <Button 
+          buttonStyle={[styles.reconnect, {backgroundColor: 'red'}]}
+          text="退出"
+          raised={false} 
+          onPress={this._onExit} 
         />
         <ModifyOverlay data={overlayState} onChanged={this._onOverlayChanged}/>
       </View>
@@ -209,11 +218,6 @@ function mapDispatchToProps(dispatch) {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-  },
-  header: {
-    fontSize: 20,
-    marginBottom: 10,
-    marginLeft: 5,
   },
   rowContainer: {
     flex: 1,

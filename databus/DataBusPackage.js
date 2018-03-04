@@ -163,7 +163,7 @@
         if(!header.getIsZip()) {
           header.body = bodyBytes;
         } else {
-          header.body = ByteBuffer.wrap(pako.inflate(new Uint8Array(bodyBytes.toArrayBuffer())));
+					header.body = ByteBuffer.wrap(pako.inflate(new Uint8Array(bodyBytes.toArrayBuffer())));
         }
         i += (DataBusPackage.SIZE_OF_HEAD + offset + bodySize);
         packages.push(header);
