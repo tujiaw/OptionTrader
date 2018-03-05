@@ -73,7 +73,7 @@ class Edit extends React.Component {
     const { list, setting } = this.props
     return (
       <View style={styles.root}>
-        <MainHeader />
+        <MainHeader title="下单" />
         <View style={styles.header}>
           <CheckBox
             title='SellFirst'

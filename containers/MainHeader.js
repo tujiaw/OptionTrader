@@ -22,7 +22,7 @@ class MainHeader extends React.Component {
   render() {
     const { netStatus } = this.props.localConfig
     let title = this.props.title || 'Option Trader'
-    let leftIconName = 'lock'
+    let leftIconName = 'bell'
     let rightIconName = 'refresh'
     let loading = true
     if (netStatus === CONNECT_STATUS.OPEN) {
