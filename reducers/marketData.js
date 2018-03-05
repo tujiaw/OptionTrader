@@ -14,15 +14,31 @@ const initData = {
 export default function marketData(state = initData, action) {
   switch(action.type) {
     case UPDATE_MARKET_DATA:
-    case UPDATE_EXIST_MARKET_DATA:
     {
         const newState = _.cloneDeep(state)
         const f = _.find(newState.data, item => item.code === action.data.code && item.dir === action.data.dir)
         if (f) {
             Object.assign(f, action.data)
-        } else if (action.type === UPDATE_MARKET_DATA) {
+        } else {
             newState.data.push(action.data)
         }
+        return newState
+    }
+    case UPDATE_EXIST_MARKET_DATA:
+    {
+        const newState = _.cloneDeep(state)
+        let newDataList = []
+        if (isArray(action.data)) {
+            newDataList = action.data
+        } else {
+            newDataList.push(action.data)
+        }
+        _.each(newDataList, (value) => {
+            const f = _.find(newState.data, item => item.code === value.code && item.dir === value.dir)
+            if (f) {
+                Object.assign(f, value)
+            }
+        })
         return newState
     }
     case CLEAR_MARKET_DATA:

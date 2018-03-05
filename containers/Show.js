@@ -59,7 +59,7 @@ class Show extends React.Component {
     if (orderId && orderId > 0) {
       controller.cancelReq(orderId).then(json => {
         if (json.retCode === 0) {
-          this.props.removeOrder(orderId)
+          console.log('cancelReq success')
         } else {
           ToastAndroid.show(json.msg, ToastAndroid.SHORT);
         }

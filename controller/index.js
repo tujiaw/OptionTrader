@@ -30,9 +30,6 @@ class Controller {
       } else if (result) {
         const localConfig = JSON.parse(result)
         store.dispatch(localConfigAction.update(localConfig))
-        localConfig.codeList.forEach(code => {
-          store.dispatch(tradeAction.update({ code: code }))
-        })
       }
     })
 
@@ -143,10 +140,6 @@ class Controller {
     })
   }
 
-  updateTradeTips(code, tips) {
-    store.dispatch(tradeAction.update({ code: code, tips: tips}))
-  }
-
   updateSetting(data) {
     AsyncStorage.setItem('tradeSetting', JSON.stringify(data))
     store.dispatch(tradeSettingAction.update(data))
@@ -163,7 +156,7 @@ class Controller {
       console.log('market is not find', code)
       return
     }
-    this.updateTradeTips(code, '')
+
     if (Math.abs(price - marketData.dLastPrice) / marketData.dLastPrice > 0.01) {
       ToastAndroid.show('价格偏离正常值！', ToastAndroid.SHORT);
       return
@@ -186,8 +179,8 @@ class Controller {
       type = ORDER_TYPE.BUY
     }
     this.orderReq(code, price, type).then(json => {
-      if (json.msg) {
-        this.updateTradeTips(code, json.msg)
+      if (json.retCode !== 0 && json.msg && json.msg.length) {
+        ToastAndroid.show(json.msg, ToastAndroid.SHORT);
       }
     })
   }
@@ -198,7 +191,6 @@ class Controller {
       return
     }
 
-    this.updateTradeTips(code, '')
     if (Math.abs(price - marketData.dLastPrice) / marketData.dLastPrice > 0.01) {
       ToastAndroid.show('价格偏离正常值！', ToastAndroid.SHORT);
       return
@@ -215,7 +207,11 @@ class Controller {
     }
     const orderData = this.dispatch.getOrder(code, enTradeDir.TRADE_DIR_SELL, price)
     if (orderData) {
-      this.modifyReq(orderData.orderId, price)
+      this.modifyReq(orderData.orderId, price).then(json => {
+        if (json.retCode !== 0 && json.msg && json.msg.length) {
+          ToastAndroid.show(json.msg, ToastAndroid.SHORT);
+        }
+      })
       return
     }
     
@@ -226,8 +222,8 @@ class Controller {
       type = ORDER_TYPE.SELLSHORT
     }
     this.orderReq(code, price, type).then(json => {
-      if (json.msg) {
-        this.updateTradeTips(code, json.msg)
+      if (json.retCode !== 0 && json.msg && json.msg.length) {
+        ToastAndroid.show(json.msg, ToastAndroid.SHORT);
       }
     })
   }
@@ -236,8 +232,8 @@ class Controller {
     this.dispatch.foreachOrder(code, (orderData) => {
       if (orderData.cancel === enTradeOrderStatus.TRADE_ORDER_STATUS_WAIT) {
         this.cancelReq(orderData.orderId).then(json => {
-          if (json.msg) {
-            this.updateTradeTips(code, json.msg)
+          if (json.retCode !== 0 && josn.msg && json.msg.length) {
+            ToastAndroid.show(json.msg, ToastAndroid.SHORT);
           }
         })
       }

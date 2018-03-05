@@ -77,7 +77,7 @@ export default function testStart() {
                 dealPrice: 0,                       // 成交价
                 placeOrderPrice: '',                // 下单价格
             }
-            store.dispatch(tradeAction.update(newItem))
+            //store.dispatch(tradeAction.update(newItem))
         }
     }, 3000)
 }

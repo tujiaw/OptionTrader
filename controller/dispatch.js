@@ -16,6 +16,8 @@ const g_htQuote = {}
 const g_htPosition = {}
 const g_htOrder = {}
 const g_htTrade = {}
+const g_newMarketList = []
+const g_newTradeList = []
 
 function getKey(code, dir) {
   return code + ':' + dir
@@ -84,7 +86,40 @@ function getPrice(code) {
   }
 }
 
-let block = true
+function updateMarketData(data) {
+  if (data.code && data.code.length) {
+    const f = _.find(g_newMarketList, item => item.code === data.code && item.dir === data.dir)
+    if (f) {
+      Object.assign(f, data)
+    } else {
+      g_newMarketList.push(data)
+    }
+  }
+}
+
+function updateTradeData(data) {
+  if (data.code && data.code.length) {
+    const f = _.find(g_newTradeList, item => item.code === data.code)
+    if (f) {
+      Object.assign(f, data)
+    } else {
+      g_newTradeList.push(data)
+    }
+  }
+}
+
+// 更新太频繁，优化间隔更新
+setInterval(() => {
+  if (g_newMarketList.length) {
+    store.dispatch(marketAction.updateIfExist(_.cloneDeep(g_newMarketList)))
+     g_newMarketList.splice(0, g_newMarketList.length)
+  }
+  if (g_newTradeList.length) {
+    store.dispatch(tradeAction.update(g_newTradeList))
+    //g_newTradeList.splice(0, g_newTradeList.length)
+  }
+}, 2000)
+
 const dispatchObj = {
   htQuote: () => {
     return g_htQuote
@@ -123,15 +158,6 @@ const dispatchObj = {
     }
     g_htQuote[code] = content
 
-    // 3秒钟放一个
-    setInterval(() => {
-      block = false
-    }, 3000)
-    if (block) {
-      return
-    }
-    block = true
-
     const key0 = getKey(code, 0)
     const key1 = getKey(code, 1)
     const price = content.dLastPrice.toFixed(1)
@@ -142,7 +168,8 @@ const dispatchObj = {
         marketData.profit = (price - p0.dAvgPrice / getPrice(code) / p0.nPosition) * p0.nPosition
         marketData.profit = marketData.profit.toFixed(1)
       }
-      store.dispatch(marketAction.updateIfExist(marketData))
+      updateMarketData(marketData)
+      //store.dispatch(marketAction.updateIfExist(marketData))
     }
     if (g_htPosition[key1]) {
       const p1 = g_htPosition[key1]
@@ -151,7 +178,8 @@ const dispatchObj = {
         marketData.profit = (p1.dAvgPrice / getPrice(code) / p1.nPosition - price) * p1.nPosition
         marketData.profit = marketData.profit.toFixed(1)
       }
-      store.dispatch(marketAction.updateIfExist(marketData))
+      updateMarketData(marketData)
+      //store.dispatch(marketAction.updateIfExist(marketData))
     }
 
     const tradeData = {
@@ -168,7 +196,8 @@ const dispatchObj = {
         dealPrice: content.dLastPrice,      // 成交价
         placeOrderPrice: '',                // 下单价格
     }
-    store.dispatch(tradeAction.update(tradeData))
+    updateTradeData(tradeData)
+    //store.dispatch(tradeAction.update(tradeData))
   },
   'Trade.Order': (content) => {
     if (!(content.nOrderID)) {
@@ -190,6 +219,8 @@ const dispatchObj = {
         tradeTime: content.szTradeDateTime,
       }
       store.dispatch(orderAction.update(orderData)) 
+    } else {
+      store.dispatch(orderAction.remove(content.nOrderID)) 
     }
 
     const code = content.szINSTRUMENT

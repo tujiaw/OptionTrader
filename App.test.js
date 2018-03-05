@@ -1,8 +1,7 @@
 var _ = require('lodash')
 
-const x = [1, 2, 3, 4, 5]
+const x = {'1': '111', '2': '222', '3': '333'}
 
-const y = _.filter(x, item => item !== 3)
-console.log(x === y)
-
-console.log(x)
+_.each(x, value => {
+    console.log(value)
+})
