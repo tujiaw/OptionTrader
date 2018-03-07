@@ -86,14 +86,18 @@ function dispatchPublishMessage(topic, content) {
     return
   }
 
-  return databus.buildProtoObject(getProtoFilename(proto.request), proto.request).then(Msg => {
-    try {
-      const decodedMsg = Msg.decode(content)
-      appClient.onPublishCallback(proto.request, decodedMsg)
-    } catch (e) {
-      console.log('dispatchPublishMessage', proto.request, e)
-    }
-  }) 
+  if (proto.request === 'MsgExpress.PublishData') {
+    console.log('MsgExpress.PublishData', content)
+  } else {
+    return databus.buildProtoObject(getProtoFilename(proto.request), proto.request).then(Msg => {
+      try {
+        const decodedMsg = Msg.decode(content)
+        appClient.onPublishCallback(proto.request, decodedMsg)
+      } catch (e) {
+        console.log('dispatchPublishMessage', proto.request, e)
+      }
+    }) 
+  }
 }
 
 class AppClient {

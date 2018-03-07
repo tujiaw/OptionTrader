@@ -57,6 +57,7 @@ class Controller {
       appClient.open(config.wsip, config.wsport)
       .then((json) => {
         return appClient.subscribe([
+          'MsgExpress.PublishData',
           'Trade.TradingAccount', 
           'Trade.MarketData',
           'Trade.Position',
