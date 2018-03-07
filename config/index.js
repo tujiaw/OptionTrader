@@ -1,9 +1,12 @@
-const Config = {
-    //wsip: '172.16.66.87',
-    //wsport: '7777',
+import { CONNECT_STATUS } from '../constants'
+
+const defaultConfig = {
     wsip: '47.100.7.224',
     wsport: '55555',
-    instruments: ['IC1803', 'IF1803', 'IH1803', 'I1805']
+    codeList: ['IC1803', 'IF1803', 'IH1803', 'i1805'],
+    username: 'admin',
+    password: 'admin',
+    netStatus: CONNECT_STATUS.CLOSED,
 }
 
-export default Config
+export default defaultConfig

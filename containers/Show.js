@@ -14,16 +14,6 @@ import controller from '../controller'
 import MainHeader from './MainHeader'
 
 class Show extends React.Component {
-  componentDidMount() {
-    console.log('1111111111111111111')
-    controller.start(this.props.localConfig)
-  }
-
-  componentWillUnmount() {
-    console.log('22222222222222222')
-    controller.close()
-  }
-
   shouldComponentUpdate(nextProps, nextState) {
     if (_.isEqual(this.props, nextProps)) {
       return false

@@ -111,12 +111,10 @@ function updateTradeData(data) {
 // 更新太频繁，优化间隔更新
 setInterval(() => {
   if (g_newMarketList.length) {
-    store.dispatch(marketAction.updateIfExist(_.cloneDeep(g_newMarketList)))
-     g_newMarketList.splice(0, g_newMarketList.length)
+    store.dispatch(marketAction.updateIfExist(g_newMarketList))
   }
   if (g_newTradeList.length) {
     store.dispatch(tradeAction.update(g_newTradeList))
-    //g_newTradeList.splice(0, g_newTradeList.length)
   }
 }, 2000)
 

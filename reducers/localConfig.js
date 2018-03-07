@@ -1,16 +1,8 @@
 import { UPDATE_LOCAL_CONFIG, UPDATE_READY_STATE } from '../constants/actionTypes'
 import { CONNECT_STATUS } from '../constants'
+import defaultConfig from '../config'
 
-const initData = {
-    wsip: '47.100.7.224',
-    wsport: '55555',
-    codeList: ['IC1803', 'IF1803', 'IH1803', 'i1805'],
-    username: 'admin',
-    password: 'admin',
-    netStatus: CONNECT_STATUS.CLOSED,
-}
-
-export default function localConfig(state = initData, action) {
+export default function localConfig(state = defaultConfig, action) {
   switch(action.type) {
     case UPDATE_LOCAL_CONFIG:
     {

@@ -64,9 +64,13 @@ class Edit extends React.Component {
   }
 
   _renderItem = ({item}) => {
-    return (
-      <TradeItem data={item} onButtonGroupPress={this._onButtonGroupPress}/>
-    )
+    if (_.find(this.props.localConfig.codeList, code => code === item.code)) {
+      return (
+        <TradeItem data={item} onButtonGroupPress={this._onButtonGroupPress}/>
+      )
+    } else {
+      return null;
+    }
   }
 
   render() {
@@ -114,7 +118,8 @@ class Edit extends React.Component {
 function mapStateToProps(state) {
   return {
     list: state.tradeData,
-    setting: state.tradeSetting
+    setting: state.tradeSetting,
+    localConfig: state.localConfig
   }
 }
 

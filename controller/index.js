@@ -8,6 +8,7 @@ import * as tradeSettingAction from '../actions/tradeSettingAction'
 import * as localConfigAction from '../actions/localConfigAction'
 import { ToastAndroid, AsyncStorage } from 'react-native'
 import dispatchObj from './dispatch'
+import defaultConfig from '../config'
 import { 
   enTradeDir,
   enTradeOrderStatus,
@@ -30,6 +31,11 @@ class Controller {
       } else if (result) {
         const localConfig = JSON.parse(result)
         store.dispatch(localConfigAction.update(localConfig))
+        if (localConfig && localConfig.wsip && localConfig.wsip.length) {
+          this.start(localConfig)
+        } else {
+          this.start(defaultConfig)
+        }
       }
     })
 
@@ -41,9 +47,9 @@ class Controller {
   }
 
   start(config) {
-    // config.codeList.forEach(code => {
-    //   store.dispatch(tradeAction.update({ code: code }))
-    // })
+    config.codeList.forEach(code => {
+      store.dispatch(tradeAction.update({ code: code }))
+    })
 
     const self = this
     console.log('start', config)
@@ -166,9 +172,13 @@ class Controller {
       ToastAndroid.show('仓位超限！', ToastAndroid.SHORT);
       return
     }
-    const orderData = this.dispatch.getOrder(code, enTradeDir.TRADE_DIR_BUY, price)
+    const orderData = this.dispatch.getOrder(code, enTradeDir.TRADE_DIR_BUY)
     if (orderData) {
-      this.modifyReq(orderData.orderId, price)
+      this.modifyReq(orderData.nOrderID, price).then(json => {
+        if (json.retCode !== 0 && json.msg && json.msg.length) {
+          ToastAndroid.show(json.msg, ToastAndroid.SHORT);
+        }
+      })
       return
     }
 
@@ -205,9 +215,9 @@ class Controller {
       ToastAndroid.show('禁止先开空单！', ToastAndroid.SHORT);
       return
     }
-    const orderData = this.dispatch.getOrder(code, enTradeDir.TRADE_DIR_SELL, price)
+    const orderData = this.dispatch.getOrder(code, enTradeDir.TRADE_DIR_SELL)
     if (orderData) {
-      this.modifyReq(orderData.orderId, price).then(json => {
+      this.modifyReq(orderData.nOrderID, price).then(json => {
         if (json.retCode !== 0 && json.msg && json.msg.length) {
           ToastAndroid.show(json.msg, ToastAndroid.SHORT);
         }
@@ -230,8 +240,8 @@ class Controller {
 
   cancel(code, price) {
     this.dispatch.foreachOrder(code, (orderData) => {
-      if (orderData.cancel === enTradeOrderStatus.TRADE_ORDER_STATUS_WAIT) {
-        this.cancelReq(orderData.orderId).then(json => {
+      if (orderData.nOrderStatus === enTradeOrderStatus.TRADE_ORDER_STATUS_WAIT) {
+        this.cancelReq(orderData.nOrderID).then(json => {
           if (json.retCode !== 0 && josn.msg && json.msg.length) {
             ToastAndroid.show(json.msg, ToastAndroid.SHORT);
           }
