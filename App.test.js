@@ -1,7 +1,4 @@
 var _ = require('lodash')
 
-const x = {'1': '111', '2': '222', '3': '333'}
-
-_.each(x, value => {
-    console.log(value)
-})
+const x = (255 << 20 | 1)
+console.log(x)

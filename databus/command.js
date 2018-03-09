@@ -183,6 +183,47 @@ export const AppList=[
   },
   {
     "$": {
+      "id": "255",
+      "name": "StockInfoServer",
+      "desc": ""
+    },
+    "function": [
+      {
+        "$": {
+          "id": "1",
+          "request": "StockServer.StockDataRequest",
+          "response": "StockServer.StockDataResponse",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "2",
+          "request": "StockServer.IpoDataRequest",
+          "response": "StockServer.IpoDataResponse",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "3",
+          "request": "StockServer.StockInfoRequest",
+          "response": "StockServer.StockInfoResponse",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "4",
+          "request": "StockServer.NewStockDataRequest",
+          "response": "StockServer.NewStockDataResponse",
+          "desc": ""
+        }
+      }
+    ]
+  },
+  {
+    "$": {
       "id": "888",
       "name": "Trade",
       "desc": ""

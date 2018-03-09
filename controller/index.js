@@ -26,17 +26,17 @@ class Controller {
       }
     })
     AsyncStorage.getItem('localConfig', (err, result) => {
+      let config = defaultConfig
       if (err) {
         console.log(err)
       } else if (result) {
         const localConfig = JSON.parse(result)
         store.dispatch(localConfigAction.update(localConfig))
         if (localConfig && localConfig.wsip && localConfig.wsip.length) {
-          this.start(localConfig)
-        } else {
-          this.start(defaultConfig)
+          config = localConfig
         }
       }
+      this.start(config)
     })
 
     setInterval(() => {
@@ -65,7 +65,7 @@ class Controller {
           'Trade.Trade',
           'Trade.ErrorInfo'
         ], (name, content) => {
-          console.log('publish', name)
+          //console.log('publish', name)
           self.handleDispatch(name, content)
         })
       })

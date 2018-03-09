@@ -8,7 +8,6 @@
     <function id="4" request="MsgExpress.Logout" response="MsgExpress.CommonResponse" desc=""></function>
     <function id="5" request="MsgExpress.HeartBeat" response="MsgExpress.HeartBeatResponse"></function>
     <function id="6" request="MsgExpress.StopBroker" response="MsgExpress.CommonResponse" desc=""></function>
-
 	<function id="11" request="MsgExpress.SimpleSubscription" response="MsgExpress.CommonResponse" desc=""></function>
     <function id="12" request="MsgExpress.SubscribeData" response="MsgExpress.CommonResponse" desc=""></function>
     <function id="13" request="MsgExpress.UnSubscribeData" response="MsgExpress.CommonResponse" desc=""></function>
@@ -27,19 +26,24 @@
   <AppServer id="2" name="Security" desc="">
     <function id="1" request="Security.ReqSessionValid" response="Security.ResSessionValid" desc=""></function>
   </AppServer> 
+  <AppServer id="255" name="StockInfoServer" desc="">
+  	<function id="1" request="StockServer.StockDataRequest" response="StockServer.StockDataResponse" desc=""></function>
+	  <function id="2" request="StockServer.IpoDataRequest" response="StockServer.IpoDataResponse" desc=""></function>
+	  <function id="3" request="StockServer.StockInfoRequest" response="StockServer.StockInfoResponse" desc=""></function>
+	  <function id="4" request="StockServer.NewStockDataRequest" response="StockServer.NewStockDataResponse" desc=""></function>
+  </AppServer>
   <AppServer id="888" name="Trade" desc="">
     <function id="1" request="Trade.LoginReq" response="Trade.LoginResp" desc=""></function>
     <function id="2" request="Trade.LogoutReq" response="Trade.LogoutResp" desc=""></function>
-	<function id="3" request="Trade.OrderReq" response="Trade.OrderResp" desc=""></function>
-	<function id="4" request="Trade.CancelReq" response="Trade.CancelResp" desc=""></function>
-	<function id="5" request="Trade.ModifyReq" response="Trade.ModifyResp" desc=""></function>
-	<function id="6" request="Trade.MarketDataReq" response="Trade.MarketDataResp"  desc=""></function>
-	
+	  <function id="3" request="Trade.OrderReq" response="Trade.OrderResp" desc=""></function>
+	  <function id="4" request="Trade.CancelReq" response="Trade.CancelResp" desc=""></function>
+	  <function id="5" request="Trade.ModifyReq" response="Trade.ModifyResp" desc=""></function>
+	  <function id="6" request="Trade.MarketDataReq" response="Trade.MarketDataResp"  desc=""></function>
     <function id="10" request="Trade.TradingAccount" response="MsgExpress.CommonResponse" ispublish="true" desc=""></function>
-	<function id="11" request="Trade.MarketData" response="MsgExpress.CommonResponse" ispublish="true" desc=""></function>
-	<function id="12" request="Trade.Position" response="MsgExpress.CommonResponse" ispublish="true" desc=""></function>
-	<function id="13" request="Trade.Order" response="MsgExpress.CommonResponse" ispublish="true" desc=""></function>
-	<function id="14" request="Trade.Trade" response="MsgExpress.CommonResponse" ispublish="true" desc=""></function>
-	<function id="15" request="Trade.ErrorInfo" response="MsgExpress.CommonResponse" ispublish="true" desc=""></function>
+	  <function id="11" request="Trade.MarketData" response="MsgExpress.CommonResponse" ispublish="true" desc=""></function>
+	  <function id="12" request="Trade.Position" response="MsgExpress.CommonResponse" ispublish="true" desc=""></function>
+	  <function id="13" request="Trade.Order" response="MsgExpress.CommonResponse" ispublish="true" desc=""></function>
+	  <function id="14" request="Trade.Trade" response="MsgExpress.CommonResponse" ispublish="true" desc=""></function>
+	  <function id="15" request="Trade.ErrorInfo" response="MsgExpress.CommonResponse" ispublish="true" desc=""></function>
   </AppServer>
 </AppList>

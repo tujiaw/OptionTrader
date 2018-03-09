@@ -27,7 +27,10 @@ class MainHeader extends React.Component {
     let loading = true
     if (netStatus === CONNECT_STATUS.OPEN) {
       loading = false
-    } 
+    } else if (netStatus === CONNECT_STATUS.CLOSED) {
+      loading = false
+      rightIconName = 'unlink'
+    }
 
     return (
       <Header
