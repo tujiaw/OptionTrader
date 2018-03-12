@@ -71,7 +71,7 @@ class Edit extends React.Component {
     const { localConfig } = this.props
     if (_.find(localConfig.codeList, code => code === item.code)) {
       return (
-        <TradeItem data={item} onButtonGroupPress={this._onButtonGroupPress} lock={localConfig.lock} />
+        <TradeItem data={item} onButtonGroupPress={this._onButtonGroupPress} />
       )
     } else {
       return null;

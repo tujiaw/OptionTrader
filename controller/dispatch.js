@@ -137,6 +137,26 @@ const dispatchObj = {
     g_htOrder = {}
     g_htTrade = {}
   },
+  initTradeList: (codeList, lock) => {
+    _.each(codeList, code => {
+      if (code && code.length) {
+        const f = _.find(g_newTradeList, item => item.code === code)
+        if (f) {
+          Object.assign(f, { lock: lock })
+        } else {
+          g_newTradeList.push({ code: code, lock: lock })
+        }
+      }
+    })
+  },
+  setTradeListLock: (lock) => {
+    if (lock && lock.length) {
+      for (const i = 0; i < g_newTradeList.length; i++) {
+        g_newTradeList[i].lock = lock
+      }
+      store.dispatch(tradeAction.update(g_newTradeList))
+    }
+  },
   'Trade.TradingAccount': (content) => {
     const obj = {
       dynamicEquity: content.dDynamicEquity || 0 ,
@@ -186,7 +206,7 @@ const dispatchObj = {
         futuresMinusPostPrice: '00',        // 期货价格-现货价格
         morePosition: '0',                  // 当前品种的多单仓位
         emptyPosition: '0',                 // 当前品种的空单仓位
-        lock: 'L',                          // 锁住或打开下单按钮和撤单按钮
+        //lock: 'unlock',                   // 锁住或打开下单按钮和撤单按钮
         sellPrice: content.dAskPrice1,      // 卖价
         buyPrice: content.dBidPrice1,       // 买价
         sellVolume: content.nAskVolume1,    // 卖量

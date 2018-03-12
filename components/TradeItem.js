@@ -41,7 +41,7 @@ function RightTop(props) {
       <View style={styles.rightTopRow1}>
         <Text>{'Buy:' + (data.morePosition || '0')}</Text>
         <Text>{'Sell:' + (data.emptyPosition || '0')}</Text>
-        <Text>{data.lock || 'L'}</Text>
+        <Text>{'L'}</Text>
       </View>
       <View>
         <Input value={editPrice || ''} onChangeText={onValueChanged} />
@@ -90,7 +90,7 @@ export default class TradeItem extends React.Component {
   }
 
   render() {
-    const { data, lock } = this.props
+    const { data } = this.props
     const buttons = ['B ' + data.code, 'S ' + data.code, 'X']
     return (
       <View style={styles.root}>
@@ -102,16 +102,16 @@ export default class TradeItem extends React.Component {
             onValueChanged={this._onPriceChanged}
           />
         </View>
-        { lock && lock === 'unlock' 
-          ? <View style={styles.row2}>
-              <ButtonGroup 
-                buttons={buttons}
-                containerStyle={styles.operButtonGroup}
-                textStyle={styles.buttonText}
-                onPress={this._onButtonGroupPress}
-              />
-            </View>
-          : null
+        { data.lock && data.lock === 'lock' 
+          ? null 
+          : <View style={styles.row2}>
+            <ButtonGroup 
+              buttons={buttons}
+              containerStyle={styles.operButtonGroup}
+              textStyle={styles.buttonText}
+              onPress={this._onButtonGroupPress}
+            />
+          </View>
         }
         <Text style={styles.tips}>{data.tips || ''}</Text>
       </View>

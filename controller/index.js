@@ -55,9 +55,7 @@ class Controller {
   }
 
   start(config) {
-    config.codeList.forEach(code => {
-      store.dispatch(tradeAction.update({ code: code }))
-    })
+    this.dispatch.initTradeList(config.codeList, config.lock)
 
     const self = this
     console.log('start', config)
@@ -120,6 +118,7 @@ class Controller {
 
   relogin(config) {
     this.clearAllData()
+    this.dispatch.initTradeList(config.codeList, config.lock || 'unlock')
     return appClient.post('Trade.LoginReq', 'Trade.LoginResp', {
       userid: config.username, 
       passwd: config.password,
@@ -163,6 +162,7 @@ class Controller {
   updateLocalConfig(data) {
     AsyncStorage.setItem('localConfig', JSON.stringify(data))
     store.dispatch(localConfigAction.update(data))
+    this.dispatch.setTradeListLock(data.lock)
   }
 
   bid(code, price, setting) {

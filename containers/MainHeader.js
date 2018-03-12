@@ -4,14 +4,15 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { CONNECT_STATUS } from '../constants'
 import { connect } from 'react-redux'
 import controller from '../controller'
+import _ from 'lodash'
 
 class MainHeader extends React.Component {
   _onLeftPress = () => {
-    if (this.props.title === '下单') {
-      const { lockConfig } = this.props
-      controller.updateLocalConfig(Object.assign({}, lockConfig, {
-        lock: (localConfig.lock === 'unlock') ? 'lock' : 'unlock'
-      }))
+    if (this.props.title && this.props.title === '下单') {
+      const newConfig = _.cloneDeep(this.props.localConfig)
+      const newLock = (newConfig.lock && newConfig.lock === 'lock') ? 'unlock' : 'lock'
+      Object.assign(newConfig, { lock: newLock })
+      controller.updateLocalConfig(newConfig)
     }
   }
 
