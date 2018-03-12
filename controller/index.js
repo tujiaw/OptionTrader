@@ -25,19 +25,25 @@ class Controller {
         store.dispatch(tradeSettingAction.update(JSON.parse(result)))
       }
     })
-    AsyncStorage.getItem('localConfig', (err, result) => {
-      let config = defaultConfig
-      if (err) {
-        console.log(err)
-      } else if (result) {
-        const localConfig = JSON.parse(result)
-        store.dispatch(localConfigAction.update(localConfig))
-        if (localConfig && localConfig.wsip && localConfig.wsip.length) {
-          config = localConfig
+
+    try {
+      AsyncStorage.getItem('localConfig', (err, result) => {
+        let config = defaultConfig
+        if (err) {
+          console.log(err)
+        } else if (result) {
+          const localConfig = JSON.parse(result)
+          if (localConfig && localConfig.wsip && localConfig.wsport) {
+            store.dispatch(localConfigAction.update(localConfig))
+            config = localConfig
+          }
         }
-      }
-      this.start(config)
-    })
+        this.start(config)
+      })
+    } catch (err) {
+      console.log('get localConfig error', err)
+      this.start(defaultConfig)
+    }
 
     setInterval(() => {
       store.dispatch(localConfigAction.updateReadyState(appClient.readyState()))

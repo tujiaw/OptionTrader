@@ -6,7 +6,7 @@ const defaultConfig = {
     codeList: ['IC1803', 'IF1803', 'IH1803', 'i1805'],
     username: 'admin',
     password: 'admin',
-    netStatus: CONNECT_STATUS.CLOSED,
+    netStatus: CONNECT_STATUS.CONNECTING,
 }
 
 export default defaultConfig
