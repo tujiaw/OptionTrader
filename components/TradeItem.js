@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, Text, TouchableOpacity, ToastAndroid } from 'react-native'
 import { Input, Button, ButtonGroup } from 'react-native-elements'
 
 function LeftTop(props) {
@@ -90,7 +90,7 @@ export default class TradeItem extends React.Component {
   }
 
   render() {
-    const { data } = this.props
+    const { data, lock } = this.props
     const buttons = ['B ' + data.code, 'S ' + data.code, 'X']
     return (
       <View style={styles.root}>
@@ -102,14 +102,17 @@ export default class TradeItem extends React.Component {
             onValueChanged={this._onPriceChanged}
           />
         </View>
-        <View style={styles.row2}>
-          <ButtonGroup 
-            buttons={buttons}
-            containerStyle={styles.operButtonGroup}
-            textStyle={styles.buttonText}
-            onPress={this._onButtonGroupPress}
-          />
-        </View>
+        { lock && lock === 'unlock' 
+          ? <View style={styles.row2}>
+              <ButtonGroup 
+                buttons={buttons}
+                containerStyle={styles.operButtonGroup}
+                textStyle={styles.buttonText}
+                onPress={this._onButtonGroupPress}
+              />
+            </View>
+          : null
+        }
         <Text style={styles.tips}>{data.tips || ''}</Text>
       </View>
     )
@@ -176,7 +179,8 @@ const styles = StyleSheet.create({
     maxHeight: 20,
   },
   operButtonGroup: {
-    maxHeight: 30,
+    minHeight: 60,
+    maxHeight: 60,
   },
   buttonStyle: {
     width: 5,

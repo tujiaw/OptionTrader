@@ -15,6 +15,10 @@ class Edit extends React.Component {
     return true
   }
 
+  _LeftIconClick = () => {
+
+  }
+
   _onButtonGroupPress = (index, data) => {
     if (!(data.code && data.code.length)) {
       return
@@ -64,9 +68,10 @@ class Edit extends React.Component {
   }
 
   _renderItem = ({item}) => {
-    if (_.find(this.props.localConfig.codeList, code => code === item.code)) {
+    const { localConfig } = this.props
+    if (_.find(localConfig.codeList, code => code === item.code)) {
       return (
-        <TradeItem data={item} onButtonGroupPress={this._onButtonGroupPress}/>
+        <TradeItem data={item} onButtonGroupPress={this._onButtonGroupPress} lock={localConfig.lock} />
       )
     } else {
       return null;

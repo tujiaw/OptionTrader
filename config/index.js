@@ -7,6 +7,7 @@ const defaultConfig = {
     username: 'admin',
     password: 'admin',
     netStatus: CONNECT_STATUS.CONNECTING,
+    lock: 'unlock'
 }
 
 export default defaultConfig

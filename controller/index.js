@@ -18,6 +18,14 @@ import {
 class Controller {
   constructor(dispatch) {
     this.dispatch = dispatch
+    setInterval(() => {
+      store.dispatch(localConfigAction.updateReadyState(appClient.readyState()))
+    }, 1000)
+
+    appClient.initProtoJson()
+  }
+
+  init() {
     AsyncStorage.getItem('tradeSetting', (err, result) => {
       if (err) {
         console.log(err)
@@ -44,12 +52,6 @@ class Controller {
       console.log('get localConfig error', err)
       this.start(defaultConfig)
     }
-
-    setInterval(() => {
-      store.dispatch(localConfigAction.updateReadyState(appClient.readyState()))
-    }, 1000)
-
-    appClient.initProtoJson()
   }
 
   start(config) {

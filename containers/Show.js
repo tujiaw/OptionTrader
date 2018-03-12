@@ -14,6 +14,10 @@ import controller from '../controller'
 import MainHeader from './MainHeader'
 
 class Show extends React.Component {
+  componentDidMount() {
+    controller.init()
+  }
+
   shouldComponentUpdate(nextProps, nextState) {
     if (_.isEqual(this.props, nextProps)) {
       return false

@@ -7,7 +7,12 @@ import controller from '../controller'
 
 class MainHeader extends React.Component {
   _onLeftPress = () => {
-
+    if (this.props.title === '下单') {
+      const { lockConfig } = this.props
+      controller.updateLocalConfig(Object.assign({}, lockConfig, {
+        lock: (localConfig.lock === 'unlock') ? 'lock' : 'unlock'
+      }))
+    }
   }
 
   _onRightPress = () => {
@@ -20,11 +25,19 @@ class MainHeader extends React.Component {
   }
 
   render() {
-    const { netStatus } = this.props.localConfig
+    const { netStatus, lock } = this.props.localConfig
+
     let title = this.props.title || 'Option Trader'
-    let leftIconName = 'bell'
     let rightIconName = 'refresh'
     let loading = true
+
+    let leftIconName = ''
+    if (title === '下单') {
+      leftIconName = lock || 'unlock'
+    } else {
+      leftIconName = 'bell'
+    }
+
     if (netStatus === CONNECT_STATUS.OPEN) {
       loading = false
     } else if (netStatus === CONNECT_STATUS.CLOSED) {
