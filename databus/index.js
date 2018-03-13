@@ -13,6 +13,10 @@ export const msgExpress = {
   KEY_SENTPUBLISHB: 41,KEY_LOGLEVEL: 61,KEY_LOGDATA: 62, KEY_TIME: 11 ,KEY_BROKER:12
 };
 
+function isArray(obj) {   
+  return Object.prototype.toString.call(obj) === '[object Array]';
+}  
+
 // 根据proto获取command值
 const commandCache = {}
 function getCommandFromProto(proto_request, proto_response) {
@@ -96,13 +100,21 @@ function dispatchPublishMessage(topic, content) {
     return
   }
 
-  if (proto.request === 'MsgExpress.PublishData') {
-    console.log('MsgExpress.PublishData', content)
+  const data = {}
+  data.topic = topic;
+  data.request = proto.request;
+  data.response = proto.response;
+  if (isArray(content)) {
+    // 老协议，如果定义了proto可以调用appClient.parsePublishMessage解析，否则用户自己去根据key-value解析
+    data.old = true;
+    data.content = content;
+    appClient.onPublishCallback(data)
   } else {
+    data.old = false;
     return databus.buildProtoObject(getProtoFilename(proto.request), proto.request).then(Msg => {
       try {
-        const decodedMsg = Msg.decode(content)
-        appClient.onPublishCallback(proto.request, decodedMsg)
+        data.content = Msg.decode(content)
+        appClient.onPublishCallback(data)
       } catch (e) {
         console.log('dispatchPublishMessage', proto.request, e)
       }
@@ -117,7 +129,6 @@ class AppClient {
     this._clientName = 'test'
     this._heartBeatTimer = 0
     this._hearBeatIntervalSecond = 5 // 心跳间隔5秒
-    this._isConnect = false
     this._addr = 0
   }
 
@@ -147,7 +158,6 @@ class AppClient {
             databus.setPushDataFactory(function(topic, content) {
               dispatchPublishMessage(topic, content)
             });
-            self._isConnect = true
             self.startHeartBeat()
             self.loginBus().then((json) => {
               self.addr = json.addr
@@ -191,31 +201,68 @@ class AppClient {
 
   // 批量订阅
 	subscribe(protoList, publishCallback) {
-    const self = this
-    this._publishCallback = publishCallback
-
+    this._publishCallback = publishCallback;
     return databus.buildProtoObject("msgexpress", "MsgExpress.SubscribeData").then(obj => {
       const objList = []
       for (let i = 0, count = protoList.length; i < count; i++) {
-        const cmd = getCommandFromProto(protoList[i])
+        let cmd = 0
+        if (isNaN(protoList[i])) {
+          // proto中的协议名，新的订阅方式，如：StockServer.StockDataRequest, StockServer.StockDataResponse
+          const arr = protoList[i].split(',');
+          if (arr.length === 2) {
+            cmd = getCommandFromProto(arr[0].trim(), arr[1].trim());
+          } else {
+            console.error('subscribe params error', protoList[i]);
+          }
+        } else {
+          // Number老的订阅方式，如：267386881
+          cmd = protoList[i]
+        }
         if (cmd) {
           const newObj = _.cloneDeep(obj)
-          newObj.subid = self._subIdStart++
+          newObj.subid = this._subIdStart++
           newObj.topic = cmd
           objList.push(newObj)
         }
       }
-      return self.post("MsgExpress.ComplexSubscribeData", "MsgExpress.CommonResponse", {
+      return this.post("MsgExpress.ComplexSubscribeData", "MsgExpress.CommonResponse", {
         sub: objList
       })
     })
   }
   
   // 回调推送的消息
-  onPublishCallback(name, msg) {
+  onPublishCallback(data) {
     if (this._publishCallback) {
-      this._publishCallback(name, msg)
+      this._publishCallback(data)
     }
+  }
+
+  // 解析推送的消息，老协议
+  parsePublishMessage(protoFilename, jsonContent) {
+    return new Promise((resolve, reject) => {
+      if (jsonContent.length < 2) {
+        return reject('json content error')
+      }
+
+      const name = jsonContent[0].value
+      const content = jsonContent[1].value
+      const arr = content.split(',')
+      var bb = new Uint8Array(arr.length)
+        for (let i = 0, count = arr.length; i < count; i++) {
+          bb[i] = arr[i]
+        }
+      
+        databus.buildProtoObject(protoFilename, name)
+        .then((Msg) => {
+          try {
+            const decodedMsg = Msg.decode(bb)
+            return resolve(decodedMsg)
+          } catch (e) {
+            return reject(e)
+          }
+        })
+    })
   }
 
 	// 发送消息，proto文件名通过Command.js中的FileList映射查找
@@ -252,9 +299,7 @@ class AppClient {
 	startHeartBeat() {
     this.closeHeartBeat()
     this._heartBeatTimer = setInterval(() => {
-      if (!this._isConnect) {
-        console.log('will reconnect...')
-        // databus.reconnect()
+      if (this.readyState() !== 1) {
         return
       }
 

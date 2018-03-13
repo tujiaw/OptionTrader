@@ -16,6 +16,7 @@ const g_htQuote = {}
 const g_htPosition = {}
 const g_htOrder = {}
 const g_htTrade = {}
+const g_hqData = {}
 const g_newMarketList = []
 const g_newTradeList = []
 
@@ -99,6 +100,16 @@ function updateMarketData(data) {
 
 function updateTradeData(data) {
   if (data.code && data.code.length) {
+    if (g_hqData[data.code]) {
+      const hq = g_hqData[data.code];
+      data.spotPrice = hq.close;
+      const dealPrice = parseFloat(data.dealPrice);
+      const spotPrice = parseFloat(data.spotPrice);
+      if (dealPrice && spotPrice && dealPrice >= 1 && spotPrice >= 1) {
+        data.futuresMinusPostPrice = '' + parseInt(dealPrice - spotPrice)
+      }
+    }
+
     const f = _.find(g_newTradeList, item => item.code === data.code)
     if (f) {
       Object.assign(f, data)
@@ -118,46 +129,9 @@ setInterval(() => {
   }
 }, 2000)
 
-const dispatchObj = {
-  htQuote: () => {
-    return g_htQuote
-  },
-  htPosition: () => {
-    return g_htPosition
-  },
-  htOrder: () => {
-    return g_htOrder
-  },
-  htTrade: () => {
-    return g_htTrade
-  },
-  clear: () => {
-    g_htQuote = {}
-    g_htPosition = {}
-    g_htOrder = {}
-    g_htTrade = {}
-  },
-  initTradeList: (codeList, lock) => {
-    _.each(codeList, code => {
-      if (code && code.length) {
-        const f = _.find(g_newTradeList, item => item.code === code)
-        if (f) {
-          Object.assign(f, { lock: lock })
-        } else {
-          g_newTradeList.push({ code: code, lock: lock })
-        }
-      }
-    })
-  },
-  setTradeListLock: (lock) => {
-    if (lock && lock.length) {
-      for (const i = 0; i < g_newTradeList.length; i++) {
-        g_newTradeList[i].lock = lock
-      }
-      store.dispatch(tradeAction.update(g_newTradeList))
-    }
-  },
-  'Trade.TradingAccount': (content) => {
+const handlePublish = {
+  'Trade.TradingAccount': (data) => {
+    const { content } = data;
     const obj = {
       dynamicEquity: content.dDynamicEquity || 0 ,
       frozenCapital: content.dFrozenCapital || 0,
@@ -168,7 +142,8 @@ const dispatchObj = {
     obj.avaiableCapital = Math.round(obj.avaiableCapital)
     store.dispatch(capitalStateAction.update(obj))
   },
-  'Trade.MarketData': (content) => {
+  'Trade.MarketData': (data) => {
+    const { content } = data;
     const code = content.szINSTRUMENT.trim()
     if (!(code && code.length)) {
       console.error('Trade.MarketData', content)
@@ -187,7 +162,6 @@ const dispatchObj = {
         marketData.profit = marketData.profit.toFixed(1)
       }
       updateMarketData(marketData)
-      //store.dispatch(marketAction.updateIfExist(marketData))
     }
     if (g_htPosition[key1]) {
       const p1 = g_htPosition[key1]
@@ -197,13 +171,12 @@ const dispatchObj = {
         marketData.profit = marketData.profit.toFixed(1)
       }
       updateMarketData(marketData)
-      //store.dispatch(marketAction.updateIfExist(marketData))
     }
 
     const tradeData = {
         code: code,
-        spotPrice: '00000',                 // 现货价格
-        futuresMinusPostPrice: '00',        // 期货价格-现货价格
+        //spotPrice: '00000',                 // 现货价格
+        //futuresMinusPostPrice: '00',        // 期货价格-现货价格
         morePosition: '0',                  // 当前品种的多单仓位
         emptyPosition: '0',                 // 当前品种的空单仓位
         //lock: 'unlock',                   // 锁住或打开下单按钮和撤单按钮
@@ -215,9 +188,9 @@ const dispatchObj = {
         placeOrderPrice: '',                // 下单价格
     }
     updateTradeData(tradeData)
-    //store.dispatch(tradeAction.update(tradeData))
   },
-  'Trade.Order': (content) => {
+  'Trade.Order': (data) => {
+    const { content } = data;
     if (!(content.nOrderID)) {
       console.error('Trade.Order', content)
       return
@@ -248,7 +221,8 @@ const dispatchObj = {
     const tips = `Order:(${code} ${dir} ${oper} ${content.dLimitPrice} ${state})`
     store.dispatch(tradeAction.updateTips({code: code, tips: tips}))
   },
-  'Trade.Trade': (content) => {
+  'Trade.Trade': (data) => {
+    const { content } = data;
     if (!(content.nOrderID)) {
       console.error('Trade.Trade', content)
       return
@@ -261,7 +235,8 @@ const dispatchObj = {
     const tips = `Trade:(${code} ${dir} ${oper} ${content.dPrice})`
     store.dispatch(tradeAction.updateTips({code: code, tips: tips}))
   },
-  'Trade.Position': (content) => {
+  'Trade.Position': (data) => {
+    const { content } = data;
     const code = content.szINSTRUMENT.trim()
     if (!(code && code.length && content.hasOwnProperty('nTradeDir'))) {
       console.error('Trade.Position', content)
@@ -292,6 +267,93 @@ const dispatchObj = {
       avgPrice: avgPrice,
     }
     store.dispatch(marketAction.update(marketData))
+  },
+  'StockServer.StockDataRequest': (data) => {
+    const { content } = data;
+    if (_.isArray(content)) {
+      const hq = {}
+      _.each(content, item => {
+        const arr = content[0].split(',');
+        if (arr.length >= 5 && arr[0].trim().length) {
+          const code = arr[0].trim();
+          hq.code = code;
+          hq.close = arr[1].trim();
+          hq.lastClose = arr[2].trim();
+          hq.vol = arr[3].trim();
+          hq.amount = arr[4].trim();
+          hq.turnoverratio = arr[5].trim();
+
+          const strTime = arr[6].trim();
+          const hour = parseInt(strTime.substr(0, 2));
+          const minite = parseInt(strTime.substr(3, 2));
+          const second = parseInt(strTime.substr(6, 2));
+          let time = hour * 3600 + minite * 60 + second - 34200;
+          if (time < 0) {
+            time = 0;
+          } else if (time > 7200 && time <= 12600) {
+            time = 7200;
+          } else if (time > 12600) {
+            time -= 7200;
+          }
+          time = Math.min(time, 14400);
+          hq.time = time;
+
+          if (code.length && g_hqData[code]) {
+            Object.assign(g_hqData[code], hq);
+          } else {
+            g_hqData[code] = hq;
+          }
+        }
+      })
+    }
+  }
+}
+
+const dispatchObj = {
+  htQuote: () => {
+    return g_htQuote
+  },
+  htPosition: () => {
+    return g_htPosition
+  },
+  htOrder: () => {
+    return g_htOrder
+  },
+  htTrade: () => {
+    return g_htTrade
+  },
+  clear: () => {
+    g_htQuote = {}
+    g_htPosition = {}
+    g_htOrder = {}
+    g_htTrade = {}
+    g_hqData = {}
+  },
+  initTradeList: (codeList, lock) => {
+    _.each(codeList, code => {
+      if (code && code.length) {
+        const f = _.find(g_newTradeList, item => item.code === code)
+        if (f) {
+          Object.assign(f, { lock: lock })
+        } else {
+          g_newTradeList.push({ code: code, lock: lock })
+        }
+      }
+    })
+  },
+  setTradeListLock: (lock) => {
+    if (lock && lock.length) {
+      for (const i = 0; i < g_newTradeList.length; i++) {
+        g_newTradeList[i].lock = lock
+      }
+      store.dispatch(tradeAction.update(g_newTradeList))
+    }
+  },
+  handle: (data) => {
+    if (data.request && handlePublish[data.request]) {
+      console.log('publish', data.request);
+      handlePublish[data.request](data);
+    }
   },
   getPosition: (code) => {
     let netPos = 0

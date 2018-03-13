@@ -1,9 +1,6 @@
 var _ = require('lodash')
 
-const x = (255 << 20 | 1)
+const x = [{a: 1, b: 2}, {a: 11, b: 22}]
+let f = _.find(x, item => item.a === 1);
+f.b = 2222222
 console.log(x)
-
-const xx = undefined
-if (!xx) {
-    console.log('xxxxxxxxxxxxxxxx')
-}

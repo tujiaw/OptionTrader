@@ -55,24 +55,23 @@ class Controller {
   }
 
   start(config) {
+    console.log('start', config);
     this.dispatch.initTradeList(config.codeList, config.lock)
-
     const self = this
     console.log('start', config)
     return new Promise((resolve, reject) => {
       appClient.open(config.wsip, config.wsport)
       .then((json) => {
         return appClient.subscribe([
-          'MsgExpress.PublishData',
-          'Trade.TradingAccount', 
-          'Trade.MarketData',
-          'Trade.Position',
-          'Trade.Order',
-          'Trade.Trade',
-          'Trade.ErrorInfo'
-        ], (name, content) => {
-          //console.log('publish', name)
-          self.handleDispatch(name, content)
+          'StockServer.StockDataRequest, StockServer.StockDataResponse',
+          'Trade.TradingAccount, MsgExpress.CommonResponse', 
+          'Trade.MarketData, MsgExpress.CommonResponse',
+          'Trade.Position, MsgExpress.CommonResponse',
+          'Trade.Order, MsgExpress.CommonResponse',
+          'Trade.Trade, MsgExpress.CommonResponse',
+          'Trade.ErrorInfo, MsgExpress.CommonResponse'
+        ], (data) => {
+          self.handleDispatch(data)
         })
       })
       .then((json) => {
@@ -127,10 +126,8 @@ class Controller {
   }
 
   // 处理推送
-  handleDispatch(name, content) {
-    if (this.dispatch[name]) {
-      this.dispatch[name](content)
-    }
+  handleDispatch(data) {
+    this.dispatch.handle(data)
   }
 
   cancelReq(orderId) {
