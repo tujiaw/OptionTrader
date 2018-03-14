@@ -1,22 +1,20 @@
 (function(global, factory) {
 /* CommonJS */ if (typeof require === 'function' && typeof module === "object" && module && module["exports"])
   module['exports'] = (function() {
-    var DataBusPackage = require('./DataBusPackage');
-    var observer = require('./observer');
+    var cbusPackage = require('./cbusPackage');
     var ProtoBuf = require("protobufjs");
     var Long = require("long");
     ProtoBuf.util.Long = Long;
     ProtoBuf.configure();
-    return factory(ProtoBuf, require('bytebuffer'), DataBusPackage, observer);
+    return factory(ProtoBuf, require('bytebuffer'), cbusPackage);
   })();
 /* Global */ else
-  global["databus"] = factory(
+  global["cbusCore"] = factory(
     global.dcodeIO.ProtoBuf, 
     global.dcodeIO.ByteBuffer,
-    global.DataBusPackage,
-    global.observer,
+    global.cbusPackage,
   );
-})(this, function(ProtoBuf, ByteBuffer, DataBusPackage, observer) {
+})(this, function(ProtoBuf, ByteBuffer, cbusPackage) {
   var ws = undefined;
   var serial = 65536;
   var protobufBuilders = {};
@@ -26,10 +24,48 @@
   var PREFIX_DATABUS = "DATABUS";
   var PROTO_FILE_DIR = '/protobuf/'
 
-  var databus = {
+  var Observer = function() {
+    this.subscribers = [];			// 订阅者数组
+  }
+  Observer.prototype = {
+    sub : function(evt, fn) {		// 订阅方法，返回订阅event标识符
+      this.subscribers[evt] ? this.subscribers[evt].push(fn) : (this.subscribers[evt] = []) && this.subscribers[evt].push(fn);
+      return '{"evt":"' + evt + '","fn":"' + (this.subscribers[evt].length - 1) + '"}';
+    },
+    pub : function(evt, args) {	// 发布方法，成功后返回自身
+      if (this.subscribers[evt]) {
+        for (var i in this.subscribers[evt]) {
+          if (typeof(this.subscribers[evt][i]) === 'function') {
+            if (arguments.length === 2) {
+              this.subscribers[evt][i](args);
+            } else {
+              this.subscribers[evt][i](arguments[1], arguments[2], arguments[3], arguments[4], arguments[5], arguments[6]);
+            }
+          }
+        }
+        return this;
+      }
+      return false;
+    },
+    unsub : function(subId) {		// 解除订阅，需传入订阅event标识符
+      try {
+        var id = JSON.parse(subId);
+        this.subscribers[id.evt][id.fn] = null;
+        delete this.subscribers[id.evt][id.fn];
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    contains : function(evt) {
+      return this.subscribers[evt] ? true : false;
+    }
+  }
+  var observer = new Observer();
+
+  var cbusCore = {
     close: function () {
       if (ws) {
-        console.log('xxxxxxxxxxxxxxxxxxxxxx')
+        console.log('close websocket');
         ws.onopen = function() {}
         ws.onmessage = function() {}
         ws.onclose = function() {}
@@ -68,8 +104,8 @@
       }
       ws.binaryType = "arraybuffer";
       ws.onopen = function () {
-        console.log("WebSocket Open Success,", ip, ":", port, path);
-        if (!!settings.onConnectSuccess) {
+        console.log("websocket connect success", ip, ":", port, path);
+        if (settings.onConnectSuccess) {
           settings.onConnectSuccess();
         }
       };
@@ -83,7 +119,7 @@
         var bb, packages;
         try {
           bb = ByteBuffer.wrap(evt.data, "binary");
-          packages = DataBusPackage.decodePackage(bb);
+          packages = cbusPackage.decodePackage(bb);
         } catch(err) {
           console.log(err)
           return;
@@ -127,7 +163,7 @@
 
         for (var i = 0; i < packages.length; i++) {
           let p = packages[i];
-          if (p.getType() === DataBusPackage.Publish) {
+          if (p.getType() === cbusPackage.Publish) {
             if (p.isPublishNewMsg()) {
               if (pushDataFactory) {
                 pushDataFactory(p.getCommand(), p.body.view)
@@ -141,11 +177,17 @@
         }
       };
       ws.onclose = function (event) {
-        console.log("Client Notify WebSocket Has Closed...");
+        console.log("websocket closed, code:" + event.code + ", reason:" + event.reason);
         if (settings.onConnectClose) {
-          settings.onConnectClose();
+          settings.onConnectClose(event);
         }
       };
+      ws.onerror = function(event) {
+        console.log('websocket error', event);
+        if (settings.onConnectError) {
+          settings.onConnectError(event);
+        }
+      }
     },
 
     // 可以使用json格式直接初始化
@@ -225,7 +267,7 @@
       var serialnum = serial++;
       var pack;
       try {
-        pack = DataBusPackage.encodePackage(serialnum, cmd, byteBuffer);
+        pack = cbusPackage.encodePackage(serialnum, cmd, byteBuffer);
       } catch(err) {
         console.error(serialnum, cmd, err)
         return
@@ -300,5 +342,5 @@
       PROTO_FILE_DIR = dir
     }
   }
-  return databus;
+  return cbusCore;
 });

@@ -1,6 +1,10 @@
 var _ = require('lodash')
+const htbl = {
+    'IC': 'sz399905',
+    'IF': 'sh000300',
+    'IH': 'sh000016'
+  }
 
-const x = [{a: 1, b: 2}, {a: 11, b: 22}]
-let f = _.find(x, item => item.a === 1);
-f.b = 2222222
-console.log(x)
+for (let t in htbl) {
+    console.log(t)
+}

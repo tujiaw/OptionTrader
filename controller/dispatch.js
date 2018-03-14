@@ -12,6 +12,12 @@ import {
   enTradeOrderStatus,
 } from '../constants'
 
+const htbl = {
+  'IC': 'sz399905',
+  'IF': 'sh000300',
+  'IH': 'sh000016'
+}
+
 const g_htQuote = {}
 const g_htPosition = {}
 const g_htOrder = {}
@@ -100,21 +106,25 @@ function updateMarketData(data) {
 
 function updateTradeData(data) {
   if (data.code && data.code.length) {
-    if (g_hqData[data.code]) {
-      const hq = g_hqData[data.code];
-      data.spotPrice = hq.close;
-      const dealPrice = parseFloat(data.dealPrice);
-      const spotPrice = parseFloat(data.spotPrice);
-      if (dealPrice && spotPrice && dealPrice >= 1 && spotPrice >= 1) {
-        data.futuresMinusPostPrice = '' + parseInt(dealPrice - spotPrice)
-      }
-    }
-
     const f = _.find(g_newTradeList, item => item.code === data.code)
     if (f) {
       Object.assign(f, data)
     } else {
       g_newTradeList.push(data)
+    }
+
+    for (let i = 0; i < g_newTradeList.length; i++) {
+      const item = g_newTradeList[i];
+      const hqCode = htbl[item.code.substr(0, 2)]
+      if (hqCode && hqCode.length && g_hqData[hqCode]) {
+        const hq = g_hqData[hqCode];
+        item.spotPrice = hq.close;
+        const dealPrice = parseFloat(item.dealPrice);
+        const spotPrice = parseFloat(item.spotPrice);
+        if (dealPrice && spotPrice && dealPrice >= 1 && spotPrice >= 1) {
+          item.futuresMinusPostPrice = '' + parseInt(dealPrice - spotPrice)
+        }
+      }
     }
   }
 }
@@ -273,7 +283,10 @@ const handlePublish = {
     if (_.isArray(content)) {
       const hq = {}
       _.each(content, item => {
-        const arr = content[0].split(',');
+        let arr = [];
+        if (item.value && item.value.length) {
+          arr = item.value.split(',');
+        }
         if (arr.length >= 5 && arr[0].trim().length) {
           const code = arr[0].trim();
           hq.code = code;
@@ -351,7 +364,7 @@ const dispatchObj = {
   },
   handle: (data) => {
     if (data.request && handlePublish[data.request]) {
-      console.log('publish', data.request);
+      //console.log('publish', data.request);
       handlePublish[data.request](data);
     }
   },

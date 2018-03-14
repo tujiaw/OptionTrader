@@ -4,6 +4,12 @@ import { Input, Button, ButtonGroup } from 'react-native-elements'
 
 function LeftTop(props) {
   const { data, onValueChanged } = props
+  let gapColor = 'black';
+  if (data.futuresMinusPostPrice) {
+    const gap = parseFloat(data.futuresMinusPostPrice);
+    gapColor = (gap && gap > 0) ? 'red' : 'blue';
+  }
+
   return (
     <View style={styles.leftTop}>
       <View style={styles.leftTopCol1}>
@@ -16,12 +22,12 @@ function LeftTop(props) {
         </TouchableOpacity>
       </View>
       <View style={styles.leftTopCol2}>
-        <Text>{data.spotPrice || 'C0000'}</Text>
+        <Text>{data.spotPrice || '00000'}</Text>
         <Text>{data.sellVolume || '0'}</Text>
         <Text>{data.buyVolume || '0'}</Text>
       </View>
       <View style={styles.leftTopCol3}>
-        <Text>{data.futuresMinusPostPrice || '00'}</Text>
+        <Text style={{ color: gapColor }}>{data.futuresMinusPostPrice || '00'}</Text>
         <Text></Text>
         <TouchableOpacity onPress={() => { onValueChanged && onValueChanged(data.dealPrice) }} >
           <Text>{data.dealPrice || '00000'}</Text>

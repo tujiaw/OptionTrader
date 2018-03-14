@@ -1,4 +1,4 @@
-import appClient from '../databus'
+import cbus from '../databus'
 import store from '../utils/store'
 import * as capitalStateAction from '../actions/capitalStateAction'
 import * as tradeAction from '../actions/tradeAction'
@@ -19,10 +19,25 @@ class Controller {
   constructor(dispatch) {
     this.dispatch = dispatch
     setInterval(() => {
-      store.dispatch(localConfigAction.updateReadyState(appClient.readyState()))
+      store.dispatch(localConfigAction.updateReadyState(cbus.readyState()))
     }, 1000)
 
-    appClient.initProtoJson()
+    cbus.initProtoJson([
+      { name: 'msgexpress', json: require('../databus/protobuf/msgexpress.json') },
+      { name: 'trade', json: require('../databus/protobuf/trade.json') }
+    ]);
+
+    cbus.setEvent(
+      function onopen() {
+        console.log('onopen...............');
+      },
+      function onclose() {
+        console.log('onclose...............');
+      },
+      function onerror() {
+        console.log('onerror...............');
+      }
+    )
   }
 
   init() {
@@ -60,9 +75,9 @@ class Controller {
     const self = this
     console.log('start', config)
     return new Promise((resolve, reject) => {
-      appClient.open(config.wsip, config.wsport)
+      cbus.open(config.wsip, config.wsport)
       .then((json) => {
-        return appClient.subscribe([
+        return cbus.subscribe([
           'StockServer.StockDataRequest, StockServer.StockDataResponse',
           'Trade.TradingAccount, MsgExpress.CommonResponse', 
           'Trade.MarketData, MsgExpress.CommonResponse',
@@ -76,7 +91,7 @@ class Controller {
       })
       .then((json) => {
         console.log('subscribe result', json)
-        return appClient.post('Trade.LoginReq', 'Trade.LoginResp', {
+        return cbus.post('Trade.LoginReq', 'Trade.LoginResp', {
           userid: config.username, 
           passwd: config.password,
           instruments: config.codeList
@@ -102,7 +117,7 @@ class Controller {
   }
 
   close() {
-    appClient.close()
+    cbus.close()
     this.clearAllData()
   }
 
@@ -112,13 +127,13 @@ class Controller {
   }
 
   logout() {
-    return appClient.post('Trade.LogoutReq', 'Trade.LogoutResp', {})
+    return cbus.post('Trade.LogoutReq', 'Trade.LogoutResp', {})
   }
 
   relogin(config) {
     this.clearAllData()
     this.dispatch.initTradeList(config.codeList, config.lock || 'unlock')
-    return appClient.post('Trade.LoginReq', 'Trade.LoginResp', {
+    return cbus.post('Trade.LoginReq', 'Trade.LoginResp', {
       userid: config.username, 
       passwd: config.password,
       instruments: config.codeList
@@ -131,20 +146,20 @@ class Controller {
   }
 
   cancelReq(orderId) {
-    return appClient.post('Trade.CancelReq', 'Trade.CancelResp', {
+    return cbus.post('Trade.CancelReq', 'Trade.CancelResp', {
       orderid: orderId
     })
   }
 
   modifyReq(orderId, price) {
-    return appClient.post('Trade.ModifyReq', 'Trade.ModifyResp', {
+    return cbus.post('Trade.ModifyReq', 'Trade.ModifyResp', {
       orderid: orderId,
       price: price
     })
   }
 
   orderReq(code, price, type) {
-    return appClient.post('Trade.OrderReq', 'Trade.OrderResp', {
+    return cbus.post('Trade.OrderReq', 'Trade.OrderResp', {
       code: code,
       price: price,
       type: type

@@ -1,4 +1,13 @@
-export const AppList=[
+(function(global, factory) {
+  if (typeof require === 'function' && typeof module === "object" && module && module["exports"])
+    module['exports'] = (function() {
+      return factory();
+  })();
+  else
+    global["cbusCommand"] = factory();
+})(this, function() {
+  return {
+    AppList: [
   {
     "$": {
       "id": "0",
@@ -333,9 +342,8 @@ export const AppList=[
       }
     ]
   }
-]
-
- export const FileList=[
+],
+    ProtoFileList: [
   {
     "filename": "msgexpress",
     "package": "MsgExpress"
@@ -345,3 +353,5 @@ export const AppList=[
     "package": "Trade"
   }
 ]
+  }
+});

@@ -7,7 +7,6 @@ import Edit from './containers/Edit'
 import Me from './containers/Me'
 import { Provider } from 'react-redux'
 import store from './utils/store'
-import testStart from './databus/test'
 
 // testStart()
 const MainTab = TabNavigator(

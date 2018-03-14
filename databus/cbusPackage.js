@@ -4,14 +4,14 @@
           return factory(require('bytebuffer'), require('pako'));
       })();
   /* Global */ else
-      global["DataBusPackage"] = factory(global.dcodeIO.ByteBuffer, global.pako);
+      global["cbusPackage"] = factory(global.dcodeIO.ByteBuffer, global.pako);
 })(this, function(ByteBuffer, pako) {
-	var DataBusPackage = function() {
-		this.flag1 = DataBusPackage.PACKAGE_START;
-		this.flag2 = DataBusPackage.PACKAGE_START;
+	var cbusPackage = function() {
+		this.flag1 = cbusPackage.PACKAGE_START;
+		this.flag2 = cbusPackage.PACKAGE_START;
 		this.version = 1;
-		this.type = DataBusPackage.REQUEST;
-		this.off = DataBusPackage.SIZE_OF_HEAD;
+		this.type = cbusPackage.REQUEST;
+		this.off = cbusPackage.SIZE_OF_HEAD;
 		this.options = 0;
 		this.codeinfo = 0;
 		this.reserve1 = 0;
@@ -24,65 +24,65 @@
 		this.shortCode = 0;
 	};
 
-	DataBusPackage.prototype.setSerialNumber = function(serialNum) {
+	cbusPackage.prototype.setSerialNumber = function(serialNum) {
 		this.serialNum = serialNum;
 	};
 
-	DataBusPackage.prototype.getSerialNumber = function() {
+	cbusPackage.prototype.getSerialNumber = function() {
 		return this.serialNum;
 	};
 
-	DataBusPackage.prototype.setBody = function(body) {
+	cbusPackage.prototype.setBody = function(body) {
 		this.body = body;
 	};
 
-	DataBusPackage.prototype.getBody = function() {
+	cbusPackage.prototype.getBody = function() {
 		return this.body;
 	};
 
-	DataBusPackage.prototype.setCommand = function(command) {
+	cbusPackage.prototype.setCommand = function(command) {
 		this.command = command;
 	};
 
-	DataBusPackage.prototype.getCommand = function () {
+	cbusPackage.prototype.getCommand = function () {
 		return this.command;
     };
 
-	DataBusPackage.prototype.getOffset = function() {
+	cbusPackage.prototype.getOffset = function() {
 		return this.off;
 	};
 
-	DataBusPackage.prototype.getBodySize = function() {
+	cbusPackage.prototype.getBodySize = function() {
 		return this.bodysize;
 	};
 
-	DataBusPackage.prototype.setBodySize = function(bodysize) {
+	cbusPackage.prototype.setBodySize = function(bodysize) {
 		this.bodysize = bodysize;
 	};
 
-	DataBusPackage.prototype.getIsZip = function() {
+	cbusPackage.prototype.getIsZip = function() {
 		return (this.codeinfo & 0x1) === 1;
 	};
 	
-	DataBusPackage.prototype.getType = function() {
+	cbusPackage.prototype.getType = function() {
 		return this.type;
 	};
 
-	DataBusPackage.prototype.isPublishNewMsg = function() {
+	cbusPackage.prototype.isPublishNewMsg = function() {
 		if (this.options && (((this.options >> 7) & 1) === 1)) {
 			return true
 		}
 		return false
 	}
 
-	DataBusPackage.encodePackage = function(serialNum, command, body) {
-		var pk = new DataBusPackage();
+	cbusPackage.encodePackage = function(serialNum, command, body) {
+		var pk = new cbusPackage();
 		pk.setSerialNumber(serialNum);
 		pk.setCommand(command);
     pk.setBody(body);
     pk.setBodySize(body.limit);
 
-		var buffer = new ByteBuffer(DataBusPackage.SIZE_OF_HEAD + pk.getBodySize());
+		var buffer = new ByteBuffer(cbusPackage.SIZE_OF_HEAD + pk.getBodySize());
 		buffer.writeByte(pk.flag1);
 		buffer.writeByte(pk.flag2);
 		buffer.writeByte(pk.version);
@@ -106,21 +106,21 @@
 		return buffer;
 	}
 
-	DataBusPackage.decodePackage1 = function(buffer) {
+	cbusPackage.decodePackage1 = function(buffer) {
 		var packages = [];
 		while (buffer.remaining() > 0) {
 			// read util 'P'
-			if (!(buffer.readByte() === DataBusPackage.PACKAGE_START && buffer.readByte() === DataBusPackage.PACKAGE_START)) {
+			if (!(buffer.readByte() === cbusPackage.PACKAGE_START && buffer.readByte() === cbusPackage.PACKAGE_START)) {
 				continue;
 			}
 			var start = buffer.offset - 2;
-			var headerBytes = buffer.copy(start, start + DataBusPackage.SIZE_OF_HEAD);
-			buffer.skip(DataBusPackage.SIZE_OF_HEAD - 2);
-			var header = DataBusPackage.decodeHeader(headerBytes);
+			var headerBytes = buffer.copy(start, start + cbusPackage.SIZE_OF_HEAD);
+			buffer.skip(cbusPackage.SIZE_OF_HEAD - 2);
+			var header = cbusPackage.decodeHeader(headerBytes);
 			packages.push(header);
 
-			if (header.getOffset() - DataBusPackage.SIZE_OF_HEAD > 0) {
-				buffer.skip(header.getOffset() - DataBusPackage.SIZE_OF_HEAD);
+			if (header.getOffset() - cbusPackage.SIZE_OF_HEAD > 0) {
+				buffer.skip(header.getOffset() - cbusPackage.SIZE_OF_HEAD);
 			}
 			var bodySize = header.getBodySize();
 			var bodyStart = buffer.offset;
@@ -135,21 +135,21 @@
 		return packages;
 	};
 
-    DataBusPackage.decodePackageInternal = function (packages, buffer) {
+    cbusPackage.decodePackageInternal = function (packages, buffer) {
     	var i = 0;
       while (buffer.remaining() > 0) {
-        if(buffer.remaining < DataBusPackage.SIZE_OF_HEAD) {
+        if(buffer.remaining < cbusPackage.SIZE_OF_HEAD) {
           break;
         }
 			  // read util 'P'
-        if (!(buffer.readByte() === DataBusPackage.PACKAGE_START && buffer.readByte() === DataBusPackage.PACKAGE_START)) {
+        if (!(buffer.readByte() === cbusPackage.PACKAGE_START && buffer.readByte() === cbusPackage.PACKAGE_START)) {
           continue;
         }
         var start = buffer.offset - 2;
-        var headerBytes = buffer.copy(start, start + DataBusPackage.SIZE_OF_HEAD);
-        buffer.skip(DataBusPackage.SIZE_OF_HEAD - 2);
-        var header = DataBusPackage.decodeHeader(headerBytes);
-        var offset  = header.getOffset() - DataBusPackage.SIZE_OF_HEAD;
+        var headerBytes = buffer.copy(start, start + cbusPackage.SIZE_OF_HEAD);
+        buffer.skip(cbusPackage.SIZE_OF_HEAD - 2);
+        var header = cbusPackage.decodeHeader(headerBytes);
+        var offset  = header.getOffset() - cbusPackage.SIZE_OF_HEAD;
         if (offset > 0) {
           buffer.skip(offset);
         }
@@ -165,13 +165,13 @@
         } else {
 					header.body = ByteBuffer.wrap(pako.inflate(new Uint8Array(bodyBytes.toArrayBuffer())));
         }
-        i += (DataBusPackage.SIZE_OF_HEAD + offset + bodySize);
+        i += (cbusPackage.SIZE_OF_HEAD + offset + bodySize);
         packages.push(header);
       }
       return i;
     }
 
-    DataBusPackage.decodePackage = function(buffer) {
+    cbusPackage.decodePackage = function(buffer) {
       var packages = [];
       if(buffer === undefined || buffer.remaining() === 0) {
         return packages;
@@ -192,8 +192,8 @@
       return packages;
     };
 
-	DataBusPackage.decodeHeader = function(buffer) {
-		var p = new DataBusPackage();
+	cbusPackage.decodeHeader = function(buffer) {
+		var p = new cbusPackage();
 		p.flag1 = buffer.readByte();
 		p.flag2 = buffer.readByte();
 		p.version = buffer.readByte();
@@ -211,12 +211,12 @@
 		return p;
 	};
 
-	DataBusPackage.PACKAGE_START = 80;
-	DataBusPackage.REQUEST = 1;
-	DataBusPackage.RESPONSE = 2;
-	DataBusPackage.Publish = 3;
-	DataBusPackage.SIZE_OF_HEAD = 0x1e;
+	cbusPackage.PACKAGE_START = 80;
+	cbusPackage.REQUEST = 1;
+	cbusPackage.RESPONSE = 2;
+	cbusPackage.Publish = 3;
+	cbusPackage.SIZE_OF_HEAD = 0x1e;
 	var recData = undefined;
 
-	return DataBusPackage;
+	return cbusPackage;
 });
