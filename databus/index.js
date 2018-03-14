@@ -110,6 +110,7 @@
           onclose: () => {},
           onerror: () => {}
         }
+        this.setReconnectIntervalSecond();
       }
     
       setClientName(name) {
@@ -133,6 +134,11 @@
         })
       }
 
+      // 设置重连间隔秒数，默认为5秒
+      setReconnectIntervalSecond(second = 5) {
+        databus.setReconnectIntervalSecond(second)
+      }
+
       setEvent(onopen, onclose, onerror) {
         this._event.onopen = onopen;
         this._event.onclose = onclose;
@@ -144,8 +150,8 @@
         const self = this
         return new Promise((resolve, reject) => {
           databus.connect(wsip, wsport, wspath || '', {
-              onConnectSuccess: function(event) {
-                self._event.onopen(event);
+              onConnectSuccess: function() {
+                self._event.onopen();
                 databus.setPushDataFactory(function(topic, content) {
                   self.dispatchPublishMessage(topic, content)
                 });

@@ -22,7 +22,9 @@
   var pushDataFactory = undefined;
   var mIp, mPort, mPath;
   var PREFIX_DATABUS = "DATABUS";
-  var PROTO_FILE_DIR = '/protobuf/'
+  var PROTO_FILE_DIR = '/protobuf/';
+  var reconnectAttempts = 0;
+  var reconnectIntervalSecond = 0;
 
   var Observer = function() {
     this.subscribers = [];			// 订阅者数组
@@ -82,6 +84,9 @@
     reconnect: function (options) {
       this.connect(mIp, mPort, mPath, options);
     },
+    setReconnectIntervalSecond: function(second) {
+      reconnectIntervalSecond = second;
+    },
     connect: function (ip, port, path, options) {
       mIp = ip;
       mPort = port;
@@ -104,12 +109,13 @@
       }
       ws.binaryType = "arraybuffer";
       ws.onopen = function () {
+        reconnectAttempts = 0;
         console.log("websocket connect success", ip, ":", port, path);
         if (settings.onConnectSuccess) {
           settings.onConnectSuccess();
         }
       };
-      var ref = this;
+      var self = this;
       ws.onmessage = function (evt) {
         if (typeof (evt.data) === "string") {
           console.log("Receive String Data");
@@ -128,8 +134,8 @@
         // 处理推送消息
         const handlePublish = (p) => {
           Promise.all([
-              ref.buildProtoObject("msgexpress", "MsgExpress.DataType"),
-              ref.buildProtoObject("msgexpress", "MsgExpress.PublishData")
+              self.buildProtoObject("msgexpress", "MsgExpress.DataType"),
+              self.buildProtoObject("msgexpress", "MsgExpress.PublishData")
           ]).then(values => {
             const DataType = values[0].values
             const publishObj = values[1]
@@ -172,14 +178,24 @@
               handlePublish(p)
             }
           } else {
-            ref.publishInfo(PREFIX_DATABUS, p.getSerialNumber(), p.body, p.getCommand() ? false : true);
+            self.publishInfo(PREFIX_DATABUS, p.getSerialNumber(), p.body, p.getCommand() ? false : true);
           }
         }
       };
       ws.onclose = function (event) {
-        console.log("websocket closed, code:" + event.code + ", reason:" + event.reason);
+        console.log("websocket closed, code:" + event.code);
         if (settings.onConnectClose) {
           settings.onConnectClose(event);
+        }
+
+        if (reconnectIntervalSecond > 0) {
+          // 间隔时间这次是上次的1.5倍
+          const time = reconnectIntervalSecond * Math.pow(1.5, reconnectAttempts) * 1000;
+          setTimeout(function() {
+            reconnectAttempts++;
+            console.log('reconnect..., interval: ' + time + ', times:' + reconnectAttempts);
+            self.connect(mIp, mPort, mPath, settings);
+          }, time)
         }
       };
       ws.onerror = function(event) {
