@@ -177,27 +177,29 @@ class Me extends React.Component {
         <SettingRow title="端口" value={localConfig.wsport} onPress={this._onPortPress} />
         <SettingRow title="用户名" value={localConfig.username} onPress={this._onUsernamePress} />
         <SettingRow title="密码" value={localConfig.password} password={true} onPress={this._onPasswordPress} />
-        <Button 
-          buttonStyle={styles.reconnect}
-          text="登出"
-          raised={false} 
-          onPress={this._onLogout} 
-          loadingProps={{ size: "large", color: "rgba(111, 202, 186, 1)" }}
-        />
-        <Button 
-          buttonStyle={styles.reconnect}
-          text="重新登录"
-          raised={false} 
-          onPress={this._onLogin} 
-          loading={this.state.loading}
-          loadingProps={{ size: "large", color: "rgba(111, 202, 186, 1)" }}
-        />
-        <Button 
-          buttonStyle={[styles.reconnect, {backgroundColor: 'red'}]}
-          text="退出"
-          raised={false} 
-          onPress={this._onExit} 
-        />
+        <View style={styles.buttonContainer}>
+          <Button 
+            buttonStyle={styles.reconnect}
+            text="登出"
+            raised={false} 
+            onPress={this._onLogout} 
+            loadingProps={{ size: "large", color: "rgba(111, 202, 186, 1)" }}
+          />
+          {/* <Button 
+            buttonStyle={styles.reconnect}
+            text="重新登录"
+            raised={false} 
+            onPress={this._onLogin} 
+            loading={this.state.loading}
+            loadingProps={{ size: "large", color: "rgba(111, 202, 186, 1)" }}
+          /> */}
+          <Button 
+            buttonStyle={[styles.reconnect, {backgroundColor: 'red'}]}
+            text="退出"
+            raised={false} 
+            onPress={this._onExit} 
+          />
+        </View>
         <ModifyOverlay data={overlayState} onChanged={this._onOverlayChanged}/>
       </View>
     )        
@@ -240,8 +242,13 @@ const styles = StyleSheet.create({
     color: 'grey'
   },
   reconnect: {
-    marginTop: 10,
-    width: 300
+    marginTop: 15,
+    width: '90%'
+  },
+  buttonContainer: {
+    flex: 1,
+    marginTop: 10
+    // justifyContent: 'flex-end',
   }
 })
 

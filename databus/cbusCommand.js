@@ -1,10 +1,10 @@
 (function(global, factory) {
-  if (typeof require === 'function' && typeof module === "object" && module && module["exports"])
-    module['exports'] = (function() {
-      return factory();
-  })();
-  else
+  // CommonJS, Global
+  if (typeof require === 'function' && typeof module === "object" && module && module["exports"]) {
+    module['exports'] = (function() { return factory(); })();
+  } else {
     global["cbusCommand"] = factory();
+  }
 })(this, function() {
   return {
     AppList: [
@@ -341,9 +341,39 @@
         }
       }
     ]
+  },
+  {
+    "$": {
+      "id": "320",
+      "name": "HelloServer",
+      "desc": ""
+    },
+    "function": [
+      {
+        "$": {
+          "id": "1",
+          "request": "HelloServer.HelloReq",
+          "response": "HelloServer.HelloRsp",
+          "desc": ""
+        }
+      },
+      {
+        "$": {
+          "id": "2",
+          "request": "HelloServer.HelloSub",
+          "response": "MsgExpress.CommonResponse",
+          "ispublish": "true",
+          "desc": ""
+        }
+      }
+    ]
   }
 ],
     ProtoFileList: [
+  {
+    "filename": "helloserver",
+    "package": "HelloServer"
+  },
   {
     "filename": "msgexpress",
     "package": "MsgExpress"

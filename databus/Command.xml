@@ -46,4 +46,8 @@
 	  <function id="14" request="Trade.Trade" response="MsgExpress.CommonResponse" ispublish="true" desc=""></function>
 	  <function id="15" request="Trade.ErrorInfo" response="MsgExpress.CommonResponse" ispublish="true" desc=""></function>
   </AppServer>
+   <AppServer id="320" name="HelloServer" desc="">
+    <function id="1" request="HelloServer.HelloReq" response="HelloServer.HelloRsp" desc=""></function>
+    <function id="2" request="HelloServer.HelloSub" response="MsgExpress.CommonResponse" ispublish="true" desc=""></function>
+  </AppServer> 
 </AppList>

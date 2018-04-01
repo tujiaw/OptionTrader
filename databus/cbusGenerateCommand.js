@@ -1,14 +1,13 @@
 var fs = require('fs'),
   xml2js = require('xml2js');
 
-
 let template = `(function(global, factory) {
-  if (typeof require === 'function' && typeof module === "object" && module && module["exports"])
-    module['exports'] = (function() {
-      return factory();
-  })();
-  else
+  // CommonJS, Global
+  if (typeof require === 'function' && typeof module === "object" && module && module["exports"]) {
+    module['exports'] = (function() { return factory(); })();
+  } else {
     global["cbusCommand"] = factory();
+  }
 })(this, function() {
   return {
     AppList: %AppList%,
@@ -17,7 +16,6 @@ let template = `(function(global, factory) {
 });`
 
 const parser = new xml2js.Parser();
-
 const xmlContent = fs.readFileSync(__dirname + '/Command.xml');
 parser.parseString(xmlContent, function (err, result) {
   if (err) {
@@ -45,12 +43,15 @@ parser.parseString(xmlContent, function (err, result) {
       console.error('file content error', file)
       continue;
     }
-    
+
     const end = content.indexOf(';', start + 1)
     if (end > start) {
       const arr = content.substring(start, end).split(' ')
       if (arr.length > 1) {
-        protoFileList.push({ filename: filename, package: arr[1]})
+        protoFileList.push({
+          filename: filename,
+          package: arr[1]
+        })
       }
     }
   }
@@ -58,14 +59,16 @@ parser.parseString(xmlContent, function (err, result) {
 
   // 删除先前的文件
   const dstFile = __dirname + '/cbusCommand.js';
-  fs.unlinkSync(dstFile);
-  console.log('---delete old cbusCommand.js---')
+  if (fs.existsSync(dstFile)) {
+    fs.unlinkSync(dstFile);
+    console.log('---delete old cbusCommand.js---')
+  }
 
   // 写入模板文件
   template = template.replace('%AppList%', JSON.stringify(appList, undefined, 2));
   template = template.replace('%ProtoFileList%', JSON.stringify(protoFileList, undefined, 2))
   const w = fs.createWriteStream(dstFile);
-  w.write(template, function(err, data) {
+  w.write(template, function (err) {
     if (err) {
       console.log(err);
     } else {
@@ -73,4 +76,3 @@ parser.parseString(xmlContent, function (err, result) {
     }
   })
 });
-

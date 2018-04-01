@@ -75,20 +75,14 @@ class Controller {
     const self = this
     console.log('start', config)
     return new Promise((resolve, reject) => {
-      cbus.open(config.wsip, config.wsport)
-      .then((json) => {
-        return cbus.subscribe([
-          'StockServer.StockDataRequest, StockServer.StockDataResponse',
-          'Trade.TradingAccount, MsgExpress.CommonResponse', 
-          'Trade.MarketData, MsgExpress.CommonResponse',
-          'Trade.Position, MsgExpress.CommonResponse',
-          'Trade.Order, MsgExpress.CommonResponse',
-          'Trade.Trade, MsgExpress.CommonResponse',
-          'Trade.ErrorInfo, MsgExpress.CommonResponse'
-        ], (data) => {
-          self.handleDispatch(data)
-        })
-      })
+      cbus.open(`ws://${config.wsip}:${config.wsport}`,[
+        'Trade.TradingAccount, MsgExpress.CommonResponse', 
+        'Trade.MarketData, MsgExpress.CommonResponse',
+        'Trade.Position, MsgExpress.CommonResponse',
+        'Trade.Order, MsgExpress.CommonResponse',
+        'Trade.Trade, MsgExpress.CommonResponse',
+        'Trade.ErrorInfo, MsgExpress.CommonResponse'
+      ])
       .then((json) => {
         console.log('subscribe result', json)
         return cbus.post('Trade.LoginReq', 'Trade.LoginResp', {

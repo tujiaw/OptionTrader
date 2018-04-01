@@ -112,7 +112,7 @@ class Edit extends React.Component {
         <Divider style={{ backgroundColor: 'grey' }} />
         <FlatList
           renderItem={this._renderItem}
-          keyExtractor={(item, index) => index}
+          keyExtractor={(item, index) => String(index)}
           data={list}
         />
       </View>
