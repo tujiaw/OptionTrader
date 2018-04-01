@@ -1,18 +1,26 @@
 import React from 'react'
+import { View } from 'react-native'
 import { Header, Button } from 'react-native-elements'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { CONNECT_STATUS } from '../constants'
 import { connect } from 'react-redux'
+import DebugLog from './DebugLog'
 import controller from '../controller'
 import _ from 'lodash'
 
 class MainHeader extends React.Component {
+  state = {
+    logVisible: false
+  }
+
   _onLeftPress = () => {
     if (this.props.title && this.props.title === '下单') {
       const newConfig = _.cloneDeep(this.props.localConfig)
       const newLock = (newConfig.lock && newConfig.lock === 'lock') ? 'unlock' : 'lock'
       Object.assign(newConfig, { lock: newLock })
       controller.updateLocalConfig(newConfig)
+    } else {
+      //this.setState({ logVisible: !this.state.logVisible})
     }
   }
 
@@ -47,41 +55,44 @@ class MainHeader extends React.Component {
     }
 
     return (
-      <Header
-      outerContainerStyles={styles.innerContainer}
-        leftComponent={<Button
-          onPress={this._onLeftPress}
-          text=''
-          icon={
-            <Icon
-              name={leftIconName}
-              size={15}
-              color='white'
-            />
-          }
-        />}
-        centerComponent={{ text: title, style: { fontSize: 17, color: '#fff' } }}
-        rightComponent={<Button
-          onPress={this._onRightPress}
-          text=''
-          loading={loading}
-          icon={
-            <Icon
-              name={rightIconName}
-              size={15}
-              color='white'
-            />
-          }
-          iconRight
-        />}
-      />
+      <View>
+        <Header
+        outerContainerStyles={styles.innerContainer}
+          leftComponent={<Button
+            onPress={this._onLeftPress}
+            text=''
+            icon={
+              <Icon
+                name={leftIconName}
+                size={15}
+                color='white'
+              />
+            }
+          />}
+          centerComponent={{ text: title, style: { fontSize: 17, color: '#fff' } }}
+          rightComponent={<Button
+            onPress={this._onRightPress}
+            text=''
+            loading={loading}
+            icon={
+              <Icon
+                name={rightIconName}
+                size={15}
+                color='white'
+              />
+            }
+            iconRight
+          />}
+        />
+        <DebugLog isVisible={this.state.logVisible} />
+      </View>
     )
   }
 }
 
 function mapStateToProps(state) {
   return {
-    localConfig: state.localConfig
+    localConfig: state.localConfig,
   }
 }
 

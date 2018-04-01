@@ -5,6 +5,7 @@ import orderData from './orderData'
 import tradeData from './tradeData'
 import tradeSetting from './tradeSetting'
 import localConfig from './localConfig'
+import debugLogData from './debugLogData'
 
 const reducers = combineReducers({
     capitalStateData,
@@ -12,7 +13,8 @@ const reducers = combineReducers({
     orderData,
     tradeData,
     tradeSetting,
-    localConfig
+    localConfig,
+    debugLogData
 })
 
 export default reducers

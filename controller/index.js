@@ -6,6 +6,7 @@ import * as marketAction from '../actions/marketAction'
 import * as orderAction from '../actions/orderAction'
 import * as tradeSettingAction from '../actions/tradeSettingAction'
 import * as localConfigAction from '../actions/localConfigAction'
+import * as debugLogAction from '../actions/debugLogAction'
 import { ToastAndroid, AsyncStorage } from 'react-native'
 import dispatchObj from './dispatch'
 import defaultConfig from '../config'
@@ -24,7 +25,8 @@ class Controller {
 
     cbus.initProtoJson([
       { name: 'msgexpress', json: require('../databus/protobuf/msgexpress.json') },
-      { name: 'trade', json: require('../databus/protobuf/trade.json') }
+      { name: 'trade', json: require('../databus/protobuf/trade.json') },
+      { name: 'stockserver', json: require('../databus/protobuf/stockserver.json') }
     ]);
 
     cbus.setEvent(
@@ -75,14 +77,7 @@ class Controller {
     const self = this
     console.log('start', config)
     return new Promise((resolve, reject) => {
-      cbus.open(`ws://${config.wsip}:${config.wsport}`,[
-        'Trade.TradingAccount, MsgExpress.CommonResponse', 
-        'Trade.MarketData, MsgExpress.CommonResponse',
-        'Trade.Position, MsgExpress.CommonResponse',
-        'Trade.Order, MsgExpress.CommonResponse',
-        'Trade.Trade, MsgExpress.CommonResponse',
-        'Trade.ErrorInfo, MsgExpress.CommonResponse'
-      ])
+      cbus.open(`ws://${config.wsip}:${config.wsport}`)
       .then((json) => {
         console.log('subscribe result', json)
         return cbus.post('Trade.LoginReq', 'Trade.LoginResp', {
@@ -96,7 +91,7 @@ class Controller {
         resolve(json)
       })
       .catch((err) => {
-        console.log(JSON.stringify(err))
+        console.error(JSON.stringify(err))
         reject(err)
       })
     })
@@ -263,6 +258,10 @@ class Controller {
         })
       }
     })
+  }
+
+  addLog(text) {
+    store.dispatch(debugLogAction.add(text))
   }
 }
 

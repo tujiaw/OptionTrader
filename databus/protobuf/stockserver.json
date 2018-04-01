@@ -1,0 +1,36 @@
+{
+  "nested": {
+    "StockServer": {
+      "nested": {
+        "TickData": {
+          "fields": {
+            "datetime": {
+              "rule": "required",
+              "type": "string",
+              "id": 1
+            },
+            "price": {
+              "rule": "required",
+              "type": "float",
+              "id": 2
+            },
+            "volume": {
+              "rule": "required",
+              "type": "float",
+              "id": 3
+            },
+            "amount": {
+              "rule": "required",
+              "type": "float",
+              "id": 4
+            },
+            "code": {
+              "type": "string",
+              "id": 5
+            }
+          }
+        }
+      }
+    }
+  }
+}

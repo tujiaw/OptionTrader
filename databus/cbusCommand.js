@@ -192,40 +192,17 @@
   },
   {
     "$": {
-      "id": "255",
-      "name": "StockInfoServer",
+      "id": "264",
+      "name": "RealTimeMarket",
       "desc": ""
     },
     "function": [
       {
         "$": {
-          "id": "1",
-          "request": "StockServer.StockDataRequest",
-          "response": "StockServer.StockDataResponse",
-          "desc": ""
-        }
-      },
-      {
-        "$": {
           "id": "2",
-          "request": "StockServer.IpoDataRequest",
-          "response": "StockServer.IpoDataResponse",
-          "desc": ""
-        }
-      },
-      {
-        "$": {
-          "id": "3",
-          "request": "StockServer.StockInfoRequest",
-          "response": "StockServer.StockInfoResponse",
-          "desc": ""
-        }
-      },
-      {
-        "$": {
-          "id": "4",
-          "request": "StockServer.NewStockDataRequest",
-          "response": "StockServer.NewStockDataResponse",
+          "request": "StockServer.TickData",
+          "response": "MsgExpress.CommonResponse",
+          "ispublish": "true",
           "desc": ""
         }
       }
@@ -371,12 +348,12 @@
 ],
     ProtoFileList: [
   {
-    "filename": "helloserver",
-    "package": "HelloServer"
-  },
-  {
     "filename": "msgexpress",
     "package": "MsgExpress"
+  },
+  {
+    "filename": "stockserver",
+    "package": "StockServer"
   },
   {
     "filename": "trade",
