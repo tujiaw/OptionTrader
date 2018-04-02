@@ -92,7 +92,7 @@ function mapDispatchToProps(dispatch) {
 
 const styles = {
   innerContainer: {
-    height: 80
+    height: 40
   },
   buttonIcon: {
     margin: 0,

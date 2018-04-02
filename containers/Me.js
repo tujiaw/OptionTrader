@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     color: 'grey'
   },
   reconnect: {
-    marginTop: 15,
+    marginTop: 10,
     width: '90%'
   },
   buttonContainer: {
