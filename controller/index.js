@@ -31,15 +31,17 @@ class Controller {
 
     cbus.setEvent(
       function onopen() {
-        console.log('onopen...............');
+        ToastAndroid.show('连接成功', ToastAndroid.SHORT);
       },
-      function onclose() {
-        console.log('onclose...............');
+      function onclose(event) {
+        ToastAndroid.show('连接关闭' + (event && event.code ? '（event.code）' : ''), ToastAndroid.SHORT);
       },
-      function onerror() {
-        console.log('onerror...............');
+      function onerror(event) {
+        ToastAndroid.show('连接出错', ToastAndroid.SHORT);
       }
     )
+
+    cbus.setPublish(this.dispatch.handle)
   }
 
   init() {

@@ -180,22 +180,14 @@ class Me extends React.Component {
         <View style={styles.buttonContainer}>
           <Button 
             buttonStyle={styles.reconnect}
-            text="登出"
+            title="登出"
             raised={false} 
             onPress={this._onLogout} 
             loadingProps={{ size: "large", color: "rgba(111, 202, 186, 1)" }}
           />
-          {/* <Button 
-            buttonStyle={styles.reconnect}
-            text="重新登录"
-            raised={false} 
-            onPress={this._onLogin} 
-            loading={this.state.loading}
-            loadingProps={{ size: "large", color: "rgba(111, 202, 186, 1)" }}
-          /> */}
           <Button 
             buttonStyle={[styles.reconnect, {backgroundColor: 'red'}]}
-            text="退出"
+            title="退出"
             raised={false} 
             onPress={this._onExit} 
           />

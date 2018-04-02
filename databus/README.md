@@ -68,7 +68,7 @@ cbus.post('HelloServer.HelloReq', 'HelloServer.HelloRsp', {
 * 使用protobufjs提供的命令行将proto文件转换为json文件，然后调用databus的initProtoJson接口初始化  
 
 ```
-pbjs -t json file1.proto file2.proto > bundle.json
+pbjs -t json msgexpress.proto > msgexpress.json
 ```
 > 原因是：react native中protobufjs没办法直接读取proto文件
 

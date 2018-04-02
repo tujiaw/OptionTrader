@@ -118,7 +118,7 @@ function updateTradeData(data) {
       const hqCode = htbl[item.code.substr(0, 2)]
       if (hqCode && hqCode.length && g_hqData[hqCode]) {
         const hq = g_hqData[hqCode];
-        item.spotPrice = hq.close;
+        item.spotPrice = hq.price;
         const dealPrice = parseFloat(item.dealPrice);
         const spotPrice = parseFloat(item.spotPrice);
         if (dealPrice && spotPrice && dealPrice >= 1 && spotPrice >= 1) {
@@ -140,8 +140,7 @@ setInterval(() => {
 }, 2000)
 
 const handlePublish = {
-  'Trade.TradingAccount': (data) => {
-    const { content } = data;
+  'Trade.TradingAccount': (content) => {
     const obj = {
       dynamicEquity: content.dDynamicEquity || 0 ,
       frozenCapital: content.dFrozenCapital || 0,
@@ -152,8 +151,7 @@ const handlePublish = {
     obj.avaiableCapital = Math.round(obj.avaiableCapital)
     store.dispatch(capitalStateAction.update(obj))
   },
-  'Trade.MarketData': (data) => {
-    const { content } = data;
+  'Trade.MarketData': (content) => {
     const code = content.szINSTRUMENT.trim()
     if (!(code && code.length)) {
       console.error('Trade.MarketData', content)
@@ -199,8 +197,7 @@ const handlePublish = {
     }
     updateTradeData(tradeData)
   },
-  'Trade.Order': (data) => {
-    const { content } = data;
+  'Trade.Order': (content) => {
     if (!(content.nOrderID)) {
       console.error('Trade.Order', content)
       return
@@ -231,8 +228,7 @@ const handlePublish = {
     const tips = `Order:(${code} ${dir} ${oper} ${content.dLimitPrice} ${state})`
     store.dispatch(tradeAction.updateTips({code: code, tips: tips}))
   },
-  'Trade.Trade': (data) => {
-    const { content } = data;
+  'Trade.Trade': (content) => {
     if (!(content.nOrderID)) {
       console.error('Trade.Trade', content)
       return
@@ -245,8 +241,7 @@ const handlePublish = {
     const tips = `Trade:(${code} ${dir} ${oper} ${content.dPrice})`
     store.dispatch(tradeAction.updateTips({code: code, tips: tips}))
   },
-  'Trade.Position': (data) => {
-    const { content } = data;
+  'Trade.Position': (content) => {
     const code = content.szINSTRUMENT.trim()
     if (!(code && code.length && content.hasOwnProperty('nTradeDir'))) {
       console.error('Trade.Position', content)
@@ -278,46 +273,15 @@ const handlePublish = {
     }
     store.dispatch(marketAction.update(marketData))
   },
-  'StockServer.StockDataRequest': (data) => {
-    const { content } = data;
-    if (_.isArray(content)) {
-      const hq = {}
-      _.each(content, item => {
-        let arr = [];
-        if (item.value && item.value.length) {
-          arr = item.value.split(',');
-        }
-        if (arr.length >= 5 && arr[0].trim().length) {
-          const code = arr[0].trim();
-          hq.code = code;
-          hq.close = arr[1].trim();
-          hq.lastClose = arr[2].trim();
-          hq.vol = arr[3].trim();
-          hq.amount = arr[4].trim();
-          hq.turnoverratio = arr[5].trim();
+  'StockServer.TickData': (data) => {
+    if (!(data.code && data.code.length)) {
+      return;
+    }
 
-          const strTime = arr[6].trim();
-          const hour = parseInt(strTime.substr(0, 2));
-          const minite = parseInt(strTime.substr(3, 2));
-          const second = parseInt(strTime.substr(6, 2));
-          let time = hour * 3600 + minite * 60 + second - 34200;
-          if (time < 0) {
-            time = 0;
-          } else if (time > 7200 && time <= 12600) {
-            time = 7200;
-          } else if (time > 12600) {
-            time -= 7200;
-          }
-          time = Math.min(time, 14400);
-          hq.time = time;
-
-          if (code.length && g_hqData[code]) {
-            Object.assign(g_hqData[code], hq);
-          } else {
-            g_hqData[code] = hq;
-          }
-        }
-      })
+    if (g_hqData[data.code]) {
+      Object.assign(g_hqData[data.code], data);
+    } else {
+      g_hqData[data.code] = data;
     }
   }
 }
@@ -363,9 +327,9 @@ const dispatchObj = {
     }
   },
   handle: (data) => {
-    if (data.request && handlePublish[data.request]) {
-      //console.log('publish', data.request);
-      handlePublish[data.request](data);
+    if (data.request && data.content && handlePublish[data.request]) {
+      console.log('publish', data.request);
+      handlePublish[data.request](data.content);
     }
   },
   getPosition: (code) => {

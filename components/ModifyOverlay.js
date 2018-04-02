@@ -40,8 +40,8 @@ export default class ModifyOverlay extends React.Component {
           value={this.state.inputText}
         />
         <View style={styles.buttons}>
-          <Button buttonStyle={styles.button} text="取消" onPress={this._onCancel} />
-          <Button buttonStyle={styles.button} text="确定" onPress={this._onOk} />
+          <Button buttonStyle={styles.button} title="取消" onPress={this._onCancel} />
+          <Button buttonStyle={styles.button} title="确定" onPress={this._onOk} />
         </View>
       </Overlay>
     )
