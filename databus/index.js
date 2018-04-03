@@ -510,7 +510,12 @@
         this._publishCallback(data);
       } else {
         data.old = false;
-        return this._cbusCore.buildProtoObject(cmdParse.getProtoFilename(proto.request), proto.request).then(Msg => {
+        const protoName = cmdParse.getProtoFilename(proto.request);
+        if (protoName.length === 0) {
+          return;
+        }
+
+        return this._cbusCore.buildProtoObject(protoName, proto.request).then(Msg => {
           try {
             data.content = Msg.decode(content)
             this._publishCallback(data);

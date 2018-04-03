@@ -19,6 +19,9 @@ import {
 class Controller {
   constructor(dispatch) {
     this.dispatch = dispatch
+    this.isStart = false;
+    this.lastConfig = null;
+
     setInterval(() => {
       store.dispatch(localConfigAction.updateReadyState(cbus.readyState()))
     }, 1000)
@@ -29,9 +32,24 @@ class Controller {
       { name: 'stockserver', json: require('../databus/protobuf/stockserver.json') }
     ]);
 
+    const self = this;
     cbus.setEvent(
       function onopen() {
-        ToastAndroid.show('连接成功', ToastAndroid.SHORT);
+        if (self.isStart && self.lastConfig) {
+          cbus.post('Trade.LoginReq', 'Trade.LoginResp', {
+            userid: self.lastConfig.username, 
+            passwd: self.lastConfig.password,
+            instruments: self.lastConfig.codeList
+          }).then((json) => {
+            if (json.retCode === 0) {
+              ToastAndroid.show('Trade登录成功', ToastAndroid.SHORT);    
+            } else if (json.msg) {
+              ToastAndroid.show('Trade登录失败：' + json.msg, ToastAndroid.SHORT);
+            }
+          })
+        } else {
+          ToastAndroid.show('连接成功', ToastAndroid.SHORT);
+        }
       },
       function onclose(event) {
         ToastAndroid.show('连接关闭' + (event && event.code ? '（event.code）' : ''), ToastAndroid.SHORT);
@@ -75,13 +93,14 @@ class Controller {
 
   start(config) {
     console.log('start', config);
+    this.lastConfig = config;
     this.dispatch.initTradeList(config.codeList, config.lock)
     const self = this
     console.log('start', config)
     return new Promise((resolve, reject) => {
       cbus.open(`ws://${config.wsip}:${config.wsport}`)
       .then((json) => {
-        console.log('subscribe result', json)
+        console.log('open result', json)
         return cbus.post('Trade.LoginReq', 'Trade.LoginResp', {
           userid: config.username, 
           passwd: config.password,
@@ -89,10 +108,12 @@ class Controller {
         })
       })
       .then((json) => {
-        console.log('login trade', json)
+        this.isStart = true;
+        console.log('login trade result', json)
         resolve(json)
       })
       .catch((err) => {
+        this.isStart = false;
         console.error(JSON.stringify(err))
         reject(err)
       })

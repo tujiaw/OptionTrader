@@ -118,9 +118,9 @@ function updateTradeData(data) {
       const hqCode = htbl[item.code.substr(0, 2)]
       if (hqCode && hqCode.length && g_hqData[hqCode]) {
         const hq = g_hqData[hqCode];
-        item.spotPrice = hq.price;
+        item.spotPrice = hq.price.toFixed(2);
         const dealPrice = parseFloat(item.dealPrice);
-        const spotPrice = parseFloat(item.spotPrice);
+        const spotPrice = item.spotPrice;
         if (dealPrice && spotPrice && dealPrice >= 1 && spotPrice >= 1) {
           item.futuresMinusPostPrice = '' + parseInt(dealPrice - spotPrice)
         }
@@ -274,7 +274,7 @@ const handlePublish = {
     store.dispatch(marketAction.update(marketData))
   },
   'StockServer.TickData': (data) => {
-    if (!(data.code && data.code.length)) {
+    if (!(data.code && data.code.length && data.price !== undefined)) {
       return;
     }
 
