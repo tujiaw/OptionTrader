@@ -363,20 +363,14 @@
       this.observer = new Observer();
     }
 
-    reset() {
+    close() {
       if (this.ws) {
         this.ws.onopen = function () {}
         this.ws.onmessage = function () {}
         this.ws.onclose = function () {}
         this.ws.onerror = function() {}
-        this.ws = undefined;
-      }
-    }
-
-    close() {
-      if (this.ws) {
         this.ws.close()
-        this.reset();
+        this.ws = undefined;
       }
     }
 
@@ -402,7 +396,6 @@
 
     connect(wsurl, opts) {
       var self = this;
-      this.reset();
       this.setConnectOptions(opts);
       console.log('websocket connect to:' + wsurl);
       if (global.WebSocket) {

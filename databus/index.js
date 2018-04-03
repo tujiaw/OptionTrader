@@ -35,7 +35,8 @@
       this._event = {                         // 网络事件回调
         onConnectSuccess: () => {},
         onConnectClose: () => {},
-        onConnectError: () => {}
+        onConnectError: () => {},
+        onLoginResult: () => {}
       }
     }
 
@@ -101,7 +102,7 @@
      * @param {(event) => {})} onerror 网络出错回调
      * @memberof ClientBus
      */
-    setEvent(onopen, onclose, onerror) {
+    setEvent(onopen, onclose, onerror, onlogin) {
       if (onopen && typeof onopen !== 'function') {
         throw new TypeError('onopen must be a function');
       }
@@ -111,9 +112,13 @@
       if (onerror && typeof onerror !== 'function') {
         throw new TypeError('onerror must be a function');
       }
+      if (onlogin && typeof onlogin !== 'function') {
+        throw new TypeError('onlogin must be a function');
+      }
       this._event.onConnectSuccess = onopen;
       this._event.onConnectClose = onclose;
       this._event.onConnectError = onerror;
+      this._event.onLoginResult = onlogin;
     }
 
     /**
@@ -213,10 +218,12 @@
       const loop = (failedCount, failedMsg) => {
         self._cbusCore.close();
         if (failedCount >= self._wsurlList.length) {
+          self._event.onLoginResult(failedMsg);
           return Promise.reject(failedMsg);
         } else {
           return go().then(() => {
             self.startHeartBeat();
+            self._event.onLoginResult('success');
             return Promise.resolve('success');
           }).catch((msg) => {
             return loop(++failedCount, msg);
