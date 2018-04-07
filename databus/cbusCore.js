@@ -256,10 +256,12 @@
       var i = 0;
       while (buffer.remaining() > 0) {
         if (buffer.remaining < pack.SIZE_OF_HEAD) {
+          console.error('remaining:' + buffer.remaining);
           break;
         }
         // 每个包的头两个字节都是80，即'P'
         if (!(buffer.readByte() === pack.PACKAGE_START && buffer.readByte() === pack.PACKAGE_START)) {
+          console.error("package start is not 'P'");
           continue;
         }
         var start = buffer.offset - 2;
@@ -274,6 +276,7 @@
         var bodyStart = buffer.offset;
         var bodyBytes = buffer.copy(bodyStart, bodyStart + bodySize);
         if (buffer.remaining < bodySize) {
+          console.error('remaining:' + buffer.remaining + ', body size:' + bodySize);
           break;
         }
         buffer.skip(bodySize);

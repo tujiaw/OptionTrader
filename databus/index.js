@@ -115,10 +115,10 @@
       if (onlogin && typeof onlogin !== 'function') {
         throw new TypeError('onlogin must be a function');
       }
-      this._event.onConnectSuccess = onopen;
-      this._event.onConnectClose = onclose;
-      this._event.onConnectError = onerror;
-      this._event.onLoginResult = onlogin;
+      onopen && (this._event.onConnectSuccess = onopen);
+      onclose && (this._event.onConnectClose = onclose);
+      onerror && (this._event.onConnectError = onerror);
+      onlogin && (this._event.onLoginResult = onlogin);
     }
 
     /**
