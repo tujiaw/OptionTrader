@@ -1,9 +1,116 @@
 package StockServer;
 
+option java_package = "com.protobuf";
+option java_outer_classname = "StockServer";
+
+enum Period {
+	DAY = 1;
+	WEEK = 2;
+	MONTH = 3;
+	YEAR = 4;
+}
+
+message StockData {
+	required string datetime = 1;
+	required float open = 2;
+	required float close = 3;
+	required float low = 4;
+	required float high = 5;
+	required float volume = 6;
+	required float amount = 7;
+	optional float lastclose =8;// 昨收
+
+}
+
+//如果from和to都是0，则查最新的num条数据，如果from有值，to=0，则从from（包含）开始查num条数据，如果from=0，to有值，则从to（包含）向前查num条数据
+message StockDataRequest {
+	required string code = 1;				//股票代码,带前缀，cf，sz，sh等
+	required int32  type = 2;
+	required Period per = 3;				//周期
+	optional string from = 4[default = "0"];	//从哪一日开始查询
+	optional string to = 5[default = "0"];	//查询截止日期
+	optional int32 num = 6[default = 20];	//要查询的条数
+}
+
+message StockDataResponse {
+	required string code = 1;				//股票代码
+	required Period per = 2;				//周期
+	repeated StockData data = 3;
+}
+
 message TickData {
-    required string datetime = 1;
-    required float price = 2;
-    required float volume = 3;
-    required float amount = 4;
-    optional string code = 5;
+    required string datetime=1;
+	required float price=2; //价格
+	required float volume = 3;
+	required float amount = 4;
+	optional string code = 5;	
+}
+
+message TickDataRequest {
+	required string code = 1;				//股票代码,带前缀，cf，sz，sh等
+	required string datetime = 2;           //格式2016-09-21
+}
+
+message TickDataResponse {
+	required string code = 1;				//股票代码
+	repeated TickData data = 2;
+}
+
+message StockInfo {
+    required string code = 1;	
+    required string name = 2;
+    optional float per   = 3;
+    optional float pb    = 4;
+    optional float mktcap= 5;
+    optional float nmc   = 6;	
+}
+
+message StockInfoRequest {
+	required int32 type = 1;				//0表示股票，1表示指数，
+}
+
+message StockInfoResponse {
+	repeated StockInfo data = 1;				//
+}
+
+message NewStockDataRequest {
+	optional string dummy = 1;				//
+}
+
+message NewStockInfo {
+    required string code = 1;				//股票代码
+	required string name = 2;
+	optional string applyupper=3;  //申购上限
+	optional string ipoprice=4; //发行价格
+	optional string listdate=5; //上市日期
+	optional string lotteryrate=6; //中签率
+	optional string peratio=7;  //市盈率
+	optional string industryratio=8;  //行业平均市盈率
+	optional int32  tradingnum=9; //
+	optional float  tradingrange=10;//
+	optional float  retreatrange=11; //
+	optional float  secondrange=12;//
+}
+
+message NewStockDataResponse {
+	repeated NewStockInfo data = 1;				//
+}
+
+message IpoDataRequest {
+	optional string dummy = 1;				//
+}
+
+message IpoInfo {
+    required string code = 1;				//股票代码
+	required string name = 2;
+	optional string applycode=3;  //申购代码
+	optional string applyupper=4;  //申购上限
+	optional string ipoprice=5; //发行价格
+	optional string listdate=6; //上市日期
+	optional string peratio=7;  //市盈率
+	optional string industryratio=8;  //行业平均市盈率
+}
+
+message IpoDataResponse {
+	repeated IpoInfo data = 1;				//
 }

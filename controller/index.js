@@ -43,19 +43,22 @@ class Controller {
         ToastAndroid.show('连接出错', ToastAndroid.SHORT);
       },
       function onlogin(result) {
-        if (result && result === 'success' && self.lastConfig) {
-          cbus.post('Trade.LoginReq', {
-            userid: self.lastConfig.username, 
-            passwd: self.lastConfig.password,
-            instruments: self.lastConfig.codeList
-          }).then((json) => {
-            if (json.retCode !== 0) {
-              ToastAndroid.show('Trade登录失败：' + json.msg, ToastAndroid.SHORT);   
-            }
-          }).catch(err => {
-            ToastAndroid.show('Trade登录失败' + err ? (':' + err) : '', ToastAndroid.SHORT);
-          })
-        }
+        setTimeout(() => {
+          console.log('onlogin result', result);
+          if (result && result === 'success' && self.lastConfig) {
+            cbus.post('Trade.LoginReq', {
+              userid: self.lastConfig.username, 
+              passwd: self.lastConfig.password,
+              instruments: self.lastConfig.codeList
+            }).then((json) => {
+              if (json.retCode !== 0) {
+                ToastAndroid.show('Trade登录失败：' + json.msg, ToastAndroid.SHORT);   
+              }
+            }).catch(err => {
+              ToastAndroid.show('Trade登录失败' + err ? (':' + err) : '', ToastAndroid.SHORT);
+            })
+          }
+        }, 2000);
       }
     )
 
