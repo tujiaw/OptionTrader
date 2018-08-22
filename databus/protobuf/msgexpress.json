@@ -30,7 +30,10 @@
             "args": {
               "rule": "repeated",
               "type": "string",
-              "id": 2
+              "id": 2,
+              "options": {
+                "packed": false
+              }
             }
           }
         },
@@ -52,6 +55,22 @@
             "msg": {
               "type": "string",
               "id": 2
+            }
+          }
+        },
+        "RegisterService": {
+          "fields": {
+            "serviceid": {
+              "type": "int32",
+              "id": 1
+            },
+            "functions": {
+              "rule": "repeated",
+              "type": "string",
+              "id": 2,
+              "options": {
+                "packed": false
+              }
             }
           }
         },
@@ -190,7 +209,8 @@
             "appinfo": {
               "rule": "repeated",
               "type": "AppInfo",
-              "id": 1
+              "id": 1,
+              "options": {}
             }
           }
         },
@@ -265,12 +285,18 @@
             "value": {
               "rule": "repeated",
               "type": "bytes",
-              "id": 3
+              "id": 3,
+              "options": {
+                "packed": false
+              }
             },
             "strVal": {
               "rule": "repeated",
               "type": "string",
-              "id": 4
+              "id": 4,
+              "options": {
+                "packed": false
+              }
             },
             "iVal": {
               "rule": "repeated",
@@ -331,7 +357,10 @@
             "rawVal": {
               "rule": "repeated",
               "type": "bytes",
-              "id": 12
+              "id": 12,
+              "options": {
+                "packed": false
+              }
             },
             "tVal": {
               "rule": "repeated",
@@ -386,7 +415,8 @@
             "value": {
               "rule": "repeated",
               "type": "ConditionValue",
-              "id": 3
+              "id": 3,
+              "options": {}
             }
           }
         },
@@ -417,12 +447,14 @@
             "condition": {
               "rule": "repeated",
               "type": "DataItem",
-              "id": 3
+              "id": 3,
+              "options": {}
             },
             "excondition": {
               "rule": "repeated",
               "type": "ConditionItem",
-              "id": 4
+              "id": 4,
+              "options": {}
             },
             "index": {
               "rule": "repeated",
@@ -462,12 +494,14 @@
             "unsub": {
               "rule": "repeated",
               "type": "UnSubscribeData",
-              "id": 1
+              "id": 1,
+              "options": {}
             },
             "sub": {
               "rule": "repeated",
               "type": "SubscribeData",
-              "id": 2
+              "id": 2,
+              "options": {}
             }
           }
         },
@@ -481,7 +515,8 @@
             "item": {
               "rule": "repeated",
               "type": "DataItem",
-              "id": 2
+              "id": 2,
+              "options": {}
             },
             "subid": {
               "rule": "repeated",

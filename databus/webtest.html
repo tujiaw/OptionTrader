@@ -6,19 +6,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>databus web test</title>
+  <script src="./dist/bytebuffer.min.js"></script>
+  <script src="./dist/long.min.js"></script>
+  <script src="./dist/pako.min.js"></script>
+  <script src="./dist/protobuf.min.js"></script>
+  <script src="./cbusCore.js"></script>
+  <script src="./index.js"></script>
 </head>
 
 <body>
   <button id="open" type="button">open</button>
   <button id="hello" type="button">hello</button>
-
-  <script src="./dist/bytebuffer.min.js"></script>
-  <script src="./dist/long.min.js"></script>
-  <script src="./dist/pako.min.js"></script>
-  <script src="./dist/protobuf.min.js"></script>
-  <script src="./cbusCommand.js"></script>
-  <script src="./cbusCore.js"></script>
-  <script src="./index.js"></script>
   <script>
     var openBtn = document.getElementById('open');
     var helloBtn = document.getElementById('hello');
@@ -27,9 +25,10 @@
       appendLog(data);
     })
 
+    // ws://47.100.7.224:8080
+    // ws://172.16.74.59:5820
     openBtn.onclick = function () {
-      cbus.open('ws://172.16.66.87:1111', [
-          'HelloServer.HelloSub, MsgExpress.CommonResponse',
+      cbus.open('ws://47.100.7.224:8080', [
         ])
         .then(json => {
           appendLog('open ' + json)
@@ -40,8 +39,11 @@
     }
 
     helloBtn.onclick = function () {
-      cbus.post('HelloServer.HelloReq', 'HelloServer.HelloRsp', {
-        name: String(new Date().getTime())
+      cbus.post('Test.Hello', {
+        i: 1,
+        l: 2,
+        f: 3.15,
+        str: String(new Date().getTime())
       }).then(json => {
         appendLog(json);
       }).catch(err => {

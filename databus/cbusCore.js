@@ -1,6 +1,6 @@
 (function (global, factory) {
-  // CommonJS, Global
-  if (typeof require === 'function' && typeof module === "object" && module && module["exports"]) {
+  /* CommonJS */
+  if (typeof require === 'function' && typeof module === "object" && module && module["exports"])
     module['exports'] = (function () {
       var ProtoBuf = require("protobufjs");
       var Long = require("long");
@@ -8,9 +8,9 @@
       ProtoBuf.configure();
       return factory(ProtoBuf, require('bytebuffer'), require('pako'));
     })();
-  } else {
+  /* Global */
+  else
     global["CBusCore"] = factory(global.protobuf, global.dcodeIO.ByteBuffer, global.pako);
-  }
 })(this, function (ProtoBuf, ByteBuffer, pako) {
   var global = this;                        // 当前环境
   var g_serial = 65536;                     // 发送消息的起始序号
@@ -36,7 +36,7 @@
           for (let i = 0; i < fnCount; i++) {
             const fnObj = this.subscribers[key][i]
             if (fnObj) {
-              if (this.responseTimeout > 0 && (curTime - fnObj.time >= this.responseTimeout * 1000)) {
+              if (this.responseTimeout > 0 && (curTime - fnObj.time > this.responseTimeout * 1000)) {
                 fnObj.fn('timeout', true);
               }
             } else {
@@ -48,7 +48,7 @@
             delete this.subscribers[key];
           }
         }
-      }, 2000);
+      }, 1000);
     }
     setResponseTimeoutSecond(second) {
       this.responseTimeout = second;
@@ -75,7 +75,6 @@
       const fnNumber = this.subscribers[evt].length - 1;
       return '{"evt":"' + evt + '","fn":"' + fnNumber + '"}';
     }
-
     /**
      * 响应应答，执行回调
      * 
@@ -122,26 +121,61 @@
   }
 
   /**
-   * 封包，拆包（包体除外，由protobufjs来处理）
+   * 封包，拆包（包体除外，由protobufjs来处理）包头总共44字节
    */
+  
   const cbusPackage = (function (ByteBuffer, pako) {
     var pack = function () {
-      this.flag1 = pack.PACKAGE_START;
-      this.flag2 = pack.PACKAGE_START;
-      this.version = 1;
-      this.type = pack.REQUEST;
-      this.off = pack.SIZE_OF_HEAD;
-      this.options = 0;
-      this.codeinfo = 0;
-      this.reserve1 = 0;
-      this.serialNum = 0;
-      this.bodysize = 0;
-      this.srcaddr = 0;
-      this.dstaddr = 0;
-      this.command = 0;
+      this.flag1 = pack.PACKAGE_START;        // 1 数据包开始标识
+      this.flag2 = pack.PACKAGE_START;        // 1 数据包开始标识
+      this.crc = 0;                           // 1 crc校验
+      this.version = 1;                       // 1 版本号，1
+      this.type = pack.REQUEST;               // 1 数据包类型MsgType
+      this.offset = pack.SIZE_OF_HEAD;        // 1 数据块的偏移量
+      this.options = 0;                       // 2 开关项
+      // union {
+      //   unsigned short options_;     //开关项
+      //   struct {
+      //     unsigned char hasext_ : 1; //是否有扩展数据
+      //     unsigned char needreply_ : 1;//Publish消息时是否需要应答
+      //     unsigned char protocol_ : 2;//数据序列化协议，0表示protobuf，1表示json
+      //     unsigned char ismulticast_ : 1; //是否组播
+      //     unsigned char issequence_ : 1; //是否时序消息
+      //     unsigned char loadbalance_ : 2;
+      //     unsigned char ispriority_ : 1;//是否优先处理
+      //     unsigned char reserve_ : 7;
+      //   };
+      // };
+      this.codeinfo = 0;                        // 2
+      // union
+      // {
+      //   unsigned short codeinfo_;
+      //   struct {
+      //     unsigned short isencrypt_ : 1;//是否加密
+      //     unsigned short iszip_ : 1;//是否压缩
+      //     unsigned short encrypt_ : 4;//加密算法
+      //     unsigned short compratio_ : 10;//压缩比
+      //   };
+      // };
+      this.multipageinfo = 0;                  // 2 
+      // union {
+      //   unsigned short multipageinfo_;
+      //   struct {
+      //     unsigned short ismultipage_ : 1; //是否分包
+      //     unsigned short pageno_ : 15;//包编号,从1开始编号，0表示最后一个包
+      //   };
+      // };
+      this.serialNum = 0;                     // 4 流水号
+      this.bodysize = 0;                      // 4 数据包体大小
+      this.srcaddr = 0;                       // 4 源地址
+      this.dstaddr = 0;                       // 4 目标地址
+      this.command = 0;                       // 4 命令，全局唯一
+      this.code = 0;                          // 2
+      this.other = 0;                         // 2
+      this.brokertrace = [0, 0, 0, 0, 0, 0, 0, 0]; // 8
       this.body = null;
-      this.shortCode = 0;
     };
+
     pack.prototype.setSerialNumber = function (serialNum) {
       this.serialNum = serialNum;
     };
@@ -161,7 +195,7 @@
       return this.command;
     };
     pack.prototype.getOffset = function () {
-      return this.off;
+      return this.offset;
     };
     pack.prototype.getBodySize = function () {
       return this.bodysize;
@@ -170,18 +204,11 @@
       this.bodysize = bodysize;
     };
     pack.prototype.getIsZip = function () {
-      return (this.codeinfo & 0x1) === 1;
+      return (this.codeinfo & 0x2) === 2;
     };
     pack.prototype.getType = function () {
       return this.type;
     };
-
-    pack.prototype.isPublishNewMsg = function () {
-      if (this.options && (((this.options >> 7) & 1) === 1)) {
-        return true
-      }
-      return false
-    }
 
     /**
      * 封包，头部30字节+包体
@@ -199,53 +226,40 @@
       var buffer = new ByteBuffer(pack.SIZE_OF_HEAD + pk.getBodySize());
       buffer.writeByte(pk.flag1);
       buffer.writeByte(pk.flag2);
+      buffer.writeByte(pk.crc);
       buffer.writeByte(pk.version);
       buffer.writeByte(pk.type);
-      buffer.writeByte(pk.off);
-      buffer.writeByte(pk.options);
-      buffer.writeByte(pk.codeinfo);
-      buffer.writeByte(pk.reserve1);
+      buffer.writeByte(pk.offset);
+      buffer.writeUint16(pk.options);
+      buffer.writeUint16(pk.codeinfo);
+      buffer.writeUint16(pk.multipageinfo);
       buffer.writeInt(pk.serialNum);
       buffer.writeInt(pk.bodysize);
       buffer.writeInt(pk.srcaddr);
       buffer.writeInt(pk.dstaddr);
       buffer.writeInt(pk.command);
-      buffer.writeInt16(pk.shortCode);
+      buffer.writeUint16(pk.code);
+      buffer.writeUint16(pk.other);
+      for (let i = 0; i < pk.brokertrace.length; i++) {
+        buffer.writeByte(pk.brokertrace[i]);
+      }
+
+      // 计算消息头CRC
+      const CRC_POS = 3;
+      for (let i = CRC_POS; i < pack.SIZE_OF_HEAD; i++) {
+        pk.crc += buffer.view[i];
+        pk.crc &= 0xFF;
+      }
+      // 重新写入CRC
+      buffer.writeByte(pk.crc, CRC_POS - 1);
+      
       if (pk.body) {
         pk.body.copyTo(buffer, buffer.offset, pk.body.offset, pk.body.limit)
       }
+
       buffer.offset = 0;
       return buffer;
     }
-
-    pack.decodePackage1 = function (buffer) {
-      var packages = [];
-      while (buffer.remaining() > 0) {
-        // read util 'P'
-        if (!(buffer.readByte() === pack.PACKAGE_START && buffer.readByte() === pack.PACKAGE_START)) {
-          continue;
-        }
-        var start = buffer.offset - 2;
-        var headerBytes = buffer.copy(start, start + pack.SIZE_OF_HEAD);
-        buffer.skip(pack.SIZE_OF_HEAD - 2);
-        var header = pack.decodeHeader(headerBytes);
-        packages.push(header);
-
-        if (header.getOffset() - pack.SIZE_OF_HEAD > 0) {
-          buffer.skip(header.getOffset() - pack.SIZE_OF_HEAD);
-        }
-        var bodySize = header.getBodySize();
-        var bodyStart = buffer.offset;
-        var bodyBytes = buffer.copy(bodyStart, bodyStart + bodySize);
-        buffer.skip(bodySize);
-        if (!header.getIsZip()) {
-          header.body = bodyBytes;
-        } else {
-          header.body = ByteBuffer.wrap(pako.inflate(new Uint8Array(bodyBytes.toArrayBuffer())));
-        }
-      }
-      return packages;
-    };
 
     /**
      * 拆包，先拆头部30个字节，获取包体大小，然后再获取包体的二进制流（后面会用protobuf来解析）
@@ -256,12 +270,10 @@
       var i = 0;
       while (buffer.remaining() > 0) {
         if (buffer.remaining < pack.SIZE_OF_HEAD) {
-          console.error('remaining:' + buffer.remaining);
           break;
         }
         // 每个包的头两个字节都是80，即'P'
         if (!(buffer.readByte() === pack.PACKAGE_START && buffer.readByte() === pack.PACKAGE_START)) {
-          console.error("package start is not 'P'");
           continue;
         }
         var start = buffer.offset - 2;
@@ -276,7 +288,6 @@
         var bodyStart = buffer.offset;
         var bodyBytes = buffer.copy(bodyStart, bodyStart + bodySize);
         if (buffer.remaining < bodySize) {
-          console.error('remaining:' + buffer.remaining + ', body size:' + bodySize);
           break;
         }
         buffer.skip(bodySize);
@@ -325,26 +336,31 @@
       var p = new pack();
       p.flag1 = buffer.readByte();
       p.flag2 = buffer.readByte();
+      p.crc = buffer.readByte();
       p.version = buffer.readByte();
       p.type = buffer.readByte();
-      p.off = buffer.readByte();
-      p.options = buffer.readByte();
-      p.codeinfo = buffer.readByte();
-      p.reserve1 = buffer.readByte();
+      p.offset = buffer.readByte();
+      p.options = buffer.readUint16();
+      p.codeinfo = buffer.readUint16();
+      p.multipageinfo = buffer.readUint16();
       p.serialNum = buffer.readInt();
       p.bodysize = buffer.readInt();
       p.srcaddr = buffer.readInt();
       p.dstaddr = buffer.readInt();
       p.command = buffer.readInt();
-      p.shortCode = buffer.readInt16();
+      p.code = buffer.readUint16();
+      p.other = buffer.readUint16();
+      for (let i = 0; i < p.brokertrace.length; i++) {
+        p.brokertrace[i] = buffer.readByte();
+      }
       return p;
     };
 
-    pack.PACKAGE_START = 80;
+    pack.PACKAGE_START = 94;
     pack.REQUEST = 1;
     pack.RESPONSE = 2;
     pack.Publish = 3;
-    pack.SIZE_OF_HEAD = 0x1e;
+    pack.SIZE_OF_HEAD = 44;
     var recData = undefined;
     return pack;
   })(ByteBuffer, pako);
@@ -353,7 +369,8 @@
    * 通信核心类
    */
   class CBusCore {
-    constructor() {
+    constructor(cmdParse) {
+      this.cmdParse = cmdParse;
       this.ws = undefined; // WebSocket
       this.enableReconnect = false; // 是否可以进行重连
       this.pushDataFactory = undefined; // 处理推送的消息
@@ -371,9 +388,8 @@
         this.ws.onopen = function () {}
         this.ws.onmessage = function () {}
         this.ws.onclose = function () {}
-        this.ws.onerror = function() {}
         this.ws.close()
-        this.ws = undefined;
+        this.ws = undefined
       }
     }
 
@@ -405,64 +421,9 @@
         this.ws = new global.WebSocket(wsurl);
       } else if (global.MozWebSocket) {
         this.ws = new global.MozWebSocket(wsurl);
-      } else if (typeof require === 'function') {
-        global.WebSocket = require('websocket').w3cwebsocket;
-        this.ws = new global.WebSocket(wsurl);
       } else {
         console.log("No Support WebSocket..."); // fixme
         return;
-      }
-
-      /**
-       * 解析老的方式推送的包
-       * @param {package} p 
-       */
-      const handleOldPublish = function (p) {
-        Promise.all([
-          self.buildProtoObject("msgexpress", "MsgExpress.DataType"),
-          self.buildProtoObject("msgexpress", "MsgExpress.PublishData")
-        ]).then(values => {
-          const DataType = values[0].values
-          const publishObj = values[1]
-          const msg = publishObj.decode(p.body.view)
-          if (msg && msg.item) {
-            let content = []
-            for (let j = 0; j < msg.item.length; j++) {
-              let item = msg.item[j];
-              let key = item.key;
-              let type = item.type;
-              let value = item.value[0];
-              if (type === DataType.STRING) {
-                value = item.strVal[0];
-              } else if (type === DataType.INT64) {
-                value = item.lVal[0];
-              } else if (type === DataType.UINT64) {
-                value = item.ulVal[0];
-              } else if (type === DataType.INT32) {
-                value = item.iVal[0];
-              } else if (type === DataType.UINT32) {
-                value = item.uiVal[0];
-              } else if (type === DataType.FLOAT) {
-                value = item.fVal[0];
-              } else if (type === DataType.DOUBLE) {
-                value = item.fVal[0];
-              } else if (type === DataType.DATETIME) {
-                value = item.tVal[0];
-              } else if (type === DataType.BINARY) {
-                value = item.rawVal[0].toString("binary");
-              }
-              content.push({
-                key: key,
-                value: value
-              });
-            }
-            if (self.pushDataFactory && content.length) {
-              self.pushDataFactory(msg.topic, content);
-            }
-          }
-        }).catch(err => {
-          console.error(err);
-        })
       }
 
       /**
@@ -501,21 +462,12 @@
 
         for (let i = 0, count = packages.length; i < count; i++) {
           const p = packages[i];
-          // for nodejs
-          if (!p.body.view && p.body.buffer) {
-            p.body.view = p.body.buffer
-          }
-          
           if (p.getType() === cbusPackage.Publish) {
-            if (p.isPublishNewMsg()) {
-              if (self.pushDataFactory) {
-                self.pushDataFactory(p.getCommand(), p.body.view)
-              }
-            } else {
-              handleOldPublish(p)
+            if (self.pushDataFactory) {
+              self.pushDataFactory(p.getCommand(), p.body.view)
             }
           } else {
-            self.publishInfo(PREFIX_DATABUS, p.getSerialNumber(), p.body, p.getCommand() ? false : true);
+            self.publishInfo(PREFIX_DATABUS, p.getSerialNumber(), p.body, p.getCommand());
           }
         }
       };
@@ -593,7 +545,7 @@
     }
 
     // 序列化包体
-    requestOnce(cmd, proto_package, proto_request, proto_response, callback) {
+    requestOnce(cmd, proto_package, proto_request, callback) {
       return this.buildProtoObject(proto_package, proto_request).then((obj) => {
         var payload = {}
         callback.fillRequest(payload);
@@ -612,57 +564,54 @@
         buffer = new Uint8Array(buffer)
         // 包装成ByteBuffer
         var binary = ByteBuffer.wrap(buffer, "binary");
-        if (!this.sendmsg(cmd, binary, proto_package, proto_response, callback)) {
-          return Promise.reject('send msg failed');
-        }
-        return Promise.resolve();
+        return this.sendmsg(cmd, binary, proto_package, callback, false);
       })
     }
 
     // 序列化整个包，设置应答回调，发送消息
-    sendmsg(cmd, byteBuffer, proto_package, proto_response, callback) {
+    sendmsg(cmd, byteBuffer, proto_package, callback, forever) {
       var serialnum = g_serial++;
       var pack;
       try {
         pack = cbusPackage.encodePackage(serialnum, cmd, byteBuffer);
       } catch (err) {
         console.error(serialnum, cmd, err)
-        return false;
+        return Promise.reject(err);
       }
 
-      if (!(this.ws && this.ws.readyState === 1)) {
-        console.error('ready state is not open')
-        return false;
-      }
-
-      const self = this
-      this.subscribeInfo(PREFIX_DATABUS, serialnum, function (info, iserror) {
-        if (iserror === undefined || !iserror) { // 处理应答
-          self.buildProtoObject(proto_package, proto_response).then(obj => {
-            try {
-              const msg = obj.decode(info.view);
-              callback.handleResponse(msg);
-            } catch (e) {
-              console.error(proto_response, e)
-            }
-          })
-        } else if (callback.handlerError) { // 处理错误
-          if (info instanceof ByteBuffer) {
-            self.buildProtoObject("msgexpress", "MsgExpress.ErrMessage").then(obj => {
-              try {
-                const msg = obj.decode(info.view);
-                callback.handlerError(msg);
-              } catch (e) {
-                console.error('ErrMessage', e)
+      if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+        if (forever === undefined || !forever) {
+          const self = this
+          this.subscribeInfo(PREFIX_DATABUS, serialnum, function (info, command) {
+            const protoName = self.cmdParse.getProtoFileName(command);
+            const className = self.cmdParse.getClassName(command);
+            if (protoName.length && className.length) {
+              if (protoName === 'msgexpress' && className === 'MsgExpress.ErrMessage') {
+                self.buildProtoObject(protoName, className).then(obj => {
+                  try {
+                    const msg = obj.decode(info.view);
+                    callback.handlerError(msg);
+                  } catch (e) {
+                    console.error('ErrMessage', e)
+                  }
+                })
+              } else {
+                self.buildProtoObject(protoName, className).then(obj => {
+                  try {
+                    const msg = obj.decode(info.view);
+                    callback.handleResponse(msg);
+                  } catch (e) {
+                    console.error(proto_response, e)
+                  }
+                })
               }
-            })
-          } else {
-            callback.handlerError(info);
-          }
+            }
+          });
         }
-      });
-      this.ws.send(pack.toArrayBuffer());
-      return true;
+        this.ws.send(pack.toArrayBuffer());
+      } else {
+        return Promise.reject('websocket disconnect.')
+      }
     }
 
     setPushDataFactory(factory) {
@@ -671,14 +620,14 @@
 
     subscribeInfo(prefix, id, callback) {
       var self = this;
-      var subId = this.observer.sub(prefix + id, function (info, extra) {
-        callback(info, extra);
+      var subId = this.observer.sub(prefix + id, function (info, command) {
+        callback(info, command);
         self.observer.unsub(subId);
       });
     }
 
-    publishInfo(prefix, id, info, extra) {
-      this.observer.pub(prefix + id, info, extra);
+    publishInfo(prefix, id, info, command) {
+      this.observer.pub(prefix + id, info, command);
     }
 
     setProtoFileDir(dir) {

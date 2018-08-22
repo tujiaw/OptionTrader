@@ -22,6 +22,11 @@ message CommonResponse { //
   optional string msg = 2;
 }
 
+message RegisterService {
+  optional int32 serviceid=1;
+  repeated string functions=2;
+}
+
 message LoginInfo {
   optional int32  type = 1;
   optional string name = 2;

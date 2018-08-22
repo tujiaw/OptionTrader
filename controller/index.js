@@ -44,7 +44,7 @@ class Controller {
       },
       function onlogin(result) {
         if (result && result === 'success' && self.lastConfig) {
-          cbus.post('Trade.LoginReq', 'Trade.LoginResp', {
+          cbus.post('Trade.LoginReq', {
             userid: self.lastConfig.username, 
             passwd: self.lastConfig.password,
             instruments: self.lastConfig.codeList
@@ -128,13 +128,13 @@ class Controller {
   }
 
   logout() {
-    return cbus.post('Trade.LogoutReq', 'Trade.LogoutResp', {})
+    return cbus.post('Trade.LogoutReq', {})
   }
 
   relogin(config) {
     this.clearAllData()
     this.dispatch.initTradeList(config.codeList, config.lock || 'unlock')
-    return cbus.post('Trade.LoginReq', 'Trade.LoginResp', {
+    return cbus.post('Trade.LoginReq', {
       userid: config.username, 
       passwd: config.password,
       instruments: config.codeList
@@ -147,20 +147,20 @@ class Controller {
   }
 
   cancelReq(orderId) {
-    return cbus.post('Trade.CancelReq', 'Trade.CancelResp', {
+    return cbus.post('Trade.CancelReq', {
       orderid: orderId
     })
   }
 
   modifyReq(orderId, price) {
-    return cbus.post('Trade.ModifyReq', 'Trade.ModifyResp', {
+    return cbus.post('Trade.ModifyReq', {
       orderid: orderId,
       price: price
     })
   }
 
   orderReq(code, price, type) {
-    return cbus.post('Trade.OrderReq', 'Trade.OrderResp', {
+    return cbus.post('Trade.OrderReq', {
       code: code,
       price: price,
       type: type

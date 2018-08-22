@@ -1,43 +1,47 @@
 (function (global, factory) {
-  // CommonJS, Global
-  if (typeof require === 'function' && typeof module === "object" && module && module["exports"]) {
-    module['exports'] = (function () { return factory(require('./cbusCore'), require('./cbusCommand'));})();
-  } else {
-    global['cbus'] = factory(global.CBusCore, global.cbusCommand);
-  }
-})(this, function (CBusCore, cbusCommand) {
+  /* CommonJS */
+  if (typeof require === 'function' && typeof module === "object" && module && module["exports"])
+    module['exports'] = (function () {
+      return factory(require('./cbusCore'));
+    })();
+  /* Global */
+  else
+    global["cbus"] = factory(global.CBusCore);
+})(this, function (CBusCore) {
   const CmdParse = function () {
     this.commandCache = {}
   }
   const cmdParse = new CmdParse();
 
-  // 网络连接状态
-  const ReadyState = {
-    CONNECTING: 0,                            // 连接还没开启
-    OPEN: 1,                                  // 连接已开启并准备好进行通信
-    CLOSING: 2,                               // 连接正在关闭的过程中
-    CLOSED: 3                                 // 连接已经关闭，或者连接无法建立
-  }
-
   class ClientBus {
     constructor() {
-      this._cbusCore = new CBusCore()         // 通信核心
-      this._wsurlList = []                    // 连接地址列表
-      this._lastConnectUrl = ''               // 最后一次连接的地址
-      this._subscribeList = []                // 订阅列表
-      this._publishCallback = null            // 推送消息回调
-      this._subIdStart = 123                  // 订阅ID的起始值
-      this._clientName = 'test'               // 客户端名字
-      this._heartBeatTimer = 0                // 心跳ID
-      this._hearBeatIntervalSecond = 5        // 心跳间隔5秒
-      this._sendqueue = 0                     // 发送的消息数
-      this._receivequeue = 0                  // 接收的消息数
-      this._event = {                         // 网络事件回调
+      this._cbusCore = new CBusCore(cmdParse)       // 通信核心
+      this._wsurlList = []                  // 连接地址列表
+      this._lastConnectUrl = ''             // 最后一次连接的地址
+      this._subscribeList = []              // 订阅列表
+      this._publishCallback = null          // 推送消息回调
+      this._subIdStart = 123                // 订阅ID的起始值
+      this._clientName = 'test'             // 客户端名字
+      this._heartBeatTimer = 0              // 心跳ID
+      this._hearBeatIntervalSecond = 5      // 心跳间隔5秒
+      this._sendqueue = 0                   // 发送的消息数
+      this._receivequeue = 0                // 接收的消息树
+      this._event = {                       // 网络事件回调
         onConnectSuccess: () => {},
         onConnectClose: () => {},
-        onConnectError: () => {},
-        onLoginResult: () => {}
+        onConnectError: () => {}
       }
+      this._onRegisterService = function(data) {
+        console.log('register service:' + JSON.stringify(data));
+        const content = data.content;
+        if (content) {
+          for (let func of content.functions) {
+            const protoFileName = func.substring(0, func.indexOf('.')).toLowerCase();
+            cmdParse.register(func, content.serviceid, protoFileName);
+          }
+        }
+      }
+      cmdParse.init();
     }
 
     /**
@@ -102,7 +106,7 @@
      * @param {(event) => {})} onerror 网络出错回调
      * @memberof ClientBus
      */
-    setEvent(onopen, onclose, onerror, onlogin) {
+    setEvent(onopen, onclose, onerror) {
       if (onopen && typeof onopen !== 'function') {
         throw new TypeError('onopen must be a function');
       }
@@ -112,13 +116,9 @@
       if (onerror && typeof onerror !== 'function') {
         throw new TypeError('onerror must be a function');
       }
-      if (onlogin && typeof onlogin !== 'function') {
-        throw new TypeError('onlogin must be a function');
-      }
-      onopen && (this._event.onConnectSuccess = onopen);
-      onclose && (this._event.onConnectClose = onclose);
-      onerror && (this._event.onConnectError = onerror);
-      onlogin && (this._event.onLoginResult = onlogin);
+      this._event.onConnectSuccess = onopen;
+      this._event.onConnectClose = onclose;
+      this._event.onConnectError = onerror;
     }
 
     /**
@@ -154,13 +154,6 @@
      * @memberof ClientBus
      */
     open(wsurl, subcribeList) {
-      if (!isString(wsurl) && !isArray(wsurl)) {
-        throw new TypeError('wsurl must be an array or string!')
-      }
-      if (subcribeList && !isArray(subcribeList)) {
-        throw new TypeError('subcribeList must be an array!')
-      }
-
       const self = this;
       this._wsurlList = isArray(wsurl) ? wsurl : [wsurl];
       this._subscribeList = subcribeList || [];
@@ -218,12 +211,10 @@
       const loop = (failedCount, failedMsg) => {
         self._cbusCore.close();
         if (failedCount >= self._wsurlList.length) {
-          self._event.onLoginResult(failedMsg);
           return Promise.reject(failedMsg);
         } else {
           return go().then(() => {
             self.startHeartBeat();
-            self._event.onLoginResult('success');
             return Promise.resolve('success');
           }).catch((msg) => {
             return loop(++failedCount, msg);
@@ -268,7 +259,7 @@
         starttime: new Date().getTime(),
         auth: 'test'
       }
-      return this.post('MsgExpress.LoginInfo', 'MsgExpress.LoginResponse', loginData)
+      return this.post('MsgExpress.LoginInfo', loginData)
     }
 
     /**
@@ -287,8 +278,8 @@
           if (isNaN(protoList[i])) {
             // proto中的协议名，新的订阅方式，如：StockServer.StockDataRequest, StockServer.StockDataResponse
             const arr = protoList[i].split(',');
-            if (arr.length === 2) {
-              cmd = cmdParse.getCommandFromProto(arr[0].trim(), arr[1].trim());
+            if (arr.length >= 1) {
+              cmd = cmdParse.getCommand(arr[0].trim());
             } else {
               console.error('subscribe params error', protoList[i]);
             }
@@ -303,52 +294,9 @@
             objList.push(newObj);
           }
         }
-        return this.post("MsgExpress.ComplexSubscribeData", "MsgExpress.CommonResponse", {
+        return this.post("MsgExpress.ComplexSubscribeData", {
           sub: objList
         })
-      })
-    }
-
-    /**
-     * 解析老的方式推送的消息
-     * 
-     * @param {string} protoFilename proto的名字
-     * @param {object} jsonContent 老的方式推送的消息
-     * @returns promise protobuf解析后的消息
-     * @memberof ClientBus
-     */
-    parseOldPublishMessage(protoFilename, jsonContent) {
-      // const msgExpress = {
-      //   KEY_UUID: 1,KEY_AUTH: 2,KEY_ADDR: 3,KEY_NAME: 4,KEY_TYPE: 5,KEY_GROUP: 6,
-      //   KEY_IP: 7,KEY_STARTTIME: 8,KEY_LOGINTIME: 9,KEY_SERVICE: 10,KEY_HBTIME: 20,
-      //   KEY_CPU: 21,KEY_TOPMEM: 22,KEY_MEM: 23,KEY_CSQUEUE: 24,KEY_CRQUEUE: 25,
-      //   KEY_QUEUELENGTH: 29,KEY_RECVREQUEST: 30,KEY_SENTREQUEST: 31,KEY_RECVRESPONSE: 32,
-      //   KEY_SENTRESPONSE: 33,KEY_RECVPUBLISH: 34,KEY_SENTPUBLISH: 35,KEY_RECVREQUESTB: 36,
-      //   KEY_SENTREQUESTB: 37,KEY_RECVRESPONSEB: 38,KEY_SENTRESPONSEB: 39,KEY_RECVPUBLISHB: 40,
-      //   KEY_SENTPUBLISHB: 41,KEY_LOGLEVEL: 61,KEY_LOGDATA: 62, KEY_TIME: 11 ,KEY_BROKER:12
-      // };
-      return new Promise((resolve, reject) => {
-        if (jsonContent.length < 2) {
-          return reject('json content error')
-        }
-
-        const name = jsonContent[0].value
-        const content = jsonContent[1].value
-        const arr = content.split(',')
-        var bb = new Uint8Array(arr.length)
-        for (let i = 0, count = arr.length; i < count; i++) {
-          bb[i] = arr[i]
-        }
-
-        this._cbusCore.buildProtoObject(protoFilename, name)
-          .then((Msg) => {
-            try {
-              const decodedMsg = Msg.decode(bb)
-              return resolve(decodedMsg)
-            } catch (e) {
-              return reject(e)
-            }
-          })
       })
     }
 
@@ -361,32 +309,33 @@
      * @returns promise protoResponse对应的结构
      * @memberof ClientBus
      */
-    post(protoRequest, protoResponse, requestObj) {
-      return this.postProto(cmdParse.getProtoFilename(protoRequest), protoRequest, protoResponse, requestObj)
+    post(protoRequest, requestObj) {
+      return this.postProto(cmdParse.getProtoFileName(protoRequest), protoRequest, requestObj)
     }
 
     /**
      * 发送消息，指定对应的proto文件名
      * 
-     * @param {any} protoFilename proto文件名
+     * @param {any} protoFileName proto文件名
      * @param {any} protoRequest 请求协议名
      * @param {any} protoResponse 应答协议名
      * @param {any} requestObj 请求传入的数据，结构对应请求的协议名
      * @returns promise protoResponse对应的结构
      * @memberof ClientBus
      */
-    postProto(protoFilename, protoRequest, protoResponse, requestObj) {
+    postProto(protoFileName, protoRequest, requestObj) {
+      console.log('post:' + protoFileName + ',' + protoRequest)
       const self = this;
       return new Promise((resolve, reject) => {
-        const cmd = cmdParse.getCommandFromProto(protoRequest, protoResponse)
+        const cmd = cmdParse.getCommand(protoRequest)
         if (!cmd) {
-          console.error('command error, request:' + protoRequest + ', response:' + protoResponse)
-          return reject('command error, request:' + protoRequest + ', response:' + protoResponse)
+          console.error('command error, request:' + protoRequest)
+          return reject('command error, request:' + protoRequest)
         }
 
         ++self._sendqueue;
-        //console.log('postProto cmd:' + cmd + ', file:' + protoFilename + ', request:' + protoRequest + ', response:' + protoRequest)
-        this._cbusCore.requestOnce(cmd, protoFilename, protoRequest, protoResponse, {
+        //console.log('postProto cmd:' + cmd + ', file:' + protoFileName + ', request:' + protoRequest + ', response:' + protoRequest)
+        this._cbusCore.requestOnce(cmd, protoFileName, protoRequest, {
           fillRequest: function (request) {
             Object.assign(request, requestObj)
           },
@@ -397,8 +346,8 @@
           handlerError: function (err) {
             return reject(err)
           }
-        }).then(() => {}).catch(err => {
-          return reject(err);
+        }).catch(err => {
+          console.log('request once error', err);
         });
       })
     }
@@ -415,13 +364,14 @@
       let heartbeatFailedCount = 0;
       // 正在登录中
       let isOpening = false;
-      
-      // 处理心跳失败，如果失败3次则进行重连
-      const handleHeartbeatError = (err) => {
+
+      /**
+       * 处理心跳失败，如果失败3次则进行重连
+       */
+      const handleHeartbeatError = () => {
         ++heartbeatFailedCount;
-        console.error(`heartbeat failed, count:${heartbeatFailedCount}, isOpening:${isOpening}, err:${err}`);
-        // 如果没有连接正在打开，并且失败的次数大于等于3或者连接已经关闭，立马重连
-        if (!isOpening && (heartbeatFailedCount >= 3 || this.readyState() === ReadyState.CLOSED)) {
+        console.log('heartbeat failed, count:' + heartbeatFailedCount + ', isOpening:' + isOpening);
+        if (!isOpening && heartbeatFailedCount >= 3) {
           heartbeatFailedCount = 0;
           isOpening = true;
           this.open(this._wsurlList, this._subscribeList).then(() => {
@@ -432,9 +382,11 @@
         }
       }
 
-      // 开始心跳Timer
+      /**
+       * 开始心跳Timer
+       */
       this._heartBeatTimer = setInterval(() => {
-        if (this.readyState() !== ReadyState.OPEN) {
+        if (this.readyState() !== 1) {
           handleHeartbeatError('readystate is not open, readyState:' + this.readyState);
           return
         }
@@ -450,13 +402,9 @@
         if (this._sendqueue % 10 === 0) {
           console.log('heartbeat', data);
         }
-
-        this.post("MsgExpress.HeartBeat", "MsgExpress.HeartBeatResponse", data).then((json) => {
-          if (json.retcode === 0) {
-            heartbeatFailedCount = 0;
-          } else {
-            console.log('heartbeat response failed', json);
-          }
+        
+        this.post("MsgExpress.HeartBeat", data).then((res) => {
+          console.log('heartbeat response:' + JSON.stringify(res));
         }).catch((err) => {
           handleHeartbeatError(err);
         })
@@ -500,7 +448,7 @@
         return;
       }
 
-      const proto = cmdParse.getProtoFromCommand(topic)
+      const proto = cmdParse.getClassName(topic)
       if (!proto || !content || !content.length) {
         console.log('get proto from command failed, topic:' + topic + ',content:' + content)
         return
@@ -508,130 +456,125 @@
 
       const data = {}
       data.topic = topic;
-      data.request = proto.request;
-      data.response = proto.response;
-      if (isArray(content)) {
-        // 老协议，如果定义了proto可以调用ClientBus.parsePublishMessage解析，否则用户自己去根据key-value解析
-        data.old = true;
-        data.content = content;
-        this._publishCallback(data);
-      } else {
-        data.old = false;
-        const protoName = cmdParse.getProtoFilename(proto.request);
-        if (protoName.length === 0) {
-          return;
-        }
-
-        return this._cbusCore.buildProtoObject(protoName, proto.request).then(Msg => {
-          try {
-            data.content = Msg.decode(content)
+      data.request = proto;
+      return this._cbusCore.buildProtoObject(cmdParse.getProtoFileName(proto), proto).then(Msg => {
+        try {
+          data.content = Msg.decode(content)
+          if (proto === 'MsgExpress.RegisterService' && this._onRegisterService) {
+            this._onRegisterService(data);
+          } else {
             this._publishCallback(data);
-          } catch (e) {
-            console.log('dispatchPublishMessage', proto.request, e)
           }
-        })
-      }
-    }
-  }
-
-  CmdParse.prototype.getCommandFromProto = function (proto_request, proto_response) {
-    proto_response = proto_response || 'MsgExpress.CommonResponse'
-    const proto_str = proto_request + '-' + proto_response
-    if (this.commandCache[proto_str]) {
-      return this.commandCache[proto_str]
-    }
-
-    for (let i = 0, appCount = cbusCommand.AppList.length; i < appCount; i++) {
-      const app = cbusCommand.AppList[i]
-      const header = app['$']
-      if (!header || !app['function']) {
-        continue;
-      }
-
-      for (let j = 0, funcCount = app['function'].length; j < funcCount; j++) {
-        const func = app['function'][j]
-        const funcObj = func['$']
-        if (funcObj) {
-          if (funcObj.request === proto_request && funcObj.response === proto_response) {
-            const val = (parseInt(header.id, 10) << 20) | parseInt(funcObj.id, 10)
-            this.commandCache[proto_str] = val
-            return val
-          }
+        } catch (e) {
+          console.log('dispatchPublishMessage', proto.request, e)
         }
-      }
+      })
     }
-    console.error('getCommandFromProto error, request:' + proto_response + ', response:' + proto_response)
-    return 0
-  }
-  CmdParse.prototype.getProtoFromCommand = function (cmd) {
-    const appId = cmd >> 20
-    const funcId = (cmd - ((cmd >> 20) << 20))
-    for (let i = 0, appCount = cbusCommand.AppList.length; i < appCount; i++) {
-      const app = cbusCommand.AppList[i]
-      const header = app['$']
-      if (!header || !app['function']) {
-        continue
-      }
-
-      if (parseInt(header.id, 10) !== appId) {
-        continue
-      }
-
-      for (let j = 0, funcCount = app['function'].length; j < funcCount; j++) {
-        const func = app['function'][j]
-        const funcObj = func['$']
-        if (funcObj) {
-          if (parseInt(funcObj.id, 10) === funcId) {
-            return {
-              request: funcObj.request,
-              response: funcObj.response
-            }
-          }
-        }
-      }
-    }
-    console.error('getProtoFromCommand error, cmd:' + cmd)
-    return undefined;
-  }
-  CmdParse.prototype.getProtoFilename = function (proto) {
-    const prefix = proto.substring(0, proto.indexOf('.'))
-    for (let file of cbusCommand.ProtoFileList) {
-      if (file.package === prefix) {
-        return file.filename
-      }
-    }
-    console.error('get proto filename error, proto:' + proto)
-    return ''
   }
 
-  /**
-   * 判断是否是数组
-   * 
-   * @param {any} obj 
-   * @returns 
-   */
   function isArray(obj) {
     return Object.prototype.toString.call(obj) === '[object Array]';
   }
-  /**
-   * 判断是否是字符串
-   * 
-   * @param {any} obj 
-   * @returns 
-   */
-  function isString(obj) {
-    return Object.prototype.toString.call(obj) === "[object String]";
-  }
-  /**
-   * 生成GUID
-   * 
-   * @returns 
-   */
+
   function guid() {
     function s4() {
-      return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+      return Math.floor((1 + Math.random()) * 0x10000)
+        .toString(16)
+        .substring(1);
     }
     return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+  }
+
+  CmdParse.prototype.init = function() {
+    this.register('MsgExpress.ErrMessage', 0, 'msgexpress')
+    this.register('MsgExpress.CommonResponse', 0, 'msgexpress')
+    this.register('MsgExpress.PublishData', 0, 'msgexpress')
+    this.register('MsgExpress.LoginInfo', 0, 'msgexpress')
+    this.register('MsgExpress.LoginResponse', 0, 'msgexpress')
+    this.register('MsgExpress.Logout', 0, 'msgexpress')
+    this.register('MsgExpress.HeartBeat', 0, 'msgexpress')
+    this.register('MsgExpress.HeartBeatResponse', 0, 'msgexpress')
+    this.register('MsgExpress.SimpleSubscription', 0, 'msgexpress')
+    this.register('MsgExpress.SubscribeData', 0, 'msgexpress')
+    this.register('MsgExpress.UnSubscribeData', 0, 'msgexpress')
+    this.register('MsgExpress.ComplexSubscribeData', 0, 'msgexpress')
+    this.register('MsgExpress.GetAppList', 0, 'msgexpress')
+    this.register('MsgExpress.AppList', 0, 'msgexpress')
+    this.register('MsgExpress.GetAppInfo', 0, 'msgexpress')
+    this.register('MsgExpress.AppInfo', 0, 'msgexpress')
+    this.register('MsgExpress.UpdateAppStatus', 0, 'msgexpress')
+    this.register('MsgExpress.AppServerList', 0, 'msgexpress')
+    this.register('MsgExpress.BrokerInfo', 0, 'msgexpress')
+    this.register('MsgExpress.RegisterService', 0, 'msgexpress')
+
+    this.register('Gateway.CommonResponse', 1, 'gateway')
+    this.register('Gateway.Login', 1, 'gateway')
+    this.register('Gateway.Logout', 1, 'gateway')
+    this.register('Gateway.Subscribe', 1, 'gateway')
+    this.register('Gateway.SubscribeResult', 1, 'gateway')
+  }
+
+  CmdParse.prototype.register = function(className, serviceId, protoFileName) {
+    this.commandCache[className] = {
+      command: this.hashCode(className),
+      serviceId: serviceId,
+      protoFileName: protoFileName || '',
+    }
+  }
+
+  CmdParse.prototype.hashCode = function(str) {
+    let code = 0;
+    for (let i = 0; i < str.length; i++) {
+        code = code * 31 + str.charCodeAt(i);
+        code &= code;
+    }
+    return code
+  }
+
+  CmdParse.prototype.getCommand = function(className) {
+    if (this.commandCache[className]) {
+      return this.commandCache[className].command;
+    }
+    console.error('getCommand error, className:' + className);
+    return -1;
+  }
+  
+  CmdParse.prototype.getClassName = function(command) {
+    for (let key in this.commandCache) {
+      if (this.commandCache[key].command == command) {
+          return key;
+      }
+    }
+    console.error('getClassName error, command:' + command);
+    return '';
+  }
+
+  CmdParse.prototype.getServiceId = function(classNameOrCommand) {
+    let info = undefined;
+    if (typeof(classNameOrCommand) === 'string') {
+      info = this.commandCache[className];
+    } else {
+      info = this.commandCache[this.getClassName(classNameOrCommand)];
+    }
+    if (info) {
+      return info.serviceId;
+    }
+    console.error('getServiceId error, classNameOrCommand:' + classNameOrCommand);
+    return -1;
+  }
+
+  CmdParse.prototype.getProtoFileName = function (classNameOrCommand) {
+    let info = undefined;
+    if (typeof(classNameOrCommand) === 'string') {
+      info = this.commandCache[classNameOrCommand];
+    } else {
+      info = this.commandCache[this.getClassName(classNameOrCommand)];
+    }
+    if (info) {
+      return info.protoFileName;
+    }
+    console.error('getServiceId error, classNameOrCommand:' + classNameOrCommand);
+    return '';
   }
 
   return new ClientBus();
