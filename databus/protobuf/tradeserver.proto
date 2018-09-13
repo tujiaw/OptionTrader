@@ -1,4 +1,4 @@
-package Trade;
+package TradeServer;
 
 message LoginReq { 
   required string userid = 1; //用户id
@@ -36,11 +36,14 @@ message OrderReq {
   required string code = 1;
   required double price = 2;
   required int32 type = 3; //定义见ORDER_TYPE
+  optional string ref = 4; //填“mobile”
 }
 
 message OrderResp { 
   required int32 retCode = 1;
   optional string msg = 2;
+  optional int32 requestId=3;
+  optional string ref = 4;
 }
 
 message CancelReq { 
@@ -70,7 +73,8 @@ message MarketDataReq {
 message MarketDataResp { 
   required string code = 1;
   required string date = 2;
-  repeated MarketData data = 3;}
+  repeated MarketData data = 3;
+}
 
 message TradingAccount { 
     optional double dPreBalance=1;                            // 上次结算准备金
@@ -101,7 +105,7 @@ message MarketData {
 
 message Position { 
     optional string szINSTRUMENT=1;			// 合约ID
-	optional int32 nTradeDir=2;                              // 交易方向(买=0,卖=1)
+	optional int32 nTradeDir=2;                              // 交易方向(买,卖)
 	optional double dAvgPrice=3;                              // 持仓均价
 	optional int32 nPosition=4;                              // 总持仓量
 	optional int32 nYesterdayPosition=5;                     // 昨仓

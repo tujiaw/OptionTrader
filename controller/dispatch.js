@@ -140,7 +140,7 @@ setInterval(() => {
 }, 2000)
 
 const handlePublish = {
-  'Trade.TradingAccount': (content) => {
+  'TradeServer.TradingAccount': (content) => {
     const obj = {
       dynamicEquity: content.dDynamicEquity || 0 ,
       frozenCapital: content.dFrozenCapital || 0,
@@ -151,7 +151,7 @@ const handlePublish = {
     obj.avaiableCapital = Math.round(obj.avaiableCapital)
     store.dispatch(capitalStateAction.update(obj))
   },
-  'Trade.MarketData': (content) => {
+  'TradeServer.MarketData': (content) => {
     const code = content.szINSTRUMENT.trim()
     if (!(code && code.length)) {
       console.error('Trade.MarketData', content)
@@ -197,7 +197,7 @@ const handlePublish = {
     }
     updateTradeData(tradeData)
   },
-  'Trade.Order': (content) => {
+  'TradeServer.Order': (content) => {
     if (!(content.nOrderID)) {
       console.error('Trade.Order', content)
       return
@@ -228,7 +228,7 @@ const handlePublish = {
     const tips = `Order:(${code} ${dir} ${oper} ${content.dLimitPrice} ${state})`
     store.dispatch(tradeAction.updateTips({code: code, tips: tips}))
   },
-  'Trade.Trade': (content) => {
+  'TradeServer.Trade': (content) => {
     if (!(content.nOrderID)) {
       console.error('Trade.Trade', content)
       return
@@ -241,7 +241,7 @@ const handlePublish = {
     const tips = `Trade:(${code} ${dir} ${oper} ${content.dPrice})`
     store.dispatch(tradeAction.updateTips({code: code, tips: tips}))
   },
-  'Trade.Position': (content) => {
+  'TradeServer.Position': (content) => {
     const code = content.szINSTRUMENT.trim()
     if (!(code && code.length && content.hasOwnProperty('nTradeDir'))) {
       console.error('Trade.Position', content)

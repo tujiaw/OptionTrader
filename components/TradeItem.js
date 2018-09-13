@@ -40,8 +40,8 @@ function LeftTop(props) {
 
 function RightTop(props) {
   const {data, editPrice, onValueAdd, onValueChanged} = props
-  const buttons = ['+', '-', '++', '--']
-  const values = [0.2, -0.2, 1, -1]
+  const buttons = ['++', '--']
+  const values = [1, -1]
   return (
     <View style={styles.rightTop}>
       <View style={styles.rightTopRow1}>
@@ -49,16 +49,12 @@ function RightTop(props) {
         <Text>{'Sell:' + (data.emptyPosition || '0')}</Text>
         <Text>{'L'}</Text>
       </View>
-      <View>
-        <Input value={editPrice || ''} onChangeText={onValueChanged} />
-      </View>
-      <View style={styles.rightTopRow3}>
-        <ButtonGroup 
-          buttons={buttons}
-          containerStyle={styles.plusButtonGroup}
-          textStyle={styles.buttonText}
-          onPress={(index) => { onValueAdd && onValueAdd(values[index]) }}
-        />
+      <View style={styles.rightCenter}>
+        <Input containerStyle={styles.inputContainerStyle} value={editPrice || ''} onChangeText={onValueChanged} />        
+        <View style={styles.rightButtonGroup}>
+          <Button title="++" buttonStyle={styles.rightButtonStyle} onPress={() => onValueAdd(1) } />
+          <Button title="--" buttonStyle={styles.rightButtonStyle} onPress={() => onValueAdd(-1) } />
+        </View>
       </View>
     </View>
   )
@@ -166,35 +162,41 @@ const styles = StyleSheet.create({
   },
   rightTop: {
     flex: 1,
-    flexDirection: 'column'
+    flexDirection: 'column',
+  },
+  rightCenter: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10
+  },
+  inputContainerStyle: {
+    width: 100,
   },
   rightTopRow1: {
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-around'
   },
-  rightTopRow2: {
+  rightButtonGroup: {
     flex: 1,
+    flexDirection: 'column',
   },
-  rightTopRow3: {
-    flex: 1,
-    flexDirection: 'row'
-  },
-  plusButtonGroup: {
-    flex: 1,
-    maxHeight: 20,
+  rightButtonStyle: {
+    width: 70,
+    height: 30,
+    marginTop: 5,
+    marginBottom: 5,
   },
   operButtonGroup: {
+    marginTop: 15,
     minHeight: 60,
     maxHeight: 60,
-  },
-  buttonStyle: {
-    width: 5,
   },
   tips: {
     color: 'darkgrey',
   },
   buttonText: {
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   }
 })

@@ -1,32 +1,390 @@
 {
   "nested": {
     "StockServer": {
+      "options": {
+        "java_package": "com.protobuf",
+        "java_outer_classname": "StockServer"
+      },
       "nested": {
-        "TickData": {
+        "Period": {
+          "values": {
+            "DAY": 1,
+            "WEEK": 2,
+            "MONTH": 3,
+            "YEAR": 4
+          }
+        },
+        "StockData": {
           "fields": {
             "datetime": {
+              "type": "string",
+              "id": 1
+            },
+            "open": {
+              "type": "float",
+              "id": 2
+            },
+            "close": {
+              "type": "float",
+              "id": 3
+            },
+            "low": {
+              "type": "float",
+              "id": 4
+            },
+            "high": {
+              "type": "float",
+              "id": 5
+            },
+            "volume": {
+              "type": "float",
+              "id": 6
+            },
+            "amount": {
+              "type": "float",
+              "id": 7
+            },
+            "lastclose": {
+              "type": "float",
+              "id": 8
+            },
+            "code": {
+              "type": "string",
+              "id": 9
+            }
+          }
+        },
+        "StockDataRequest": {
+          "fields": {
+            "code": {
               "rule": "required",
               "type": "string",
               "id": 1
             },
-            "price": {
+            "type": {
               "rule": "required",
+              "type": "int32",
+              "id": 2
+            },
+            "per": {
+              "rule": "required",
+              "type": "Period",
+              "id": 3
+            },
+            "from": {
+              "type": "string",
+              "id": 4,
+              "options": {
+                "default": "0"
+              }
+            },
+            "to": {
+              "type": "string",
+              "id": 5,
+              "options": {
+                "default": "0"
+              }
+            },
+            "num": {
+              "type": "int32",
+              "id": 6,
+              "options": {
+                "default": 20
+              }
+            }
+          }
+        },
+        "StockDataResponse": {
+          "fields": {
+            "code": {
+              "rule": "required",
+              "type": "string",
+              "id": 1
+            },
+            "per": {
+              "rule": "required",
+              "type": "Period",
+              "id": 2
+            },
+            "data": {
+              "rule": "repeated",
+              "type": "StockData",
+              "id": 3,
+              "options": {}
+            }
+          }
+        },
+        "TickData": {
+          "fields": {
+            "datetime": {
+              "type": "string",
+              "id": 1
+            },
+            "price": {
               "type": "float",
               "id": 2
             },
             "volume": {
-              "rule": "required",
               "type": "float",
               "id": 3
             },
             "amount": {
-              "rule": "required",
               "type": "float",
               "id": 4
             },
             "code": {
               "type": "string",
               "id": 5
+            }
+          }
+        },
+        "StockUpdownCount": {
+          "fields": {
+            "shup": {
+              "type": "int32",
+              "id": 1
+            },
+            "shdown": {
+              "type": "int32",
+              "id": 2
+            },
+            "shflat": {
+              "type": "int32",
+              "id": 3
+            },
+            "szup": {
+              "type": "int32",
+              "id": 4
+            },
+            "szdown": {
+              "type": "int32",
+              "id": 5
+            },
+            "szflat": {
+              "type": "int32",
+              "id": 6
+            },
+            "cyup": {
+              "type": "int32",
+              "id": 7
+            },
+            "cydown": {
+              "type": "int32",
+              "id": 8
+            },
+            "cyflat": {
+              "type": "int32",
+              "id": 9
+            },
+            "datetime": {
+              "type": "string",
+              "id": 10
+            }
+          }
+        },
+        "TickDataRequest": {
+          "fields": {
+            "code": {
+              "rule": "required",
+              "type": "string",
+              "id": 1
+            },
+            "datetime": {
+              "rule": "required",
+              "type": "string",
+              "id": 2
+            }
+          }
+        },
+        "TickDataResponse": {
+          "fields": {
+            "code": {
+              "rule": "required",
+              "type": "string",
+              "id": 1
+            },
+            "data": {
+              "rule": "repeated",
+              "type": "TickData",
+              "id": 2,
+              "options": {}
+            }
+          }
+        },
+        "StockInfo": {
+          "fields": {
+            "code": {
+              "rule": "required",
+              "type": "string",
+              "id": 1
+            },
+            "name": {
+              "rule": "required",
+              "type": "string",
+              "id": 2
+            },
+            "per": {
+              "type": "float",
+              "id": 3
+            },
+            "pb": {
+              "type": "float",
+              "id": 4
+            },
+            "mktcap": {
+              "type": "float",
+              "id": 5
+            },
+            "nmc": {
+              "type": "float",
+              "id": 6
+            }
+          }
+        },
+        "StockInfoRequest": {
+          "fields": {
+            "type": {
+              "rule": "required",
+              "type": "int32",
+              "id": 1
+            }
+          }
+        },
+        "StockInfoResponse": {
+          "fields": {
+            "data": {
+              "rule": "repeated",
+              "type": "StockInfo",
+              "id": 1,
+              "options": {}
+            }
+          }
+        },
+        "NewStockDataRequest": {
+          "fields": {
+            "dummy": {
+              "type": "string",
+              "id": 1
+            }
+          }
+        },
+        "NewStockInfo": {
+          "fields": {
+            "code": {
+              "rule": "required",
+              "type": "string",
+              "id": 1
+            },
+            "name": {
+              "rule": "required",
+              "type": "string",
+              "id": 2
+            },
+            "applyupper": {
+              "type": "string",
+              "id": 3
+            },
+            "ipoprice": {
+              "type": "string",
+              "id": 4
+            },
+            "listdate": {
+              "type": "string",
+              "id": 5
+            },
+            "lotteryrate": {
+              "type": "string",
+              "id": 6
+            },
+            "peratio": {
+              "type": "string",
+              "id": 7
+            },
+            "industryratio": {
+              "type": "string",
+              "id": 8
+            },
+            "tradingnum": {
+              "type": "int32",
+              "id": 9
+            },
+            "tradingrange": {
+              "type": "float",
+              "id": 10
+            },
+            "retreatrange": {
+              "type": "float",
+              "id": 11
+            },
+            "secondrange": {
+              "type": "float",
+              "id": 12
+            }
+          }
+        },
+        "NewStockDataResponse": {
+          "fields": {
+            "data": {
+              "rule": "repeated",
+              "type": "NewStockInfo",
+              "id": 1,
+              "options": {}
+            }
+          }
+        },
+        "IpoDataRequest": {
+          "fields": {
+            "dummy": {
+              "type": "string",
+              "id": 1
+            }
+          }
+        },
+        "IpoInfo": {
+          "fields": {
+            "code": {
+              "rule": "required",
+              "type": "string",
+              "id": 1
+            },
+            "name": {
+              "rule": "required",
+              "type": "string",
+              "id": 2
+            },
+            "applycode": {
+              "type": "string",
+              "id": 3
+            },
+            "applyupper": {
+              "type": "string",
+              "id": 4
+            },
+            "ipoprice": {
+              "type": "string",
+              "id": 5
+            },
+            "listdate": {
+              "type": "string",
+              "id": 6
+            },
+            "peratio": {
+              "type": "string",
+              "id": 7
+            },
+            "industryratio": {
+              "type": "string",
+              "id": 8
+            }
+          }
+        },
+        "IpoDataResponse": {
+          "fields": {
+            "data": {
+              "rule": "repeated",
+              "type": "IpoInfo",
+              "id": 1,
+              "options": {}
             }
           }
         }

@@ -27,7 +27,7 @@ class Controller {
 
     cbus.initProtoJson([
       { name: 'msgexpress', json: require('../databus/protobuf/msgexpress.json') },
-      { name: 'trade', json: require('../databus/protobuf/trade.json') },
+      { name: 'tradeserver', json: require('../databus/protobuf/tradeserver.json') },
       { name: 'stockserver', json: require('../databus/protobuf/stockserver.json') }
     ]);
 
@@ -46,7 +46,7 @@ class Controller {
         setTimeout(() => {
           console.log('onlogin result', result);
           if (result && result === 'success' && self.lastConfig) {
-            cbus.post('Trade.LoginReq', {
+            cbus.post('TradeServer.LoginReq', {
               userid: self.lastConfig.username, 
               passwd: self.lastConfig.password,
               instruments: self.lastConfig.codeList
@@ -131,13 +131,13 @@ class Controller {
   }
 
   logout() {
-    return cbus.post('Trade.LogoutReq', {})
+    return cbus.post('TradeServer.LogoutReq', {})
   }
 
   relogin(config) {
     this.clearAllData()
     this.dispatch.initTradeList(config.codeList, config.lock || 'unlock')
-    return cbus.post('Trade.LoginReq', {
+    return cbus.post('TradeServer.LoginReq', {
       userid: config.username, 
       passwd: config.password,
       instruments: config.codeList
@@ -150,20 +150,20 @@ class Controller {
   }
 
   cancelReq(orderId) {
-    return cbus.post('Trade.CancelReq', {
+    return cbus.post('TradeServer.CancelReq', {
       orderid: orderId
     })
   }
 
   modifyReq(orderId, price) {
-    return cbus.post('Trade.ModifyReq', {
+    return cbus.post('TradeServer.ModifyReq', {
       orderid: orderId,
       price: price
     })
   }
 
   orderReq(code, price, type) {
-    return cbus.post('Trade.OrderReq', {
+    return cbus.post('TradeServer.OrderReq', {
       code: code,
       price: price,
       type: type

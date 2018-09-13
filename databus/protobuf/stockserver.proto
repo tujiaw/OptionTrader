@@ -11,15 +11,15 @@ enum Period {
 }
 
 message StockData {
-	required string datetime = 1;
-	required float open = 2;
-	required float close = 3;
-	required float low = 4;
-	required float high = 5;
-	required float volume = 6;
-	required float amount = 7;
+	optional string datetime = 1;
+	optional float open = 2;
+	optional float close = 3;
+	optional float low = 4;
+	optional float high = 5;
+	optional float volume = 6;
+	optional float amount = 7;
 	optional float lastclose =8;// 昨收
-
+	optional string code = 9;
 }
 
 //如果from和to都是0，则查最新的num条数据，如果from有值，to=0，则从from（包含）开始查num条数据，如果from=0，to有值，则从to（包含）向前查num条数据
@@ -39,11 +39,24 @@ message StockDataResponse {
 }
 
 message TickData {
-    required string datetime=1;
-	required float price=2; //价格
-	required float volume = 3;
-	required float amount = 4;
+    optional string datetime=1;
+	optional float price=2; //价格
+	optional float volume = 3;
+	optional float amount = 4;
 	optional string code = 5;	
+}
+
+message StockUpdownCount {
+    optional int32 shup =1;
+	optional int32 shdown =2 ;
+	optional int32 shflat =3;
+	optional int32 szup =4;
+	optional int32 szdown =5 ;
+	optional int32 szflat =6;
+	optional int32 cyup =7;
+	optional int32 cydown =8 ;
+	optional int32 cyflat =9;
+	optional string datetime=10;
 }
 
 message TickDataRequest {

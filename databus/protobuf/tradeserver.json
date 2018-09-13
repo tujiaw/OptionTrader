@@ -1,6 +1,6 @@
 {
   "nested": {
-    "Trade": {
+    "TradeServer": {
       "nested": {
         "LoginReq": {
           "fields": {
@@ -17,7 +17,10 @@
             "instruments": {
               "rule": "repeated",
               "type": "string",
-              "id": 3
+              "id": 3,
+              "options": {
+                "packed": false
+              }
             }
           }
         },
@@ -35,7 +38,10 @@
             "instruments": {
               "rule": "repeated",
               "type": "string",
-              "id": 3
+              "id": 3,
+              "options": {
+                "packed": false
+              }
             }
           }
         },
@@ -71,6 +77,10 @@
               "rule": "required",
               "type": "int32",
               "id": 3
+            },
+            "ref": {
+              "type": "string",
+              "id": 4
             }
           }
         },
@@ -84,6 +94,14 @@
             "msg": {
               "type": "string",
               "id": 2
+            },
+            "requestId": {
+              "type": "int32",
+              "id": 3
+            },
+            "ref": {
+              "type": "string",
+              "id": 4
             }
           }
         },
@@ -165,7 +183,8 @@
             "data": {
               "rule": "repeated",
               "type": "MarketData",
-              "id": 3
+              "id": 3,
+              "options": {}
             }
           }
         },

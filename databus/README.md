@@ -61,4 +61,10 @@ pbjs -t json file1.proto file2.proto > bundle.json
 ```
 > 原因是：react native中protobufjs没办法直接读取proto文件
 
+编译：
+```
+$ cd android
+$ gradlew.bat assembleRelease
+```
+
 
